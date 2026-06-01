@@ -314,8 +314,7 @@ También puede utilizarse un modelo como `embeddinggemma`, siguiendo la document
 ollama run embeddinggemma "Hello world"
 ```
 
-> 🖼️ **Espacio para captura sugerida:** salida JSON o vector generada por un modelo de embeddings.  
-> Archivo sugerido: `assets/img/llm/13-ollama-embeddings.png`
+![Ollama](assets/img/llm/embed.png)
 
 ---
 
@@ -341,9 +340,6 @@ ollama run hf.co/Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
 
 > ⚠️ **Consideración importante:** usar `hf.co/...` con Ollama requiere que el repositorio sea compatible, normalmente porque contiene archivos GGUF. Si el modelo solo está en Safetensors, no necesariamente podrá ejecutarse directamente con Ollama.
 
-> 🖼️ **Espacio para captura requerida:** página de Hugging Face con el menú `Use this model` → `Ollama`.  
-> Archivo sugerido: `assets/img/llm/14-huggingface-use-with-ollama.png`
-
 ---
 
 ## 15. Modelos sugeridos para la actividad
@@ -358,18 +354,13 @@ ollama pull mistral:7b
 ollama pull phi4-mini
 ollama pull tinyllama:1.1b-chat-v1-q8_0
 ```
-
-> 🖼️ **Espacio para captura requerida:** terminal mostrando descarga de modelos.  
-> Archivo sugerido: `assets/img/llm/15-ollama-pull-modelos.png`
-
 Después de descargarlos, revisar los modelos instalados:
 
 ```bash
 ollama ls
 ```
 
-> 🖼️ **Espacio para captura requerida:** terminal mostrando `ollama ls` con nombre, ID, tamaño y fecha de instalación.  
-> Archivo sugerido: `assets/img/llm/16-ollama-ls-modelos.png`
+![Ollama](assets/img/llm/modelos.png)
 
 ---
 
@@ -405,10 +396,6 @@ Incluye un ejemplo breve para cada riesgo.
 Dame un ejemplo de cómo un estudiante de ingeniería podría usar un LLM
 para apoyar el desarrollo de un proyecto con ESP32, sin sustituir su aprendizaje.
 ```
-
-> 🖼️ **Espacio para captura requerida:** respuesta de al menos tres modelos al mismo prompt.  
-> Archivo sugerido: `assets/img/llm/17-comparacion-respuestas-modelos.png`
-
 ---
 
 ## 17. Tabla comparativa de modelos
@@ -431,7 +418,7 @@ La siguiente tabla se llena con información de Hugging Face, Ollama y la termin
 
 ---
 
-## 18. Actividad práctica
+## 18. Práctica 1
 
 ### Nombre de la actividad
 
@@ -439,11 +426,7 @@ La siguiente tabla se llena con información de Hugging Face, Ollama y la termin
 
 ### Modalidad
 
-Trabajo individual o en equipos de 2 a 3 estudiantes.
-
-### Duración sugerida
-
-Entre 90 y 120 minutos.
+Trabajo en equipos para reportar en su repositorio.
 
 ### Instrucciones
 
@@ -454,72 +437,26 @@ Entre 90 y 120 minutos.
    ollama --version
    ```
 
-3. Descargar al menos tres modelos desde Ollama.
-4. Ejecutar al menos tres modelos con el mismo prompt.
+3. Descargar al menos 6 modelos desde Ollama.
+4. Ejecutar al menos 6 modelos con el mismo prompt.
 5. Revisar los modelos instalados con:
 
    ```bash
    ollama ls
    ```
 
-6. Consultar en Hugging Face la model card de al menos dos modelos.
+6. Consultar en Hugging Face la model card de los modelos.
 7. Identificar fabricante, tipo de modelo, licencia, parámetros, idiomas y requerimientos.
 8. Completar la tabla comparativa de seis modelos.
-9. Escribir una reflexión breve sobre la experiencia.
+9. Escribir una reflexión breve sobre la experiencia:
 
----
 
-## 19. Evidencias requeridas
-
-El equipo debe entregar las siguientes evidencias:
-
-1. Captura de instalación o verificación de Ollama.
-2. Captura de `ollama --version`.
-3. Captura de `ollama pull` para al menos tres modelos.
-4. Captura de `ollama ls`.
-5. Captura de ejecución de al menos tres modelos.
-6. Captura de Hugging Face mostrando model card, licencia y archivos.
-7. Tabla comparativa de seis modelos.
-8. Reflexión final de 150 a 250 palabras.
-
-> 🖼️ **Espacio para imagen sugerida:** collage de evidencias de terminal y navegador.  
-> Archivo sugerido: `assets/img/llm/19-evidencias-actividad.png`
-
----
-
-## 20. Preguntas de reflexión
-
-Responder brevemente:
-
-1. ¿Qué modelo fue más fácil de instalar y ejecutar?
-2. ¿Qué modelo respondió mejor en español?
-3. ¿Qué diferencia observaste entre un modelo pequeño y uno más grande?
-4. ¿Qué importancia tiene la licencia del modelo?
-5. ¿Por qué no debe usarse un LLM como única fuente académica?
-6. ¿Qué ventajas y limitaciones tiene ejecutar modelos localmente?
-
----
-
-## 21. Criterios de evaluación sugeridos
-
-| Criterio | Ponderación |
-|---|---:|
-| Instalación y ejecución correcta de Ollama | 20% |
-| Evidencias de terminal y navegador | 20% |
-| Tabla comparativa completa y verificada | 30% |
-| Análisis crítico de licencia, tamaño e idioma | 15% |
-| Reflexión final clara y académica | 15% |
-
----
-
-## 22. Consideraciones finales
-
-1. **Verificar fuentes:** Las respuestas de un LLM deben contrastarse con documentación oficial, artículos académicos o fuentes institucionales.
-2. **Revisar licencias:** No todos los modelos permiten los mismos usos. Antes de usar un modelo en investigación, docencia, producto o servicio, debe revisarse su licencia.
-3. **Distinguir parámetros y tamaño en disco:** Un modelo de 7B parámetros no siempre ocupa lo mismo en todas sus versiones. La cuantización modifica el tamaño y el desempeño.
-4. **Cuidar privacidad:** Ejecutar localmente puede reducir dependencia de servicios externos, pero no elimina todos los riesgos. No se deben usar datos sensibles sin una política clara de manejo de información.
-5. **Evaluar idioma:** Un modelo puede ser multilingüe pero responder con distinta calidad según el idioma, el dominio técnico y el prompt.
-6. **No confundir fluidez con verdad:** Un texto bien redactado puede ser incorrecto. La validación sigue siendo responsabilidad del usuario.
+- ¿Qué modelo fue más fácil de instalar y ejecutar?
+- ¿Qué modelo respondió mejor en español?
+- ¿Qué diferencia observaste entre un modelo pequeño y uno más grande?
+- ¿Qué importancia tiene la licencia del modelo?
+- ¿Por qué no debe usarse un LLM como única fuente académica?
+- ¿Qué ventajas y limitaciones tiene ejecutar modelos localmente?
 
 ---
 
