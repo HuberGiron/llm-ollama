@@ -12,9 +12,6 @@ El contenido toma como base conceptual el *Machine Learning Crash Course* de Goo
 
 > 🎯 **Objetivo de aprendizaje:** Al finalizar esta actividad, el estudiante será capaz de explicar la diferencia entre IA, aprendizaje automático, IA generativa, embeddings, transformers y LLM; instalar y usar Ollama desde terminal; consultar modelos en Hugging Face; y comparar modelos según fabricante, licencia, tamaño, idioma y requerimientos técnicos.
 
-> 🖼️ **Espacio para imagen sugerida:** portada o collage visual de IA generativa, terminal, Hugging Face y Ollama.  
-> Archivo sugerido: `assets/img/llm/00-portada-ia-generativa-llm.png`
-
 ---
 
 ## 1. De inteligencia artificial a LLM
@@ -30,9 +27,6 @@ Inteligencia artificial (IA)
         └── Modelos generativos modernos
             └── Transformers y modelos grandes de lenguaje (LLM)
 ```
-
-> 🖼️ **Espacio para imagen sugerida:** diagrama de círculos concéntricos o pirámide: IA → ML → Deep Learning → IA generativa → LLM.  
-> Archivo sugerido: `assets/img/llm/01-ia-ml-deeplearning-llm.png`
 
 ---
 
@@ -62,8 +56,7 @@ En este caso, el modelo no está generando contenido nuevo. Está aprendiendo un
 | Clasificación | ¿A qué categoría pertenece? | Texto de correo electrónico | Spam / No spam |
 | Generación | ¿Qué contenido nuevo puede producirse? | Prompt textual | Explicación, resumen, código o imagen |
 
-> 🖼️ **Espacio para imagen sugerida:** diagrama comparativo entre regresión, clasificación y generación.  
-> Archivo sugerido: `assets/img/llm/02-regresion-clasificacion-generacion.png`
+![Regresión vs Clasificasión vs Generación](assets/img/llm/02-regresion-clasificacion-generacion.png)
 
 ---
 
