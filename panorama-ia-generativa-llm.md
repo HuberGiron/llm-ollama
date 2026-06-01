@@ -342,7 +342,49 @@ ollama run hf.co/Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
 
 ---
 
-## 15. Modelos sugeridos para la actividad
+## 15. Práctica 1
+
+### Nombre de la actividad
+
+**Instalación, ejecución y comparación de modelos LLM locales con Ollama y Hugging Face**
+
+### Modalidad
+
+Trabajo en equipos para reportar en su repositorio.
+
+### Instrucciones
+
+1. Instalar Ollama en la computadora.
+2. Verificar la instalación con:
+
+   ```bash
+   ollama --version
+   ```
+
+3. Descargar al menos 6 modelos desde Ollama. (Captura evidencia de pantalla)
+4. Ejecutar al menos 6 modelos con el mismo prompt. (Captura evidencia de pantalla)
+5. Revisar los modelos instalados con:
+
+   ```bash
+   ollama ls
+   ```
+
+6. Consultar en Hugging Face la model card de los modelos.
+7. Identificar fabricante, tipo de modelo, licencia, parámetros, idiomas y requerimientos.
+8. Realiza una tabla comparativa como la de la [sección 18](#18-tabla-comparativa-de-modelos).
+9. Escribir una reflexión breve sobre la experiencia:
+
+
+- ¿Qué modelo fue más fácil de instalar y ejecutar?
+- ¿Qué modelo respondió mejor en español?
+- ¿Qué diferencia observaste entre un modelo pequeño y uno más grande?
+- ¿Qué importancia tiene la licencia del modelo?
+- ¿Por qué no debe usarse un LLM como única fuente académica?
+- ¿Qué ventajas y limitaciones tiene ejecutar modelos localmente?
+
+---
+
+## 16. Modelos sugeridos para la actividad
 
 Para la práctica, se recomiendan modelos pequeños o medianos que puedan ejecutarse en laptops con recursos razonables. Los modelos de 1B a 4B parámetros son más accesibles para equipos modestos. Los modelos de 7B pueden requerir más RAM, tardar más o beneficiarse claramente de GPU.
 
@@ -364,7 +406,7 @@ ollama ls
 
 ---
 
-## 16. Prompts de prueba
+## 17. Prompts de prueba
 
 Para comparar modelos, todos los equipos deben usar los mismos prompts.
 
@@ -398,7 +440,7 @@ para apoyar el desarrollo de un proyecto con ESP32, sin sustituir su aprendizaje
 ```
 ---
 
-## 17. Tabla comparativa de modelos
+## 18. Ejemplo Tabla comparativa de modelos
 
 La siguiente tabla se llena con información de Hugging Face, Ollama y la terminal del estudiante. Algunos campos se proporcionan como referencia inicial; el estudiante debe confirmar la información en la model card oficial y con `ollama ls`.
 
@@ -412,48 +454,6 @@ La siguiente tabla se llena con información de Hugging Face, Ollama y la termin
 | TinyLlama 1.1B Chat | TinyLlama | LLM chat compacto | Apache 2.0 | 1.1B | Principalmente inglés según tags de Hugging Face | Útil para equipos con recursos limitados; menor calidad esperada que modelos más grandes | `ollama run tinyllama:1.1b-chat-v1-q8_0` | Completar con `ollama ls` |
 
 > ⚠️ **Consideraciones:** En la tabla, “parámetros” se refiere al tamaño arquitectónico del modelo. El “tamaño en Ollama” es el espacio que ocupa la variante descargada en la computadora y depende del tag, formato y cuantización. Por eso debe registrarse desde `ollama ls`.
-
----
-
-## 18. Práctica 1
-
-### Nombre de la actividad
-
-**Instalación, ejecución y comparación de modelos LLM locales con Ollama y Hugging Face**
-
-### Modalidad
-
-Trabajo en equipos para reportar en su repositorio.
-
-### Instrucciones
-
-1. Instalar Ollama en la computadora.
-2. Verificar la instalación con:
-
-   ```bash
-   ollama --version
-   ```
-
-3. Descargar al menos 6 modelos desde Ollama. (Captura evidencia de pantalla)
-4. Ejecutar al menos 6 modelos con el mismo prompt. (Captura evidencia de pantalla)
-5. Revisar los modelos instalados con:
-
-   ```bash
-   ollama ls
-   ```
-
-6. Consultar en Hugging Face la model card de los modelos.
-7. Identificar fabricante, tipo de modelo, licencia, parámetros, idiomas y requerimientos.
-8. Realiza una tabla comparativa como la de la [sección 17](#17-tabla-comparativa-de-modelos).
-9. Escribir una reflexión breve sobre la experiencia:
-
-
-- ¿Qué modelo fue más fácil de instalar y ejecutar?
-- ¿Qué modelo respondió mejor en español?
-- ¿Qué diferencia observaste entre un modelo pequeño y uno más grande?
-- ¿Qué importancia tiene la licencia del modelo?
-- ¿Por qué no debe usarse un LLM como única fuente académica?
-- ¿Qué ventajas y limitaciones tiene ejecutar modelos localmente?
 
 ---
 
