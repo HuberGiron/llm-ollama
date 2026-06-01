@@ -1,7 +1,7 @@
 ---
 layout: default
 title: IA generativa y LLM
-nav_order: 2
+nav_order: 1
 ---
 
 # Panorama de IA generativa y LLM
@@ -338,7 +338,7 @@ Ejemplo con un modelo GGUF de Qwen:
 ollama run hf.co/Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M
 ```
 
-> ⚠️ **Consideración importante:** usar `hf.co/...` con Ollama requiere que el repositorio sea compatible, normalmente porque contiene archivos GGUF. Si el modelo solo está en Safetensors, no necesariamente podrá ejecutarse directamente con Ollama.
+> ⚠️ **Consideración:** usar `hf.co/...` con Ollama requiere que el repositorio sea compatible, normalmente porque contiene archivos GGUF. Si el modelo solo está en Safetensors, no necesariamente podrá ejecutarse directamente con Ollama.
 
 ---
 
@@ -411,10 +411,7 @@ La siguiente tabla se llena con información de Hugging Face, Ollama y la termin
 | Phi-4-mini-instruct | Microsoft | LLM instruct compacto | MIT | 3.8B | Árabe, chino, checo, danés, neerlandés, inglés, finés, francés, alemán, hebreo, húngaro, italiano, japonés, coreano, noruego, polaco, portugués, ruso, español, sueco, tailandés, turco y ucraniano [11] | Diseñado para entornos con memoria/cómputo restringidos; requiere Ollama 0.5.13 o posterior según biblioteca de Ollama | `ollama run phi4-mini` | Completar con `ollama ls` |
 | TinyLlama 1.1B Chat | TinyLlama | LLM chat compacto | Apache 2.0 | 1.1B | Principalmente inglés según tags de Hugging Face | Útil para equipos con recursos limitados; menor calidad esperada que modelos más grandes | `ollama run tinyllama:1.1b-chat-v1-q8_0` | Completar con `ollama ls` |
 
-> ⚠️ **Nota sobre el tamaño:** En la tabla, “parámetros” se refiere al tamaño arquitectónico del modelo. El “tamaño en Ollama” es el espacio que ocupa la variante descargada en la computadora y depende del tag, formato y cuantización. Por eso debe registrarse desde `ollama ls`.
-
-> 🖼️ **Espacio para captura requerida:** tabla llenada por el equipo o captura de la terminal usada para obtener el tamaño local de los modelos.  
-> Archivo sugerido: `assets/img/llm/18-tabla-comparativa-modelos.png`
+> ⚠️ **Consideraciones:** En la tabla, “parámetros” se refiere al tamaño arquitectónico del modelo. El “tamaño en Ollama” es el espacio que ocupa la variante descargada en la computadora y depende del tag, formato y cuantización. Por eso debe registrarse desde `ollama ls`.
 
 ---
 
@@ -447,7 +444,7 @@ Trabajo en equipos para reportar en su repositorio.
 
 6. Consultar en Hugging Face la model card de los modelos.
 7. Identificar fabricante, tipo de modelo, licencia, parámetros, idiomas y requerimientos.
-8. Realiza una tabla comparativa como la de la seccion 17.
+8. Realiza una tabla comparativa como la de la [sección 17](#17-tabla-comparativa-de-modelos).
 9. Escribir una reflexión breve sobre la experiencia:
 
 
@@ -493,8 +490,5 @@ Trabajo en equipos para reportar en su repositorio.
 [15] Ollama, “phi4-mini,” *Ollama Library*. [En línea]. Disponible en: https://ollama.com/library/phi4-mini
 
 [16] Qwen, “Qwen2.5-7B-Instruct-GGUF,” *Hugging Face Model Card*. [En línea]. Disponible en: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF
+
 ---
-
-## Siguiente sección
-
-[Volver al inicio](index.md)
