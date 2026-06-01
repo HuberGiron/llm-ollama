@@ -93,9 +93,6 @@ Un **LLM** es un modelo de lenguaje de gran escala. Normalmente se caracteriza p
 - arquitectura basada en transformers;
 - habilidad para generar lenguaje, resumir, traducir, responder preguntas, seguir instrucciones y producir código.
 
-> 🖼️ **Espacio para imagen sugerida:** captura o diagrama de tokenización de una frase en subpalabras.  
-> Archivo sugerido: `assets/img/llm/04-tokenizacion.png`
-
 ---
 
 ## 5. Embeddings
@@ -107,7 +104,7 @@ Ejemplo simplificado:
 ```text
 "perro"       → [0.12, -0.45, 0.88, ...]
 "gato"        → [0.10, -0.40, 0.81, ...]
-"router CNC"  → [0.72,  0.33, -0.21, ...]
+"Tornillo"  → [0.72,  0.33, -0.21, ...]
 ```
 
 En una aplicación real, estos vectores pueden tener cientos o miles de dimensiones. Su uso es importante para:
@@ -118,21 +115,7 @@ En una aplicación real, estos vectores pueden tener cientos o miles de dimensio
 - recomendación de contenido;
 - comparación de similitud entre textos.
 
-Ejemplo aplicado:
-
-```text
-Consulta del usuario:
-"¿Dónde encuentro información sobre motores paso a paso?"
-
-Sistema con embeddings:
-1. Convierte la consulta en un vector.
-2. Convierte documentos del repositorio en vectores.
-3. Busca documentos cercanos semánticamente.
-4. Entrega los documentos relevantes al LLM para generar una respuesta.
-```
-
-> 🖼️ **Espacio para imagen sugerida:** plano 2D con palabras agrupadas por similitud semántica.  
-> Archivo sugerido: `assets/img/llm/05-embeddings-espacio-vectorial.png`
+![Similitud Semantica](assets/img/llm/05-embeddings-espacio-vectorial.png)
 
 ---
 
@@ -156,8 +139,7 @@ La autoatención ayuda a relacionar "la" con "herramienta".
 
 Los modelos solo de decodificador son especialmente importantes en generación de texto, porque generan nuevos tokens a partir del texto previo. Muchos LLM conversacionales modernos utilizan arquitecturas de este tipo.
 
-> 🖼️ **Espacio para imagen sugerida:** frase con flechas de atención entre palabras; por ejemplo, de “la” hacia “herramienta”.  
-> Archivo sugerido: `assets/img/llm/06-self-attention.png`
+[Simulador de Transformer](https://poloclub.github.io/transformer-explainer/)
 
 ---
 
