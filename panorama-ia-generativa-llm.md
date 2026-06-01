@@ -153,13 +153,13 @@ Los **embeddings** permiten representar el lenguaje como vectores numéricos, mi
 
 | Concepto | Definición breve | Ejemplo |
 |---|---|---|
-| IA | Campo general de sistemas capaces de realizar tareas asociadas con inteligencia | Un asistente que interpreta lenguaje natural |
-| Aprendizaje automático | Subcampo donde los modelos aprenden patrones a partir de datos | Clasificador de correos spam |
-| Deep Learning | Aprendizaje automático con redes neuronales profundas | Reconocimiento de imágenes |
-| IA generativa | Modelos que producen contenido nuevo | Generación de texto, imagen o código |
-| Embeddings | Representaciones vectoriales de datos | Vectores para búsqueda semántica |
-| Transformer | Arquitectura neuronal basada en mecanismos de atención | Base de muchos LLM modernos |
-| LLM | Modelo grande de lenguaje entrenado para procesar y generar texto | Llama, Gemma, Qwen, Mistral, Phi |
+| **IA** | Campo general de sistemas capaces de realizar tareas asociadas con inteligencia | Un asistente que interpreta lenguaje natural |
+| **Aprendizaje automático** | Subcampo donde los modelos aprenden patrones a partir de datos | Clasificador de correos spam |
+| **Deep Learning** | Aprendizaje automático con redes neuronales profundas | Reconocimiento de imágenes |
+| **IA generativa** | Modelos que producen contenido nuevo | Generación de texto, imagen o código |
+| **Embeddings** | Representaciones vectoriales de datos | Vectores para búsqueda semántica |
+| **Transformer** | Arquitectura neuronal basada en mecanismos de atención | Base de muchos LLM modernos |
+| **LLM** | Modelo grande de lenguaje entrenado para procesar y generar texto | Llama, Gemma, Qwen, Mistral, Phi |
 
 ---
 
@@ -167,9 +167,13 @@ Los **embeddings** permiten representar el lenguaje como vectores numéricos, mi
 
 **Hugging Face** es una plataforma donde la comunidad de aprendizaje automático comparte modelos, datasets y aplicaciones. Para esta clase, se utilizará como fuente para consultar información técnica y documental de modelos.
 
+[Página de Huggning Face](https://huggingface.co/)
+
+![Huggning Face](assets/img/llm/hugging-face.png)
+
 Un elemento central es la **model card**. Según la documentación de Hugging Face, una model card es un archivo que acompaña al modelo y contiene información útil; normalmente corresponde al archivo `README.md` del repositorio del modelo [6].
 
-Al revisar un modelo en Hugging Face, el estudiante debe identificar:
+Al revisar un modelo en Huggingface, puedes identificar:
 
 | Elemento | Pregunta guía |
 |---|---|
@@ -184,8 +188,7 @@ Al revisar un modelo en Hugging Face, el estudiante debe identificar:
 | Requerimientos | ¿Necesita GPU? ¿Puede ejecutarse cuantizado? |
 | Limitaciones | ¿Reporta sesgos, restricciones, riesgos o alucinaciones? |
 
-> 🖼️ **Espacio para captura sugerida:** página de un modelo en Hugging Face resaltando nombre, licencia, tipo, archivos y model card.  
-> Archivo sugerido: `assets/img/llm/08-huggingface-model-card.png`
+![Model Card](assets/img/llm/model-card.png)
 
 ---
 
@@ -201,18 +204,17 @@ Al revisar un modelo en Hugging Face, el estudiante debe identificar:
 | Clasificador | Asignar categorías | Detección de sentimiento o moderación |
 | GGUF cuantizado | Ejecución local eficiente | Ejecutar modelos en Ollama o llama.cpp |
 
-> ⚠️ **Consideración importante:** No todos los modelos de Hugging Face pueden instalarse directamente con Ollama. Ollama trabaja especialmente bien con modelos disponibles en formato GGUF o con modelos ya publicados en la biblioteca de Ollama. Los modelos en Safetensors pueden requerir otra herramienta, conversión o una versión GGUF preparada por la comunidad.
+> ⚠️ **Consideración:** No todos los modelos de Hugging Face pueden instalarse directamente con Ollama. Ollama trabaja especialmente bien con modelos disponibles en formato GGUF o con modelos ya publicados en la biblioteca de Ollama. Los modelos en Safetensors pueden requerir otra herramienta, conversión o una versión GGUF preparada por la comunidad.
 
 ---
 
 ## 10. Ollama
 
-**Ollama** es una herramienta para descargar, ejecutar y administrar modelos localmente desde la terminal. Es útil para docencia porque permite experimentar con LLM en la computadora del estudiante sin depender necesariamente de una API comercial externa.
+**Ollama** es una herramienta para descargar, ejecutar y administrar modelos localmente desde la terminal. Es útil para el aprendizaje porque permite experimentar con LLM en la computadora del estudiante sin depender necesariamente de una API comercial externa.
 
 La documentación oficial de Ollama incluye comandos para ejecutar modelos, descargar modelos, listar modelos instalados, generar embeddings, eliminar modelos, ver modelos en ejecución y detener modelos [4].
 
-> 🖼️ **Espacio para captura sugerida:** página oficial de Ollama o biblioteca de modelos.  
-> Archivo sugerido: `assets/img/llm/09-ollama-library.png`
+![Ollama](assets/img/llm/ollama.png)
 
 ---
 
