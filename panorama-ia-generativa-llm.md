@@ -203,7 +203,7 @@ La siguiente tabla muestra los elementos principales usando como ejemplo el mode
 
 ## 9. Tipos de modelos que se pueden encontrar
 
-| Tipo de modelo | Uso principal | Ejemplo de uso en clase |
+| Tipo de modelo | Uso principal | Ejemplo de uso |
 |---|---|---|
 | Base / pretrained | Continuación de texto e investigación | Analizar cómo completa texto sin estar optimizado para chat |
 | Instruct / chat | Seguimiento de instrucciones y conversación | Preguntar conceptos de IA en lenguaje natural |
@@ -231,15 +231,12 @@ La documentación oficial de Ollama incluye comandos para ejecutar modelos, desc
 
 ### 11.1 Windows
 
-En Windows, se puede instalar desde el instalador oficial de Ollama o desde PowerShell.
+En Windows, se puede instalar desde el **instalador oficial de Ollama** o desde PowerShell.
 
 ```powershell
 irm https://ollama.com/install.ps1 | iex
 ollama --version
 ```
-
-> 🖼️ **Espacio para captura requerida:** terminal de PowerShell mostrando `ollama --version`.  
-> Archivo sugerido: `assets/img/llm/10-windows-ollama-version.png`
 
 ### 11.2 macOS y Linux
 
@@ -249,9 +246,6 @@ En macOS y Linux, la instalación puede realizarse desde terminal con:
 curl -fsSL https://ollama.com/install.sh | sh
 ollama --version
 ```
-
-> 🖼️ **Espacio para captura requerida:** terminal de macOS o Linux mostrando `ollama --version`.  
-> Archivo sugerido: `assets/img/llm/11-linux-mac-ollama-version.png`
 
 ---
 
@@ -274,6 +268,8 @@ ollama run llama3.2:3b
 ```bash
 ollama ls
 ```
+
+![Ollama](assets/img/llm/modelos.png)
 
 ### 12.4 Ver modelos cargados en memoria
 
@@ -299,8 +295,7 @@ ollama rm llama3.2:3b
 ollama run llama3.2:3b "Explica qué es un LLM en máximo 100 palabras."
 ```
 
-> 🖼️ **Espacio para captura requerida:** terminal mostrando `ollama pull`, `ollama run` y una respuesta del modelo.  
-> Archivo sugerido: `assets/img/llm/12-terminal-ollama-run.png`
+![Ollama](assets/img/llm/prueba.png)
 
 ---
 
