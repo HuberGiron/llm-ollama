@@ -437,8 +437,8 @@ Trabajo en equipos para reportar en su repositorio.
    ollama --version
    ```
 
-3. Descargar al menos 6 modelos desde Ollama.
-4. Ejecutar al menos 6 modelos con el mismo prompt.
+3. Descargar al menos 6 modelos desde Ollama. (Captura evidencia de pantalla)
+4. Ejecutar al menos 6 modelos con el mismo prompt. (Captura evidencia de pantalla)
 5. Revisar los modelos instalados con:
 
    ```bash
@@ -447,7 +447,7 @@ Trabajo en equipos para reportar en su repositorio.
 
 6. Consultar en Hugging Face la model card de los modelos.
 7. Identificar fabricante, tipo de modelo, licencia, parámetros, idiomas y requerimientos.
-8. Completar la tabla comparativa de seis modelos.
+8. Realiza una tabla comparativa como la de la seccion 17.
 9. Escribir una reflexión breve sobre la experiencia:
 
 
