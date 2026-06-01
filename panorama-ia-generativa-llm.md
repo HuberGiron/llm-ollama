@@ -58,20 +58,11 @@ La **IA generativa** se refiere a modelos capaces de producir contenido nuevo a 
 
 En lugar de limitarse a responder con una clase o un valor numérico, un modelo generativo puede construir una respuesta completa. Por ejemplo:
 
-```text
-Prompt:
-Explica qué es un sensor ultrasónico para estudiantes de primer semestre.
-
-Salida esperada:
-Un texto explicativo generado por el modelo.
-```
+![Prompt](assets/img/llm/03-flujo-ia-generativa.png)
 
 La IA generativa no significa que el sistema “comprenda” como un humano. En términos técnicos, el modelo aprende patrones estadísticos en grandes conjuntos de datos y utiliza esos patrones para generar una salida plausible. Por eso sus respuestas pueden ser útiles, pero también pueden contener errores, omisiones o afirmaciones no verificadas.
 
-> ⚠️ **Consideración académica:** En clase debe insistirse en que una respuesta fluida no equivale necesariamente a una respuesta correcta. Los LLM pueden producir información falsa con apariencia convincente; a este fenómeno se le conoce comúnmente como *alucinación*.
-
-> 🖼️ **Espacio para imagen sugerida:** flujo `prompt → modelo generativo → texto / imagen / código / audio`.  
-> Archivo sugerido: `assets/img/llm/03-flujo-ia-generativa.png`
+> ⚠️ **Consideración:** Una respuesta fluida no equivale necesariamente a una respuesta correcta. Los LLM pueden producir información falsa con apariencia convincente; a este fenómeno se le conoce comúnmente como *alucinación*.
 
 ---
 
