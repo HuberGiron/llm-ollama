@@ -36,15 +36,7 @@ En aprendizaje automático, un modelo aprende una relación entre **entradas** y
 
 Ejemplo sencillo:
 
-```text
-Entrada del modelo:
-- Horas de estudio
-- Asistencia
-- Promedio de tareas
-
-Salida esperada:
-- Aprobar / No aprobar
-```
+![Modelo](assets/img/llm/01-modelo.png)
 
 En este caso, el modelo no está generando contenido nuevo. Está aprendiendo una relación estadística para clasificar o predecir una salida. Esta distinción será importante para diferenciar modelos predictivos tradicionales de modelos generativos.
 
