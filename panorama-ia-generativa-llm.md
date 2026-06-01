@@ -145,6 +145,12 @@ Los modelos solo de decodificador son especialmente importantes en generación d
 
 ## 7. Diferencias principales entre conceptos
 
+La inteligencia artificial es el campo general que busca construir sistemas capaces de realizar tareas asociadas con percepción, razonamiento, lenguaje, aprendizaje o toma de decisiones. Dentro de ella, el aprendizaje automático permite que un modelo aprenda patrones a partir de datos. A su vez, el deep learning utiliza redes neuronales con muchas capas para aprender representaciones complejas. La IA generativa forma parte de esta evolución, ya que no solo clasifica o predice valores, sino que produce nuevo contenido, como texto, imágenes, código o audio [1].
+
+Los modelos de lenguaje de gran escala, conocidos como LLM, son un caso particular de IA generativa orientado principalmente al procesamiento y generación de texto. Para que un LLM pueda trabajar con lenguaje humano, primero debe transformar las palabras o fragmentos de palabras en unidades procesables llamadas tokens. Sin embargo, una computadora no comprende directamente el significado de una palabra como lo haría una persona; por ello, cada token se representa mediante un vector numérico. A estas representaciones se les conoce como embeddings [2].
+
+Los embeddings permiten representar el lenguaje como vectores numéricos, mientras que los transformers permiten procesar esos vectores considerando el contexto y las relaciones entre tokens [3]. Los LLM combinan ambos elementos: usan embeddings para convertir el texto en información matemática y transformers para modelar relaciones complejas dentro de secuencias de lenguaje. Esta combinación es una de las razones por las que los modelos actuales pueden generar texto coherente, adaptado al contexto y útil para múltiples tareas académicas, técnicas y profesionales.
+
 | Concepto | Definición breve | Ejemplo |
 |---|---|---|
 | IA | Campo general de sistemas capaces de realizar tareas asociadas con inteligencia | Un asistente que interpreta lenguaje natural |
@@ -154,9 +160,6 @@ Los modelos solo de decodificador son especialmente importantes en generación d
 | Embeddings | Representaciones vectoriales de datos | Vectores para búsqueda semántica |
 | Transformer | Arquitectura neuronal basada en mecanismos de atención | Base de muchos LLM modernos |
 | LLM | Modelo grande de lenguaje entrenado para procesar y generar texto | Llama, Gemma, Qwen, Mistral, Phi |
-
-> 🖼️ **Espacio para imagen sugerida:** tabla visual o mapa conceptual para usar como resumen de la primera parte de la clase.  
-> Archivo sugerido: `assets/img/llm/07-resumen-conceptos.png`
 
 ---
 
