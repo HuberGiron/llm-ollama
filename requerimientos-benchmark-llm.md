@@ -162,7 +162,7 @@ Una API en la nube permite usar modelos potentes sin administrar directamente se
 - Dependencia del proveedor.
 
 [Benchmarking LLM API Pricing](https://benchlm.ai/llm-pricing)
-
+[Costos modelos Digital Ocean](https://docs.digitalocean.com/products/inference/details/pricing/)
 ---
 
 ### 3.3 Servidor propio en la nube con GPU
@@ -171,19 +171,19 @@ Un servidor en la nube con GPU permite ejecutar modelos open-source o personaliz
 
 **Ventajas:**
 
-- control del modelo;
-- posibilidad de servir múltiples usuarios;
-- integración con backend propio;
-- uso de modelos específicos;
-- despliegue de servicios con Ollama, vLLM, TGI u otras herramientas.
+- Control del modelo;
+- Posibilidad de servir múltiples usuarios;
+- Integración con backend propio;
+- Uso de modelos específicos;
+- Despliegue de servicios con Ollama, vLLM, TGI u otras herramientas.
 
 **Desventajas:**
 
-- configuración de drivers y dependencias;
-- administración de seguridad;
-- monitoreo;
-- costo por hora aunque no haya uso constante;
-- necesidad de mantenimiento técnico.
+- Configuración de drivers y dependencias;
+- Administración de seguridad;
+- Monitoreo;
+- Costo por hora aunque no haya uso constante;
+- Necesidad de mantenimiento técnico.
 
 [Ejemplo Costos Droplet](https://www.digitalocean.com/pricing/calculator)
 
