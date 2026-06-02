@@ -567,10 +567,8 @@ Ejecuta el archivo desde la terminal:
 python prueba_manual_parametros.py
 ```
 
-> **Espacio para captura de pantalla:** ejecución del script en terminal mostrando parámetros, respuesta del modelo y métricas.
->
-> ![Prueba manual de parámetros con Ollama](assets/img/tema2/prueba-manual-parametros.png)
-
+![Prueba manual de parámetros con Ollama1](assets/img/benchmark/c1.png)
+![Prueba manual de parámetros con Ollama2](assets/img/benchmark/c2.png)
 ---
 
 ### 6.4 Diseño experimental A: comparación entre modelos
