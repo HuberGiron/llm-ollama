@@ -8,35 +8,33 @@ nav_order: 2
 
 Esta sección aborda los criterios técnicos para ejecutar modelos grandes de lenguaje (*Large Language Models*, LLM) en una computadora local, un servidor, una API en la nube o una plataforma embebida. El propósito es que el estudiante comprenda la relación entre **memoria**, **cómputo**, **latencia**, **tokens**, **costo**, **parámetros de generación** y **calidad de respuesta** antes de seleccionar un modelo o una arquitectura de implementación.
 
-El tema se apoya en documentación oficial de Ollama, Hugging Face, OpenAI, Google AI, NVIDIA y Espressif, así como en literatura académica sobre eficiencia, cuantización, consumo energético e integración de modelos de lenguaje en robótica [1]–[11].
+El tema se apoya en documentación oficial de Ollama, Hugging Face, OpenAI, Google AI, NVIDIA y Espressif, así como en literatura sobre eficiencia, cuantización, consumo energético e integración de modelos de lenguaje en robótica [1]–[11].
 
-> 🎯 **Objetivo de aprendizaje:** Al finalizar esta actividad, el estudiante será capaz de explicar los requerimientos técnicos para ejecutar LLM; distinguir entre CPU, GPU, RAM y VRAM; estimar costos locales y en la nube; configurar parámetros de generación; diseñar un benchmark con Python y Ollama; exportar resultados en CSV; y justificar la selección de un modelo y una plataforma de cómputo para una aplicación robótica.
-
-> 🖼️ **Espacio para imagen sugerida:** portada con computadora local, GPU, servidor nube, Jetson y terminal ejecutando Ollama.  
-> Archivo sugerido: `assets/img/llm/tema2/00-portada-requerimientos-benchmark-llm.png`
+> 🎯 **Objetivo de aprendizaje:** Al finalizar esta actividad, el estudiante será capaz de explicar los requerimientos técnicos para ejecutar LLM; distinguir entre CPU, GPU, RAM y VRAM; estimar costos locales y en la nube; configurar parámetros de generación; diseñar un benchmark con Python y Ollama; exportar resultados en CSV; y justificar la selección de un modelo en alguna plataforma de cómputo.
 
 ---
 
-## 1. Por qué no basta con elegir “el mejor modelo”
+## 1. Elegir “el mejor modelo”
 
-Seleccionar un LLM no consiste únicamente en escoger el modelo con mayor número de parámetros o el que aparece mejor posicionado en una tabla de evaluación. En una aplicación real, especialmente si se relaciona con robótica, automatización o sistemas ciberfísicos, la decisión debe considerar simultáneamente:
+Seleccionar un LLM no consiste únicamente en escoger el modelo con mayor número de parámetros o el que aparece mejor posicionado en una tabla de evaluación. En una aplicación real, especialmente si se relaciona con sistemas al borde o **edge computing** como en robótica, automatización o sistemas ciberfísicos, la decisión debe considerar simultáneamente:
 
-- si el modelo cabe en la memoria disponible;
-- si la velocidad de respuesta es aceptable;
-- si la latencia permite interactuar con el usuario o con el robot;
-- si el costo local o en la nube es sostenible;
-- si el modelo puede ejecutarse con privacidad suficiente;
-- si la calidad de respuesta justifica los recursos usados;
-- si el modelo es adecuado para la tarea específica.
+- Si el modelo cabe en la memoria disponible;
+- Si la velocidad de respuesta es aceptable;
+- Si la latencia permite interactuar con el usuario o con el sistema;
+- Si el costo local o en la nube es sostenible;
+- Si el modelo puede ejecutarse con privacidad suficiente;
+- Si la calidad de respuesta justifica los recursos usados;
+- Si el modelo es adecuado para la tarea específica.
 
-En robótica, además, un LLM no debe confundirse con un controlador de bajo nivel en tiempo real. Un modelo de lenguaje puede ser útil como interfaz conversacional, planificador de alto nivel, generador de instrucciones, traductor de lenguaje natural a comandos estructurados o asistente de diagnóstico. Sin embargo, el control directo de motores, la lectura de sensores críticos y los lazos de realimentación de baja latencia deben mantenerse en componentes deterministas y verificables.
+En este contexto, el uso de LLM en robótica y sistemas ciberfísicos puede entenderse como parte del campo emergente de la **IA física** (Physical AI). A diferencia de una IA limitada al procesamiento de texto, imágenes o datos en entornos digitales, la IA física se refiere a sistemas capaces de percibir el mundo real mediante sensores, razonar o planificar a partir de esa información, y actuar sobre el entorno mediante actuadores, robots, vehículos o máquinas autónomas. Por ello, cuando un LLM se integra con plataformas robóticas, sistemas embebidos, cámaras, sensores, motores o servicios de control, deja de ser únicamente un modelo conversacional y se convierte en un componente de una arquitectura que conecta lenguaje, percepción, decisión y acción física. Esta distinción es importante porque los requerimientos técnicos ya no dependen solo de la calidad del modelo, sino también de la latencia, memoria, consumo energético, seguridad, conectividad y capacidad de operar en tiempo real o cerca del tiempo real [14].
 
-La literatura sobre LLM y robótica ha señalado este problema. En el enfoque SayCan, por ejemplo, el modelo de lenguaje aporta conocimiento semántico de alto nivel, pero sus propuestas se combinan con funciones de valor asociadas a habilidades robóticas para seleccionar acciones que sean no solo lingüísticamente plausibles, sino también físicamente ejecutables por el robot [10], [11].
+En la IA física, un LLM no es un controlador de bajo nivel en tiempo real. normalmente se utiliza como interfaz conversacional, planificador de alto nivel, generador de instrucciones, traductor de lenguaje natural a comandos estructurados o asistente de diagnóstico. Sin embargo, el control directo de motores, la lectura de sensores críticos y los lazos de realimentación de baja latencia deben mantenerse en componentes deterministas y verificables.
 
-> ⚠️ **Consideración académica:** En aplicaciones robóticas, un LLM debe tratarse como un componente de razonamiento, planificación o interacción, no como sustituto directo de los controladores de seguridad, navegación, cinemática, dinámica o control de motores.
+Un modelo de lenguaje aporta conocimiento semántico de alto nivel, pero sus propuestas se combinan con funciones de valor asociadas a habilidades robóticas para seleccionar acciones que sean no solo lingüísticamente plausibles, sino también físicamente ejecutables por el robot [10], [11].
 
-> 🖼️ **Espacio para imagen sugerida:** diagrama de arquitectura robótica donde el LLM opera como capa de alto nivel y el control de motores se mantiene en una capa determinista.  
-> Archivo sugerido: `assets/img/llm/tema2/01-llm-capa-alto-nivel-robotica.png`
+> ⚠️ **Consideración:** En aplicaciones robóticas, un LLM debe tratarse como un componente de razonamiento, planificación o interacción, no como sustituto directo de los controladores de seguridad, navegación, cinemática, dinámica o control de motores.
+
+![Modelo](assets/img/benchmark/)
 
 ---
 
@@ -50,12 +48,12 @@ La **RAM** es la memoria principal del sistema. Se utiliza cuando el modelo se e
 
 Durante la inferencia se requiere memoria para:
 
-1. cargar los pesos del modelo;
-2. almacenar el prompt y el contexto de conversación;
-3. mantener la caché de atención o *KV cache*;
-4. procesar tokens de entrada;
-5. generar tokens de salida;
-6. almacenar buffers internos del sistema de inferencia.
+- Cargar los pesos del modelo;
+- Almacenar el prompt y el contexto de conversación;
+- Mantener la caché de atención o *KV cache*;
+- Procesar tokens de entrada;
+- Generar tokens de salida;
+- Almacenar buffers internos del sistema de inferencia.
 
 Una aproximación inicial para estimar memoria es:
 
@@ -72,12 +70,7 @@ Por ejemplo, un modelo de 7 mil millones de parámetros puede requerir aproximad
 | INT8 | 1 byte | 7 GB |
 | INT4 | 0.5 bytes | 3.5 GB |
 
-Esta tabla solo estima la memoria de los pesos. En la práctica, también se requiere memoria adicional para contexto, caché KV, buffers, paralelismo y sobrecarga del framework. Por ello, un modelo que teóricamente ocupa 3.5 GB en INT4 puede necesitar más memoria real al ejecutarse.
-
 Hugging Face explica que la cuantización reduce el costo de memoria y cómputo al representar pesos y activaciones con tipos de menor precisión, como 8 bits o 4 bits. Esto permite cargar modelos más grandes en hardware limitado, aunque puede introducir compromisos en precisión, compatibilidad o velocidad [4].
-
-> 🖼️ **Espacio para imagen sugerida:** diagrama de memoria con bloques: pesos del modelo, contexto, caché KV, tokens de entrada y tokens generados.  
-> Archivo sugerido: `assets/img/llm/tema2/02-ram-vram-contexto-kv-cache.png`
 
 ---
 
@@ -96,9 +89,6 @@ La **GPU** está diseñada para cómputo paralelo. Cuando el modelo cabe en VRAM
 | Ejemplos de modelos viables | TinyLlama, Llama 3.2 1B/3B cuantizados | Llama 3.2 3B, Qwen 7B, Mistral 7B cuantizados |
 
 En LLM, el cuello de botella no siempre es solo la capacidad de cómputo; también puede ser el ancho de banda de memoria. La literatura sobre cuantización y eficiencia en LLM muestra que reducir precisión puede disminuir memoria y acelerar inferencia, especialmente en hardware limitado [5], [6].
-
-> 🖼️ **Espacio para imagen sugerida:** comparativa visual de CPU procesando pocas tareas secuenciales frente a GPU procesando muchas operaciones en paralelo.  
-> Archivo sugerido: `assets/img/llm/tema2/03-cpu-vs-gpu-llm.png`
 
 ---
 
@@ -1218,3 +1208,5 @@ La selección responsable de un modelo requiere medir. Por ello, el benchmark de
 [12] Strubell, E., Ganesh, A., & McCallum, A. “Energy and Policy Considerations for Deep Learning in NLP.” *Proceedings of ACL*, 2019. Disponible en: <https://aclanthology.org/P19-1355/>
 
 [13] Fernandez, J., Na, C., Tiwari, V., Bisk, Y., Luccioni, S., & Strubell, E. “Energy Considerations of Large Language Model Inference and Efficiency Optimizations.” *ACL Anthology*, 2025. Disponible en: <https://aclanthology.org/2025.acl-long.1563/>
+
+[14] NVIDIA. (s. f.). *What is Physical AI?* NVIDIA Glossary. Define la IA física como sistemas que permiten a máquinas autónomas percibir, comprender y realizar acciones complejas en el mundo físico.
