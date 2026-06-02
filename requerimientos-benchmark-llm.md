@@ -145,21 +145,23 @@ Una API en la nube permite usar modelos potentes sin administrar directamente se
 
 **Ventajas:**
 
-- no requiere GPU local;
-- acceso a modelos avanzados;
-- implementación rápida;
-- escalabilidad;
-- mantenimiento reducido.
+- No requiere GPU local;
+- Acceso a modelos avanzados;
+- Implementación rápida;
+- Escalabilidad;
+- Mantenimiento reducido.
 
 **Desventajas:**
 
-- costo variable por uso;
-- dependencia de internet;
-- latencia de red;
-- restricciones de privacidad;
-- límites de tasa;
-- cambios de precio o disponibilidad;
-- dependencia del proveedor.
+- Costo variable por uso;
+- Dependencia de internet;
+- Latencia de red;
+- Restricciones de privacidad;
+- Límites de tasa;
+- Cambios de precio o disponibilidad;
+- Dependencia del proveedor.
+
+[Benchmarking LLM API Pricing](https://benchlm.ai/llm-pricing)
 
 ---
 
@@ -182,6 +184,10 @@ Un servidor en la nube con GPU permite ejecutar modelos open-source o personaliz
 - monitoreo;
 - costo por hora aunque no haya uso constante;
 - necesidad de mantenimiento técnico.
+
+[Ejemplo Costos Droplet](https://www.digitalocean.com/pricing/calculator)
+
+![Nube Ibero](assets/img/benchmark/saptiva.png)
 
 ---
 
