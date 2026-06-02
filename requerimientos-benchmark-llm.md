@@ -349,7 +349,7 @@ El costo de implementación no se limita al pago de energía o tokens. También 
 - Capacitación de usuarios;
 - Mitigación de errores y alucinaciones.
 
-En un proyecto robótico, además deben considerarse sensores, comunicación, sistemas de seguridad, pruebas de campo y mecanismos de recuperación ante errores.
+En un proyecto físico, además deben considerarse sensores, comunicación, sistemas de seguridad, pruebas de campo y mecanismos de recuperación ante errores.
 
 ---
 
@@ -372,7 +372,7 @@ Los parámetros de generación modifican el comportamiento del modelo. No cambia
 | `num_thread` | Hilos de CPU usados. | `4`, `8`, `12` | Puede mejorar rendimiento en CPU, según procesador. |
 | `num_gpu` | Capas o uso de GPU según backend y hardware. | `0`, `1`, `-1`, depende | Permite controlar si se usa GPU o CPU, según compatibilidad. |
 | `keep_alive` | Tiempo que el modelo queda cargado en memoria. | `"5m"`, `"30m"`, `0` | Reduce tiempo de carga entre solicitudes, pero ocupa memoria. |
-| `format` | Fuerza salida JSON o esquema estructurado. | `"json"` o JSON Schema | Útil para evaluación automática, APIs y robótica. |
+| `format` | Fuerza salida JSON o esquema estructurado. | `"json"` o JSON Schema | Útil para evaluación automática, APIs e IA física. |
 | `stream` | Devuelve respuesta por partes o completa. | `true` / `false` | `false` facilita benchmark porque devuelve métricas al final. |
 
 Ejemplo de uso desde la API de Ollama:
