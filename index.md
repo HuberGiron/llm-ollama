@@ -219,7 +219,7 @@ La siguiente tabla muestra los elementos principales usando como ejemplo el mode
 
 ## 10. Ollama
 
-**Ollama** es una herramienta para descargar, ejecutar y administrar modelos localmente desde la terminal. Es útil para el aprendizaje porque permite experimentar con LLM en la computadora del estudiante sin depender necesariamente de una API comercial externa.
+**Ollama** es una herramienta para descargar, ejecutar y administrar modelos localmente desde la terminal. Es útil para el aprendizaje porque permite experimentar con LLM en la computadora sin depender necesariamente de una API comercial externa.
 
 La documentación oficial de Ollama incluye comandos para ejecutar modelos, descargar modelos, listar modelos instalados, generar embeddings, eliminar modelos, ver modelos en ejecución y detener modelos [4].
 
