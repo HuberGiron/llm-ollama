@@ -1675,17 +1675,17 @@ Permite identificar:
 
 Si un modelo tiene muchos puntos fuera de la banda de una desviación estándar, puede considerarse menos estable para aplicaciones donde la latencia debe ser predecible.
 
-[Modelo 1](assets/img/benchmark/latencia_iteracion_llama3_2_3b.png)
-[Modelo 2](assets/img/benchmark/latencia_iteracion_gemma3_4b.png)
-[Modelo 3](assets/img/benchmark/latencia_iteracion_deepseek-r1_8b-0528-qwen3-q4_k_m.png)
+![Modelo 1](assets/img/benchmark/latencia_iteracion_llama3_2_3b.png)
+![Modelo 2](assets/img/benchmark/latencia_iteracion_gemma3_4b.png)
+![Modelo 3](assets/img/benchmark/latencia_iteracion_deepseek-r1_8b-0528-qwen3-q4_k_m.png)
 
 
 **Latencia por iteración comparando todos los modelos**
 
 Esta gráfica coloca todos los modelos en la misma figura. Permite observar cuál modelo responde más rápido y cuál presenta mayor variabilidad.
 
-[Modelos](assets/img/benchmark/latencia_iteracion_todos_los_grupos.png)
-[Modelo 1](assets/img/benchmark/latencia_promedio_por_grupo.png)
+![Modelos](assets/img/benchmark/latencia_iteracion_todos_los_grupos.png)
+![Modelo 1](assets/img/benchmark/latencia_promedio_por_grupo.png)
 
 
 
@@ -1695,7 +1695,7 @@ La gráfica de tokens por segundo mide la velocidad de generación. Esta métric
 
 Una velocidad mayor en tokens por segundo indica mejor rendimiento de generación, aunque no necesariamente mejor calidad.
 
-[Modelos](assets/img/benchmark/tokens_por_segundo_todos_los_grupos.png)
+![Modelos](assets/img/benchmark/tokens_por_segundo_todos_los_grupos.png)
 
 
 **Latencia contra tokens de salida**
@@ -1704,7 +1704,7 @@ Esta gráfica permite observar si las respuestas más largas incrementan el tiem
 
 Si se observa una relación muy fuerte entre tokens de salida y tiempo de respuesta, puede ser conveniente reducir `num_predict` o pedir respuestas más breves en el prompt.
 
-[Modelos](assets/img/benchmark/latencia_vs_tokens_salida.png)
+![Modelos](assets/img/benchmark/latencia_vs_tokens_salida.png)
 
 
 **Latencia contra tokens totales**
@@ -1715,7 +1715,7 @@ Esta gráfica considera:
 tokens_totales = tokens_entrada + tokens_salida
 ```
 
-[Modelos](assets/img/benchmark//latencia_vs_tokens_totales.png)
+![Modelos](assets/img/benchmark//latencia_vs_tokens_totales.png)
 
 **Boxplot de latencia por modelo**
 
@@ -1728,7 +1728,7 @@ Puede usarse para justificar una decisión técnica:
 - modelo con menos valores atípicos;
 - modelo con mejor consistencia entre iteraciones.
 
-[Modelos](assets/img/benchmark/boxplot_latencia_por_grupo.png)
+![Modelos](assets/img/benchmark/boxplot_latencia_por_grupo.png)
 
 ---
 
