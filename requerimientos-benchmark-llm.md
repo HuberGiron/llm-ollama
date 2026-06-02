@@ -1042,7 +1042,421 @@ python benchmark_parametros.py
 
 ---
 
-## Análisis del CSV
+## Análisis gráfico de resultados del benchmark
+
+Después de ejecutar los experimentos de benchmark, no basta con observar únicamente el tiempo promedio de respuesta. Es importante analizar la variabilidad entre iteraciones, la relación entre latencia y número de tokens, y la diferencia de comportamiento entre modelos. Para ello, se recomienda generar gráficas que permitan visualizar el desempeño de cada modelo a lo largo de las 100 repeticiones del experimento.
+
+Este análisis permite responder preguntas como:
+
+- ¿El modelo mantiene una latencia estable durante todas las iteraciones?
+- ¿Existen valores atípicos donde el tiempo de respuesta aumenta significativamente?
+- ¿Qué modelo genera más tokens por segundo?
+- ¿Las respuestas más largas incrementan la latencia?
+- ¿Qué modelo tiene mejor equilibrio entre tiempo de respuesta, longitud de salida y calidad?
+- ¿Qué configuración sería más adecuada para una aplicación robótica donde la latencia es crítica?
+
+> **Nota:** en aplicaciones robóticas, la latencia no debe analizarse solamente como un dato técnico aislado. Un modelo puede producir buenas respuestas, pero si su tiempo de respuesta es demasiado alto o muy variable, puede no ser adecuado para interacción humano-robot, supervisión en línea o toma de decisiones de alto nivel.
+
+El script utiliza como entrada el archivo CSV generado por los experimentos anteriores, por ejemplo:
+
+```text
+benchmark_modelos.csv
+```
+
+El CSV debe incluir, al menos, las siguientes columnas:
+
+| Columna | Descripción |
+|---|---|
+| `model` | Nombre del modelo evaluado |
+| `cycle` | Número de iteración |
+| `total_duration_s` | Tiempo total de respuesta en segundos |
+| `prompt_eval_count` | Tokens de entrada procesados |
+| `eval_count` | Tokens de salida generados |
+| `eval_duration_s` | Tiempo de generación de la salida |
+| `tokens_per_second` | Tokens de salida por segundo |
+
+Si el CSV contiene también `quality_score`, el resumen estadístico incluirá la calidad promedio por modelo.
+
+El script completo está disponible como archivo independiente. Su función es leer el CSV de resultados, calcular métricas derivadas y generar gráficas en formato PNG.
+
+Guarda el siguiente archivo como `graficar_benchmark.py`.
+
+```python
+import argparse
+from pathlib import Path
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+def ensure_numeric(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
+    """Convierte columnas a numéricas cuando existan en el CSV."""
+    for col in columns:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+    return df
+
+
+def prepare_dataframe(csv_path: Path) -> pd.DataFrame:
+    """Carga el CSV y prepara columnas derivadas para análisis."""
+    df = pd.read_csv(csv_path)
+
+    required = ["model", "cycle"]
+    missing = [col for col in required if col not in df.columns]
+    if missing:
+        raise ValueError(f"Faltan columnas obligatorias en el CSV: {missing}")
+
+    numeric_cols = [
+        "cycle",
+        "total_duration_s",
+        "wall_time_s",
+        "load_duration_s",
+        "prompt_eval_count",
+        "eval_count",
+        "eval_duration_s",
+        "tokens_per_second",
+        "response_chars",
+        "quality_score",
+    ]
+    df = ensure_numeric(df, numeric_cols)
+
+    # Si no existe total_duration_s o está vacío, usar wall_time_s como respaldo.
+    if "total_duration_s" not in df.columns and "wall_time_s" in df.columns:
+        df["total_duration_s"] = df["wall_time_s"]
+
+    if "total_duration_s" in df.columns and "wall_time_s" in df.columns:
+        df["total_duration_s"] = df["total_duration_s"].fillna(df["wall_time_s"])
+
+    if "total_duration_s" not in df.columns:
+        raise ValueError(
+            "El CSV necesita 'total_duration_s' o 'wall_time_s' para graficar latencia."
+        )
+
+    # Convertir segundos a milisegundos.
+    df["latency_ms"] = df["total_duration_s"] * 1000
+
+    # Tokens totales.
+    if "prompt_eval_count" in df.columns and "eval_count" in df.columns:
+        df["total_tokens"] = df["prompt_eval_count"] + df["eval_count"]
+    else:
+        df["total_tokens"] = pd.NA
+
+    # Si no existe tokens_per_second, calcularlo cuando sea posible.
+    if "tokens_per_second" not in df.columns:
+        df["tokens_per_second"] = pd.NA
+
+    if "eval_count" in df.columns and "eval_duration_s" in df.columns:
+        calculated_tps = df["eval_count"] / df["eval_duration_s"]
+        df["tokens_per_second"] = df["tokens_per_second"].fillna(calculated_tps)
+
+    # Filtrar ejecuciones con errores o métricas inválidas.
+    df = df.dropna(subset=["model", "cycle", "latency_ms"])
+    df = df[df["latency_ms"] > 0]
+
+    return df
+
+
+def save_summary(df: pd.DataFrame, out_dir: Path) -> pd.DataFrame:
+    """Genera resumen estadístico por modelo."""
+    agg_dict = {"latency_ms": ["count", "mean", "std", "min", "max"]}
+
+    if "prompt_eval_count" in df.columns:
+        agg_dict["prompt_eval_count"] = ["mean", "std", "min", "max"]
+    if "eval_count" in df.columns:
+        agg_dict["eval_count"] = ["mean", "std", "min", "max"]
+    if "total_tokens" in df.columns:
+        agg_dict["total_tokens"] = ["mean", "std", "min", "max"]
+    if "tokens_per_second" in df.columns:
+        agg_dict["tokens_per_second"] = ["mean", "std", "min", "max"]
+    if "quality_score" in df.columns:
+        agg_dict["quality_score"] = ["mean", "std", "min", "max"]
+
+    summary = df.groupby("model").agg(agg_dict)
+    summary.columns = ["_".join(col).strip() for col in summary.columns.values]
+    summary = summary.reset_index()
+
+    summary_path = out_dir / "resumen_estadistico_por_modelo.csv"
+    summary.to_csv(summary_path, index=False, encoding="utf-8-sig")
+    return summary
+
+
+def plot_latency_per_model(df: pd.DataFrame, out_dir: Path) -> None:
+    """
+    Genera una gráfica individual por modelo:
+    latencia por iteración con línea de media y banda ±1 desviación estándar.
+    """
+    for model, group in df.groupby("model"):
+        group = group.sort_values("cycle")
+        mean_ms = group["latency_ms"].mean()
+        std_ms = group["latency_ms"].std()
+
+        fig, ax = plt.subplots(figsize=(10, 7))
+        ax.scatter(group["cycle"], group["latency_ms"], s=28, label="Iteraciones")
+        ax.axhline(mean_ms, linestyle="--", linewidth=1.5, label=f"media = {mean_ms:.2f} ms")
+
+        if pd.notna(std_ms):
+            ax.fill_between(
+                group["cycle"],
+                mean_ms - std_ms,
+                mean_ms + std_ms,
+                alpha=0.2,
+                label=f"±1σ = {std_ms:.2f} ms",
+            )
+
+        in_tok = group["prompt_eval_count"].mean() if "prompt_eval_count" in group else None
+        out_tok = group["eval_count"].mean() if "eval_count" in group else None
+
+        token_text = ""
+        if pd.notna(in_tok) and pd.notna(out_tok):
+            token_text = f"\nin_tok≈{in_tok:.0f} out_tok≈{out_tok:.0f}"
+
+        ax.set_title(f"Latencia por iteración\nmodelo={model}{token_text}")
+        ax.set_xlabel("Iteración")
+        ax.set_ylabel("Tiempo (ms)")
+        ax.grid(True)
+        ax.legend()
+
+        safe_model_name = (
+            model.replace("/", "_")
+            .replace(":", "_")
+            .replace(" ", "_")
+            .replace(".", "_")
+        )
+        fig.tight_layout()
+        fig.savefig(out_dir / f"latencia_iteracion_{safe_model_name}.png", dpi=150)
+        plt.close(fig)
+
+
+def plot_all_models_latency(df: pd.DataFrame, out_dir: Path) -> None:
+    """Grafica todos los modelos en la misma figura: latencia por iteración."""
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for model, group in df.groupby("model"):
+        group = group.sort_values("cycle")
+        ax.plot(group["cycle"], group["latency_ms"], marker="o", linewidth=1, markersize=3, label=model)
+
+    ax.set_title("Latencia por iteración comparando modelos")
+    ax.set_xlabel("Iteración")
+    ax.set_ylabel("Tiempo total (ms)")
+    ax.grid(True)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(out_dir / "latencia_iteracion_todos_los_modelos.png", dpi=150)
+    plt.close(fig)
+
+
+def plot_tokens_per_second(df: pd.DataFrame, out_dir: Path) -> None:
+    """Grafica velocidad de generación por iteración."""
+    if "tokens_per_second" not in df.columns:
+        return
+
+    plot_df = df.dropna(subset=["tokens_per_second"])
+    if plot_df.empty:
+        return
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for model, group in plot_df.groupby("model"):
+        group = group.sort_values("cycle")
+        ax.plot(group["cycle"], group["tokens_per_second"], marker="o", linewidth=1, markersize=3, label=model)
+
+    ax.set_title("Velocidad de generación por iteración")
+    ax.set_xlabel("Iteración")
+    ax.set_ylabel("Tokens de salida por segundo")
+    ax.grid(True)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(out_dir / "tokens_por_segundo_todos_los_modelos.png", dpi=150)
+    plt.close(fig)
+
+
+def plot_latency_vs_output_tokens(df: pd.DataFrame, out_dir: Path) -> None:
+    """Grafica latencia contra tokens de salida."""
+    if "eval_count" not in df.columns:
+        return
+
+    plot_df = df.dropna(subset=["eval_count", "latency_ms"])
+    if plot_df.empty:
+        return
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for model, group in plot_df.groupby("model"):
+        ax.scatter(group["eval_count"], group["latency_ms"], s=35, alpha=0.75, label=model)
+
+    ax.set_title("Latencia respecto a tokens de salida")
+    ax.set_xlabel("Tokens de salida")
+    ax.set_ylabel("Tiempo total (ms)")
+    ax.grid(True)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(out_dir / "latencia_vs_tokens_salida.png", dpi=150)
+    plt.close(fig)
+
+
+def plot_latency_vs_total_tokens(df: pd.DataFrame, out_dir: Path) -> None:
+    """Grafica latencia contra tokens totales."""
+    if "total_tokens" not in df.columns:
+        return
+
+    plot_df = df.dropna(subset=["total_tokens", "latency_ms"])
+    if plot_df.empty:
+        return
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for model, group in plot_df.groupby("model"):
+        ax.scatter(group["total_tokens"], group["latency_ms"], s=35, alpha=0.75, label=model)
+
+    ax.set_title("Latencia respecto a tokens totales")
+    ax.set_xlabel("Tokens totales = entrada + salida")
+    ax.set_ylabel("Tiempo total (ms)")
+    ax.grid(True)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(out_dir / "latencia_vs_tokens_totales.png", dpi=150)
+    plt.close(fig)
+
+
+def plot_boxplot_latency(df: pd.DataFrame, out_dir: Path) -> None:
+    """Genera un boxplot para comparar la distribución de latencia por modelo."""
+    models = list(df["model"].dropna().unique())
+    data = [df[df["model"] == model]["latency_ms"].dropna() for model in models]
+
+    if not models:
+        return
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+    ax.boxplot(data, labels=models, showmeans=True)
+    ax.set_title("Distribución de latencia por modelo")
+    ax.set_xlabel("Modelo")
+    ax.set_ylabel("Tiempo total (ms)")
+    ax.grid(True, axis="y")
+    plt.xticks(rotation=20, ha="right")
+    fig.tight_layout()
+    fig.savefig(out_dir / "boxplot_latencia_por_modelo.png", dpi=150)
+    plt.close(fig)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Genera gráficas de resultados de benchmark de LLM con Ollama.")
+    parser.add_argument("--csv", required=True, help="Ruta al archivo CSV de benchmark.")
+    parser.add_argument("--out", default="graficas_benchmark", help="Carpeta de salida para guardar PNG y resumen CSV.")
+
+    args = parser.parse_args()
+
+    csv_path = Path(args.csv)
+    out_dir = Path(args.out)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    df = prepare_dataframe(csv_path)
+    summary = save_summary(df, out_dir)
+
+    plot_latency_per_model(df, out_dir)
+    plot_all_models_latency(df, out_dir)
+    plot_tokens_per_second(df, out_dir)
+    plot_latency_vs_output_tokens(df, out_dir)
+    plot_latency_vs_total_tokens(df, out_dir)
+    plot_boxplot_latency(df, out_dir)
+
+    print("\nAnálisis terminado.")
+    print(f"Archivo CSV leído: {csv_path}")
+    print(f"Carpeta de salida: {out_dir}")
+    print("\nResumen estadístico por modelo:")
+    print(summary.to_string(index=False))
+
+
+if __name__ == "__main__":
+    main()
+
+```
+
+```bash
+python graficar_benchmark.py --csv benchmark_modelos.csv --out graficas_benchmark
+```
+
+**Ejemplo de uso**
+
+Ejecutar el benchmark de modelos:
+
+```bash
+python benchmark_modelos.py
+```
+
+Después, generar las gráficas:
+
+```bash
+python graficar_benchmark.py --csv benchmark_modelos.csv --out graficas_benchmark
+```
+
+### Interpretación de las gráficas
+
+#### 1. Latencia por iteración de cada modelo
+
+Esta gráfica muestra el tiempo de respuesta en cada repetición. La línea punteada representa la media y la banda sombreada representa una desviación estándar.
+
+Permite identificar:
+
+- estabilidad del modelo;
+- iteraciones lentas o atípicas;
+- efecto de carga inicial;
+- variabilidad durante las 100 pruebas.
+
+Si un modelo tiene muchos puntos fuera de la banda de una desviación estándar, puede considerarse menos estable para aplicaciones donde la latencia debe ser predecible.
+
+---
+
+#### 2. Latencia por iteración comparando todos los modelos
+
+Esta gráfica coloca todos los modelos en la misma figura. Permite observar cuál modelo responde más rápido y cuál presenta mayor variabilidad.
+
+En robótica, esta gráfica es útil porque un modelo con menor latencia promedio puede ser preferible para interacción rápida, siempre que mantenga calidad suficiente en las respuestas.
+
+---
+
+#### 3. Tokens por segundo
+
+La gráfica de tokens por segundo mide la velocidad de generación. Esta métrica es importante porque dos modelos pueden tener tiempos similares, pero uno puede producir muchas más palabras o tokens durante ese tiempo.
+
+Una velocidad mayor en tokens por segundo indica mejor rendimiento de generación, aunque no necesariamente mejor calidad.
+
+---
+
+#### 4. Latencia contra tokens de salida
+
+Esta gráfica permite observar si las respuestas más largas incrementan el tiempo total de respuesta. En general, mientras más tokens genera el modelo, mayor suele ser la latencia.
+
+Si se observa una relación muy fuerte entre tokens de salida y tiempo de respuesta, puede ser conveniente reducir `num_predict` o pedir respuestas más breves en el prompt.
+
+---
+
+#### 5. Latencia contra tokens totales
+
+Esta gráfica considera:
+
+```text
+tokens_totales = tokens_entrada + tokens_salida
+```
+
+Es útil para analizar el efecto combinado del tamaño del prompt y la longitud de la respuesta.
+
+---
+
+#### 6. Boxplot de latencia por modelo
+
+El boxplot permite comparar la distribución de latencia entre modelos. Muestra mediana, dispersión y valores atípicos.
+
+Puede usarse para justificar una decisión técnica:
+
+- modelo más rápido;
+- modelo más estable;
+- modelo con menos valores atípicos;
+- modelo con mejor consistencia entre iteraciones.
+
+---
+
+
+## 9. Análisis del CSV
 
 Guarda el siguiente archivo como `analizar_benchmark.py`.
 
@@ -1113,7 +1527,7 @@ Tabla esperada:
 
 ---
 
-## 10. PRÁCTICA 2: Selección de plataforma y benchmark de modelos LLM
+## 10. Práctica 2: Selección de plataforma y benchmark de modelos LLM
 
 ### Parte A. Matriz de decisión para proyecto final
 
@@ -1122,9 +1536,9 @@ El estudiante debe seleccionar que plataformas utilizara para el proyecto final,
 1. PC local con CPU;
 2. PC local con GPU;
 3. API en la nube;
-4. servidor GPU en nube;
-5. sistema embebido tipo Jetson;
-6. microcontrolador conectado a API.
+4. Servidor GPU en nube;
+5. Sistema embebido tipo Jetson;
+6. Microcontrolador conectado a API.
 
 | Plataforma | Costo inicial | Costo operativo | Latencia | Privacidad | Implementación | Modelo | Escalabilidad | Notas |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -1133,7 +1547,8 @@ El estudiante debe seleccionar que plataformas utilizara para el proyecto final,
 | API nube | | | | | | | | | 
 | Servidor GPU nube | | | | | | | | | 
 | Jetson | | | | | | | | | 
-| Microcontrolador + API | | | | | | | | | 
+| Microcontrolador + API | | | | | | | | |
+| Otro | | | | | | | | | 
 
 ---
 
