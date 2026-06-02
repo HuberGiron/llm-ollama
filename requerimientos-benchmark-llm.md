@@ -34,7 +34,7 @@ Un modelo de lenguaje aporta conocimiento semántico de alto nivel, pero sus pro
 
 > ⚠️ **Consideración:** En aplicaciones robóticas, un LLM debe tratarse como un componente de razonamiento, planificación o interacción, no como sustituto directo de los controladores de seguridad, navegación, cinemática, dinámica o control de motores.
 
-![Modelo](assets/img/benchmark/)
+![Modelo](assets/img/benchmark/ia-fisica.png)
 
 ---
 
@@ -120,11 +120,11 @@ Esto ayuda a evitar que equipos con poca RAM o VRAM se saturen y permite compara
 
 ---
 
-## 3. Comparativa de plataformas de cómputo
+## 3. Plataformas de cómputo
 
-### 3.1 PC local
+### 3.1 Computadora local
 
-Una PC local es una plataforma adecuada para aprendizaje, pruebas, desarrollo de prototipos y ejecución de modelos pequeños o medianos. Su ventaja principal es que permite trabajar sin pagar por tokens y sin depender de una API externa. Su limitación es que el rendimiento depende directamente del hardware disponible.
+Una computadora local es una plataforma adecuada para aprendizaje, pruebas, desarrollo de prototipos y ejecución de modelos pequeños o medianos. Su ventaja principal es que permite trabajar sin pagar por tokens y sin depender de una API externa. Su limitación es que el rendimiento depende directamente del hardware disponible.
 
 En una PC local deben revisarse:
 
@@ -132,16 +132,14 @@ En una PC local deben revisarse:
 - CPU;
 - GPU;
 - VRAM;
-- almacenamiento disponible;
-- ventilación y consumo energético;
-- sistema operativo;
-- compatibilidad con Ollama, drivers y bibliotecas.
-
-**Uso recomendado:** clase práctica, experimentación con Ollama, comparación de modelos pequeños, pruebas de prompts, desarrollo de prototipos y conexión con robots mediante una computadora intermedia.
+- Almacenamiento disponible (SSD);
+- Ventilación y consumo energético;
+- Sistema operativo;
+- Compatibilidad con Ollama, drivers y bibliotecas.
 
 ---
 
-### 3.2 API en la nube
+### 3.2 API en la nube o servidor
 
 Una API en la nube permite usar modelos potentes sin administrar directamente servidores ni GPUs. El proveedor se encarga del modelo, infraestructura, escalabilidad y disponibilidad. En este esquema, el costo suele calcularse por tokens de entrada y salida. OpenAI y Google AI publican precios por millón de tokens, con tarifas diferenciadas por modelo, entrada, salida y, en algunos casos, caché de contexto o herramientas adicionales [8], [9].
 
