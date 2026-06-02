@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Requerimientos y ajustes LLM
+title: Benchmark LLM
 nav_order: 2
 ---
 
