@@ -393,28 +393,24 @@ Ejemplo de uso desde la API de Ollama:
   }
 }
 ```
-
-> 🖼️ **Espacio para imagen sugerida:** diagrama de parámetros de generación: diversidad (`temperature`, `top_p`, `top_k`), longitud (`num_predict`, `num_ctx`) y rendimiento (`num_thread`, `num_gpu`, `keep_alive`).  
-> Archivo sugerido: `assets/img/llm/tema2/06-parametros-generacion-llm.png`
-
 ---
 
 ## 6. Metodología de benchmark con Python y Ollama
 
 ### 6.1 Objetivo del benchmark
 
-Un benchmark no debe limitarse a preguntar “qué modelo responde mejor”. Debe medir el comportamiento del modelo bajo condiciones controladas. En esta práctica se propone evaluar:
+Un benchmark nos permite responder “qué modelo es mejor para cierta aplicación”. Mide el comportamiento del modelo bajo condiciones controladas. En esta práctica se propone evaluar:
 
-- tiempo total de respuesta;
-- tiempo de carga;
-- tokens de entrada;
-- tokens de salida;
-- tokens por segundo;
-- longitud de la respuesta;
-- variabilidad entre ciclos;
-- calidad conceptual;
-- cumplimiento del límite de tokens;
-- viabilidad para la aplicación robótica.
+- Tiempo total de respuesta;
+- Tiempo de carga;
+- Tokens de entrada;
+- Tokens de salida;
+- Tokens por segundo;
+- Longitud de la respuesta;
+- Variabilidad entre ciclos;
+- Calidad conceptual;
+- Cumplimiento del límite de tokens;
+- Viabilidad para la aplicación.
 
 Ollama expone una API local en `http://localhost:11434/api`, lo que permite automatizar pruebas desde Python y guardar resultados en CSV [2].
 
@@ -445,23 +441,139 @@ ollama ps
 Instalar dependencias de Python:
 
 ```bash
-python -m venv .venv
-
-# Windows PowerShell
-.\.venv\Scripts\activate
-
-# macOS / Linux
-source .venv/bin/activate
 
 pip install requests pandas
+pip install requests
 ```
-
-> 🖼️ **Espacio para captura:** terminal con `ollama ls`.  
-> Archivo sugerido: `assets/img/llm/tema2/captura-ollama-ls.png`
 
 ---
 
-### 6.3 Diseño experimental A: comparación entre modelos
+### 6.3 Prueba manual de un prompt con parámetros de generación
+
+Antes de ejecutar un benchmark con 100 ciclos por modelo o por configuración, conviene realizar una prueba manual con un solo prompt,lo que permitira observar de manera directa cómo cambia la respuesta del modelo al modificar parámetros como `temperature`, `top_p`, `top_k`, `num_predict`, `num_ctx`, `repeat_penalty` o `seed`. La finalidad es comprender experimentalmente que un LLM no responde únicamente en función del prompt: también depende del modelo seleccionado, de la ventana de contexto, del límite de tokens y de los parámetros de muestreo configurados.
+
+En esta prueba se utilizará la API local de Ollama. Por defecto, Ollama expone un servicio local en `http://localhost:11434/api/generate`, desde el cual es posible enviar un modelo, un prompt y un conjunto de opciones de generación. Para este primer ejercicio se recomienda usar `stream: false`, porque de esta manera Ollama devuelve la respuesta completa y, al final, incluye métricas útiles como tiempo total, tiempo de carga, tokens de entrada, tokens de salida y duración de generación [15].
+
+Crea un archivo llamado `prueba_manual_parametros.py` y copia el siguiente código.
+
+```python
+import requests
+import time
+
+# ============================================================
+# Prueba manual de un prompt con parámetros de generación
+# Requiere Ollama ejecutándose localmente.
+# Endpoint por defecto: http://localhost:11434/api/generate
+# ============================================================
+
+OLLAMA_URL = "http://localhost:11434/api/generate"
+
+# Cambia este modelo por uno que ya tengas instalado en Ollama.
+MODEL = "llama3.2:3b"
+
+# Prompt fijo para observar cómo cambian las respuestas al modificar parámetros.
+PROMPT = (
+    "Explica en máximo 120 palabras qué es un sensor ultrasónico "
+    "y cómo podría usarse en un robot móvil educativo. "
+    "Usa lenguaje claro para estudiantes de primer semestre."
+)
+
+# Modifica manualmente estos parámetros y vuelve a ejecutar el script.
+OPTIONS = {
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": 40,
+    "min_p": 0.0,
+    "num_ctx": 4096,
+    "num_predict": 160,
+    "repeat_penalty": 1.1,
+    "repeat_last_n": 64,
+    "seed": 42
+}
+
+payload = {
+    "model": MODEL,
+    "prompt": PROMPT,
+    "stream": False,
+    "keep_alive": "5m",
+    "options": OPTIONS
+}
+
+print("=" * 70)
+print("PRUEBA MANUAL DE PARÁMETROS CON OLLAMA")
+print("=" * 70)
+print(f"Modelo: {MODEL}")
+print("\nPrompt:")
+print(PROMPT)
+print("\nParámetros:")
+for key, value in OPTIONS.items():
+    print(f"  {key}: {value}")
+print("=" * 70)
+
+try:
+    start_time = time.perf_counter()
+    response = requests.post(OLLAMA_URL, json=payload, timeout=300)
+    end_time = time.perf_counter()
+
+    response.raise_for_status()
+    data = response.json()
+
+    generated_text = data.get("response", "")
+
+    total_duration_s = data.get("total_duration", 0) / 1e9
+    load_duration_s = data.get("load_duration", 0) / 1e9
+    prompt_eval_count = data.get("prompt_eval_count", 0)
+    eval_count = data.get("eval_count", 0)
+    eval_duration_s = data.get("eval_duration", 0) / 1e9
+
+    tokens_per_second = (
+        eval_count / eval_duration_s if eval_duration_s > 0 else 0
+    )
+
+    print("\nRESPUESTA DEL MODELO")
+    print("-" * 70)
+    print(generated_text)
+
+    print("\nMÉTRICAS")
+    print("-" * 70)
+    print(f"Tiempo medido por Python: {end_time - start_time:.3f} s")
+    print(f"Tiempo total reportado por Ollama: {total_duration_s:.3f} s")
+    print(f"Tiempo de carga del modelo: {load_duration_s:.3f} s")
+    print(f"Tokens de entrada: {prompt_eval_count}")
+    print(f"Tokens de salida: {eval_count}")
+    print(f"Tiempo de generación: {eval_duration_s:.3f} s")
+    print(f"Tokens por segundo: {tokens_per_second:.2f}")
+
+except requests.exceptions.ConnectionError:
+    print("ERROR: No se pudo conectar con Ollama.")
+    print("Verifica que Ollama esté instalado y ejecutándose.")
+    print("Puedes probar en terminal: ollama run llama3.2:3b")
+
+except requests.exceptions.Timeout:
+    print("ERROR: La solicitud tardó demasiado tiempo.")
+    print("Prueba con un modelo más pequeño o reduce num_predict.")
+
+except requests.exceptions.HTTPError as error:
+    print("ERROR HTTP:", error)
+    print("Respuesta del servidor:", response.text)
+
+except Exception as error:
+    print("ERROR inesperado:", error)
+```
+
+Ejecuta el archivo desde la terminal:
+
+```bash
+python prueba_manual_parametros.py
+```
+
+> **Espacio para captura de pantalla:** ejecución del script en terminal mostrando parámetros, respuesta del modelo y métricas.
+>
+> ![Prueba manual de parámetros con Ollama](assets/img/tema2/prueba-manual-parametros.png)
+
+---
+
+### 6.4 Diseño experimental A: comparación entre modelos
 
 El primer experimento compara mínimo tres modelos con el mismo prompt y los mismos parámetros.
 
@@ -500,7 +612,7 @@ Para observar variabilidad, no se debe fijar una misma `seed` en todas las repet
 
 ---
 
-### 6.4 Diseño experimental B: variación de parámetros
+### 6.5 Diseño experimental B: variación de parámetros
 
 El segundo experimento usa un solo modelo y modifica tres parámetros, cada uno con tres configuraciones.
 
@@ -529,7 +641,7 @@ Este experimento permite observar cómo cambian estabilidad, longitud, repetici�
 
 ---
 
-### 6.5 Campos mínimos del CSV
+### 6.6 Campos mínimos del CSV
 
 El CSV debe incluir variables suficientes para reproducir y analizar el experimento.
 
@@ -560,7 +672,7 @@ El CSV debe incluir variables suficientes para reproducir y analizar el experime
 
 ---
 
-### 6.6 Evaluación de calidad de respuesta
+### 6.7 Evaluación de calidad de respuesta
 
 La calidad no debe medirse únicamente por velocidad. Para esta práctica se propone una rúbrica de 0 a 10:
 
@@ -1210,3 +1322,7 @@ La selección responsable de un modelo requiere medir. Por ello, el benchmark de
 [13] Fernandez, J., Na, C., Tiwari, V., Bisk, Y., Luccioni, S., & Strubell, E. “Energy Considerations of Large Language Model Inference and Efficiency Optimizations.” *ACL Anthology*, 2025. Disponible en: <https://aclanthology.org/2025.acl-long.1563/>
 
 [14] NVIDIA. (s. f.). *What is Physical AI?* NVIDIA Glossary. Define la IA física como sistemas que permiten a máquinas autónomas percibir, comprender y realizar acciones complejas en el mundo físico.
+
+[15] Ollama. (s. f.). *Generate API*. Documentación oficial de la API `/api/generate`, incluyendo uso de `stream`, `options`, `keep_alive` y métricas como `total_duration`, `load_duration`, `prompt_eval_count`, `eval_count` y `eval_duration`. https://docs.ollama.com/api/generate
+
+[16] Ollama. (s. f.). *Modelfile reference*. Documentación oficial de parámetros de generación como `temperature`, `top_k`, `top_p`, `min_p`, `num_ctx`, `num_predict`, `repeat_penalty`, `repeat_last_n`, `seed` y `stop`. https://docs.ollama.com/modelfile
