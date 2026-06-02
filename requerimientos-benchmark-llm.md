@@ -128,7 +128,7 @@ Una computadora local es una plataforma adecuada para aprendizaje, pruebas, desa
 
 En una PC local deben revisarse:
 
-- memoria RAM;
+- Memoria RAM;
 - CPU;
 - GPU;
 - VRAM;
@@ -185,8 +185,9 @@ Un servidor en la nube con GPU permite ejecutar modelos open-source o personaliz
 - Costo por hora aunque no haya uso constante;
 - Necesidad de mantenimiento técnico.
 
-[Ejemplo Costos Droplet](https://www.digitalocean.com/pricing/calculator)
+[Ejemplo costos Digital Ocean](https://www.digitalocean.com/pricing/calculator)
 
+**Laboratorio IA IBERO (ONLINE-Julio 2026)**
 ![Nube Ibero](assets/img/benchmark/saptiva.png)
 
 ---
@@ -204,14 +205,12 @@ En cambio, una tarjeta como NVIDIA Jetson Orin Nano Super Developer Kit es una c
 | Microcontrolador ESP32 | No para LLM modernos generales | Sensores, actuadores, comunicación, adquisición de datos |
 | Raspberry Pi | Limitado; modelos pequeños cuantizados con baja velocidad | Prototipos educativos, cliente local, interfaz |
 | Jetson Orin Nano | Sí, con modelos pequeños/medianos cuantizados y restricciones | Robótica móvil, visión, inferencia en borde |
-| PC con CPU | Sí, modelos pequeños/medianos cuantizados | Clase, pruebas, prototipos |
+| PC con CPU | Sí, modelos pequeños/medianos cuantizados | Entorno educativo, pruebas, prototipos |
 | PC con GPU | Sí, mejor velocidad si el modelo cabe en VRAM | Desarrollo, evaluación, integración robótica |
 | Servidor GPU | Sí, modelos medianos o grandes | Producción, investigación, múltiples usuarios |
 | API comercial | Sí, como servicio externo | Aplicaciones web, prototipos rápidos, modelos avanzados |
 
-> 🖼️ **Espacio para imagen sugerida:** mapa comparativo desde microcontrolador → Jetson → PC local → servidor GPU → API nube.  
-> Archivo sugerido: `assets/img/llm/tema2/04-plataformas-computo-llm.png`
-
+![Digital Ocean](assets/img/benchmark/do-models.png)
 ---
 
 ## 4. Tokens, latencia, memoria y costos
@@ -224,7 +223,7 @@ Un **token** es una unidad de texto procesada por el modelo. Puede ser una palab
 tokens_totales = tokens_entrada + tokens_salida
 ```
 
-Un prompt más largo exige más procesamiento de entrada. Una respuesta más larga exige más generación autoregresiva. Por esta razón, en aplicaciones robóticas conviene diseñar prompts compactos y respuestas estructuradas.
+Un prompt más largo exige más procesamiento de entrada. Una respuesta más larga exige más generación autoregresiva. Por esta razón, en aplicaciones con recursos limitados conviene diseñar prompts compactos y respuestas estructuradas.
 
 Ejemplo:
 
@@ -251,7 +250,7 @@ La **latencia** es el tiempo que tarda el sistema en responder. En un LLM puede 
 | Evaluación del prompt | Tiempo para procesar tokens de entrada |
 | Generación | Tiempo para producir tokens de salida |
 | Latencia de red | Aplica si se usa nube o servidor remoto |
-| Postprocesamiento | Validar JSON, guardar resultados o ejecutar acciones |
+| Postprocesamiento | Validar JSON, guardar resultados o ejecutar acciones (En caso de tener algun script, skill, o proceso posterior a la salida del LLM) |
 
 Ollama permite obtener métricas de inferencia cuando se usa su API con `stream: false`. Entre los campos útiles se encuentran `total_duration`, `load_duration`, `prompt_eval_count`, `prompt_eval_duration`, `eval_count` y `eval_duration` [2].
 
@@ -266,28 +265,27 @@ tiempo_generacion_s = eval_duration / 1e9
 tokens_por_segundo = eval_count / tiempo_generacion_s
 ```
 
-> 🖼️ **Espacio para imagen sugerida:** línea de tiempo de una solicitud LLM: cargar modelo → procesar prompt → generar respuesta → guardar métricas.  
-> Archivo sugerido: `assets/img/llm/tema2/05-latencia-inferencia-llm.png`
-
 ---
 
 ### 4.3 Memoria durante la inferencia
 
 La memoria durante una prueba depende de varios factores:
 
-- tamaño del modelo;
-- nivel de cuantización;
-- longitud de contexto;
-- número de solicitudes paralelas;
-- uso de CPU o GPU;
-- cantidad de modelos cargados simultáneamente;
-- tiempo que el modelo permanece cargado con `keep_alive`.
+- Tamaño del modelo;
+- Nivel de cuantización;
+- Longitud de contexto;
+- Número de solicitudes paralelas;
+- Uso de CPU o GPU;
+- Cantidad de modelos cargados simultáneamente;
+- Tiempo que el modelo permanece cargado con `keep_alive`.
 
-Ollama permite mantener un modelo cargado cierto tiempo mediante `keep_alive`, lo que reduce el tiempo de carga en solicitudes posteriores. Esto mejora la latencia en experimentos repetidos, pero aumenta el tiempo durante el cual RAM o VRAM permanecen ocupadas [2].
+Ollama permite mantener un modelo cargado cierto tiempo mediante `keep_alive`, lo que **reduce el tiempo de carga en solicitudes posteriores**. Esto mejora la latencia en experimentos repetidos, pero aumenta el tiempo durante el cual **RAM o VRAM permanecen ocupadas** [2].
 
 ---
 
 ### 4.4 Costo energético local
+
+La literatura académica sobre NLP y LLM ha señalado que el cómputo profundo implica costos financieros y ambientales, tanto en entrenamiento como en inferencia. Strubell, Ganesh y McCallum documentaron la relevancia del costo energético en NLP moderno, y estudios recientes han analizado cómo las optimizaciones de inferencia pueden modificar significativamente el consumo energético en LLM [12], [13].
 
 El costo energético local puede estimarse con:
 
@@ -304,8 +302,6 @@ energía = (180 / 1000) × 2 = 0.36 kWh
 ```
 
 Este costo puede parecer bajo para una práctica individual, pero crece cuando se ejecutan muchos experimentos, se usan GPUs de alto consumo, se realizan pruebas durante varias horas o se atienden múltiples usuarios.
-
-La literatura académica sobre NLP y LLM ha señalado que el cómputo profundo implica costos financieros y ambientales, tanto en entrenamiento como en inferencia. Strubell, Ganesh y McCallum documentaron la relevancia del costo energético en NLP moderno, y estudios recientes han analizado cómo las optimizaciones de inferencia pueden modificar significativamente el consumo energético en LLM [12], [13].
 
 ---
 
