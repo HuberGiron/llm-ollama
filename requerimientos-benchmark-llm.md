@@ -318,17 +318,17 @@ costo_total =
 (tokens_salida / 1,000,000 × precio_salida)
 ```
 
-Ejemplo de plantilla para cálculo:
+Ejemplo Anthropic Claude 4.1 Opus (Digital Ocean - 02 Junio 2026):
 
 | Variable | Valor de ejemplo |
 |---|---:|
 | Tokens de entrada | 100,000 |
 | Tokens de salida | 50,000 |
-| Precio entrada por 1M tokens | Consultar proveedor |
-| Precio salida por 1M tokens | Consultar proveedor |
-| Costo total | Calcular con la fórmula |
+| Precio entrada por 1M tokens | USD $15.00/M input tokens |
+| Precio salida por 1M tokens | USD $75.00/M output tokens |
+| Costo total | **USD $5.25** |
 
-> ⚠️ **Consideración:** Los precios de APIs cambian con frecuencia. Para un documento académico o práctica de clase, se recomienda consultar siempre la página oficial del proveedor el día de la actividad [8], [9].
+> ⚠️ **Consideración:** Los precios de APIs cambian con frecuencia, se recomienda consultar siempre la página oficial del proveedor el día de la actividad [8], [9].
 
 ---
 
@@ -336,18 +336,18 @@ Ejemplo de plantilla para cálculo:
 
 El costo de implementación no se limita al pago de energía o tokens. También incluye:
 
-- tiempo de instalación y configuración;
-- selección del modelo;
-- evaluación de calidad;
-- integración con backend;
-- seguridad;
-- monitoreo;
-- almacenamiento de logs;
-- pruebas;
-- documentación;
-- mantenimiento;
-- capacitación de usuarios;
-- mitigación de errores y alucinaciones.
+- Tiempo de instalación y configuración;
+- Selección del modelo;
+- Evaluación de calidad;
+- Integración con backend;
+- Seguridad;
+- Monitoreo;
+- Almacenamiento de logs;
+- Pruebas;
+- Documentación;
+- Mantenimiento;
+- Capacitación de usuarios;
+- Mitigación de errores y alucinaciones.
 
 En un proyecto robótico, además deben considerarse sensores, comunicación, sistemas de seguridad, pruebas de campo y mecanismos de recuperación ante errores.
 
