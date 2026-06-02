@@ -576,12 +576,12 @@ python prueba_manual_parametros.py
 El primer experimento compara mínimo tres modelos con el mismo prompt y los mismos parámetros.
 
 ```text
-Modelos:
+Ejemplo Modelos:
 - llama3.2:3b
 - qwen2.5:7b
 - mistral:7b
 
-Prompt fijo:
+Ejemplo Prompt fijo:
 "Explica en máximo 120 palabras cómo podría usarse un LLM
 como asistente de alto nivel para un robot móvil universitario."
 
@@ -615,10 +615,10 @@ Para observar variabilidad, no se debe fijar una misma `seed` en todas las repet
 El segundo experimento usa un solo modelo y modifica tres parámetros, cada uno con tres configuraciones.
 
 ```text
-Modelo sugerido:
+Ejemplo Modelo :
 llama3.2:3b
 
-Prompt fijo:
+Ejemplo Prompt fijo:
 "Explica en máximo 120 palabras qué es un sensor ultrasónico
 y cómo podría usarse en un robot móvil educativo."
 ```
@@ -670,33 +670,7 @@ El CSV debe incluir variables suficientes para reproducir y analizar el experime
 
 ---
 
-### 6.7 Evaluación de calidad de respuesta
-
-La calidad no debe medirse únicamente por velocidad. Para esta práctica se propone una rúbrica de 0 a 10:
-
-| Criterio | Puntaje |
-|---|---:|
-| Corrección conceptual | 0 a 3 |
-| Claridad para el público objetivo | 0 a 2 |
-| Concisión y respeto al límite de tokens | 0 a 2 |
-| Utilidad para la aplicación robótica | 0 a 2 |
-| Ausencia de errores graves o alucinaciones | 0 a 1 |
-| **Total** | **10** |
-
-La evaluación puede realizarse de tres maneras:
-
-1. evaluación manual por el estudiante;
-2. revisión cruzada entre equipos;
-3. evaluación asistida por otro modelo, aclarando que no sustituye la validación humana.
-
-Para iniciar de forma sencilla, el script puede calcular una **evaluación heurística** mediante longitud, palabras clave, respuesta no vacía y repetición extrema. Esta métrica no reemplaza la revisión humana, pero ayuda a automatizar una primera comparación.
-
-> 🖼️ **Espacio para imagen sugerida:** flujo de benchmark: prompt → Ollama API → CSV → análisis → matriz de decisión.  
-> Archivo sugerido: `assets/img/llm/tema2/07-flujo-benchmark-ollama-python.png`
-
----
-
-## 7. Script 1: benchmark comparativo entre modelos
+## 7. Benchmark comparativo entre modelos
 
 Guarda el siguiente archivo como `benchmark_modelos.py`.
 
@@ -895,10 +869,11 @@ Ejecutar:
 ```bash
 python benchmark_modelos.py
 ```
+![Prueba manual de parámetros con Ollama3](assets/img/benchmark/c3.png)
 
 ---
 
-## 8. Script 2: benchmark por variación de parámetros
+## 8. Benchmark por variación de parámetros
 
 Guarda el siguiente archivo como `benchmark_parametros.py`.
 
@@ -1063,9 +1038,11 @@ Ejecutar:
 python benchmark_parametros.py
 ```
 
+![Prueba manual de parámetros con Ollama4](assets/img/benchmark/c4.png)
+
 ---
 
-## 9. Script 3: análisis del CSV
+## Análisis del CSV
 
 Guarda el siguiente archivo como `analizar_benchmark.py`.
 
@@ -1121,6 +1098,8 @@ Ejecutar:
 python analizar_benchmark.py
 ```
 
+![Prueba manual de parámetros con Ollama5](assets/img/benchmark/c5.png)
+
 Tabla esperada:
 
 | Modelo | Tiempo promedio | Tokens entrada | Tokens salida | Tokens/s | Calidad promedio | Observación |
@@ -1134,19 +1113,11 @@ Tabla esperada:
 
 ---
 
-## 10. Actividad 2
+## 10. PRÁCTICA 2: Selección de plataforma y benchmark de modelos LLM
 
-### Actividad 2. Selección de plataforma y benchmark de modelos LLM
+### Parte A. Matriz de decisión para proyecto final
 
-#### Objetivo
-
-Construir una matriz de decisión para seleccionar una plataforma de cómputo adecuada para ejecutar o consumir LLM en una aplicación robótica, considerando presupuesto, recursos de hardware, latencia, privacidad, costo energético, costo por tokens y calidad de respuesta.
-
----
-
-### Parte A. Matriz de decisión
-
-El estudiante debe comparar al menos cuatro plataformas. Se recomienda incluir:
+El estudiante debe seleccionar que plataformas utilizara para el proyecto final, de cada una escribe las consideraciones de costos latencia, temas de privacidad, consideraciones de implementación y  escalabilidadlas cuales pueden ser:
 
 1. PC local con CPU;
 2. PC local con GPU;
@@ -1155,35 +1126,14 @@ El estudiante debe comparar al menos cuatro plataformas. Se recomienda incluir:
 5. sistema embebido tipo Jetson;
 6. microcontrolador conectado a API.
 
-Criterios sugeridos:
-
-| Criterio | Peso sugerido |
-|---|---:|
-| Costo inicial | 10 % |
-| Costo operativo | 15 % |
-| Latencia | 15 % |
-| Privacidad | 10 % |
-| Facilidad de implementación | 10 % |
-| Capacidad de ejecutar modelos locales | 15 % |
-| Compatibilidad con robótica | 15 % |
-| Escalabilidad | 10 % |
-
-Cada plataforma se evalúa de 1 a 5.
-
-```text
-Puntaje final = suma(puntaje × peso)
-```
-
-Plantilla:
-
-| Plataforma | Costo inicial | Costo operativo | Latencia | Privacidad | Implementación | Modelo local | Robótica | Escalabilidad | Puntaje final |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| PC local CPU | | | | | | | | | |
-| PC local GPU | | | | | | | | | |
-| API nube | | | | | | | | | |
-| Servidor GPU nube | | | | | | | | | |
-| Jetson | | | | | | | | | |
-| Microcontrolador + API | | | | | | | | | |
+| Plataforma | Costo inicial | Costo operativo | Latencia | Privacidad | Implementación | Modelo | Escalabilidad | Notas |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| PC local CPU | | | | | | | | | 
+| PC local GPU | | | | | | | | | 
+| API nube | | | | | | | | | 
+| Servidor GPU nube | | | | | | | | | 
+| Jetson | | | | | | | | | 
+| Microcontrolador + API | | | | | | | | | 
 
 ---
 

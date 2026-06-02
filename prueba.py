@@ -1,26 +1,19 @@
-import requests
+import csv
 import time
+from datetime import datetime
 
-# ============================================================
-# Prueba manual de un prompt con parámetros de generación
-# Requiere Ollama ejecutándose localmente.
-# Endpoint por defecto: http://localhost:11434/api/generate
-# ============================================================
+import requests
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
 
-# Cambia este modelo por uno que ya tengas instalado en Ollama.
 MODEL = "llama3.2:3b"
 
-# Prompt fijo para observar cómo cambian las respuestas al modificar parámetros.
 PROMPT = (
     "Explica en máximo 120 palabras qué es un sensor ultrasónico "
-    "y cómo podría usarse en un robot móvil educativo. "
-    "Usa lenguaje claro para estudiantes de primer semestre."
+    "y cómo podría usarse en un robot móvil educativo."
 )
 
-# Modifica manualmente estos parámetros y vuelve a ejecutar el script.
-OPTIONS = {
+BASE_OPTIONS = {
     "temperature": 0.7,
     "top_p": 0.9,
     "top_k": 40,
@@ -28,75 +21,132 @@ OPTIONS = {
     "num_ctx": 4096,
     "num_predict": 160,
     "repeat_penalty": 1.1,
-    "repeat_last_n": 64,
-    "seed": 42
 }
 
-payload = {
-    "model": MODEL,
-    "prompt": PROMPT,
-    "stream": False,
-    "keep_alive": "5m",
-    "options": OPTIONS
+PARAMETER_TESTS = {
+    "temperature": [0.0, 0.7, 1.1],
+    "top_p": [0.7, 0.9, 0.95],
+    "repeat_penalty": [1.0, 1.2, 1.5],
 }
 
-print("=" * 70)
-print("PRUEBA MANUAL DE PARÁMETROS CON OLLAMA")
-print("=" * 70)
-print(f"Modelo: {MODEL}")
-print("\nPrompt:")
-print(PROMPT)
-print("\nParámetros:")
-for key, value in OPTIONS.items():
-    print(f"  {key}: {value}")
-print("=" * 70)
+N_CYCLES = 10
+OUTPUT_CSV = "benchmark_parametros.csv"
 
-try:
-    start_time = time.perf_counter()
+
+def run_ollama(model: str, prompt: str, options: dict) -> dict:
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "stream": False,
+        "keep_alive": "30m",
+        "options": options,
+    }
+
+    start = time.perf_counter()
     response = requests.post(OLLAMA_URL, json=payload, timeout=300)
-    end_time = time.perf_counter()
+    end = time.perf_counter()
 
     response.raise_for_status()
     data = response.json()
 
-    generated_text = data.get("response", "")
-
-    total_duration_s = data.get("total_duration", 0) / 1e9
-    load_duration_s = data.get("load_duration", 0) / 1e9
-    prompt_eval_count = data.get("prompt_eval_count", 0)
-    eval_count = data.get("eval_count", 0)
     eval_duration_s = data.get("eval_duration", 0) / 1e9
+    eval_count = data.get("eval_count", 0)
 
-    tokens_per_second = (
-        eval_count / eval_duration_s if eval_duration_s > 0 else 0
-    )
+    return {
+        "response": data.get("response", ""),
+        "total_duration_s": data.get("total_duration", 0) / 1e9,
+        "wall_time_s": end - start,
+        "load_duration_s": data.get("load_duration", 0) / 1e9,
+        "prompt_eval_count": data.get("prompt_eval_count", 0),
+        "eval_count": eval_count,
+        "eval_duration_s": eval_duration_s,
+        "tokens_per_second": eval_count / eval_duration_s if eval_duration_s > 0 else 0,
+    }
 
-    print("\nRESPUESTA DEL MODELO")
-    print("-" * 70)
-    print(generated_text)
 
-    print("\nMÉTRICAS")
-    print("-" * 70)
-    print(f"Tiempo medido por Python: {end_time - start_time:.3f} s")
-    print(f"Tiempo total reportado por Ollama: {total_duration_s:.3f} s")
-    print(f"Tiempo de carga del modelo: {load_duration_s:.3f} s")
-    print(f"Tokens de entrada: {prompt_eval_count}")
-    print(f"Tokens de salida: {eval_count}")
-    print(f"Tiempo de generación: {eval_duration_s:.3f} s")
-    print(f"Tokens por segundo: {tokens_per_second:.2f}")
+fieldnames = [
+    "timestamp",
+    "experiment_id",
+    "model",
+    "parameter_changed",
+    "parameter_value",
+    "cycle",
+    "prompt",
+    "temperature",
+    "top_p",
+    "top_k",
+    "min_p",
+    "num_ctx",
+    "num_predict",
+    "repeat_penalty",
+    "response",
+    "total_duration_s",
+    "wall_time_s",
+    "load_duration_s",
+    "prompt_eval_count",
+    "eval_count",
+    "eval_duration_s",
+    "tokens_per_second",
+    "response_chars",
+    "notes",
+]
 
-except requests.exceptions.ConnectionError:
-    print("ERROR: No se pudo conectar con Ollama.")
-    print("Verifica que Ollama esté instalado y ejecutándose.")
-    print("Puedes probar en terminal: ollama run llama3.2:3b")
+with open(OUTPUT_CSV, mode="w", newline="", encoding="utf-8") as file:
+    writer = csv.DictWriter(file, fieldnames=fieldnames)
+    writer.writeheader()
 
-except requests.exceptions.Timeout:
-    print("ERROR: La solicitud tardó demasiado tiempo.")
-    print("Prueba con un modelo más pequeño o reduce num_predict.")
+    for parameter, values in PARAMETER_TESTS.items():
+        for value in values:
+            options = BASE_OPTIONS.copy()
+            options[parameter] = value
 
-except requests.exceptions.HTTPError as error:
-    print("ERROR HTTP:", error)
-    print("Respuesta del servidor:", response.text)
+            for cycle in range(1, N_CYCLES + 1):
+                print(f"Parámetro: {parameter}={value} | Ciclo: {cycle}/{N_CYCLES}")
 
-except Exception as error:
-    print("ERROR inesperado:", error)
+                row = {
+                    "timestamp": datetime.now().isoformat(),
+                    "experiment_id": "variacion_parametros",
+                    "model": MODEL,
+                    "parameter_changed": parameter,
+                    "parameter_value": value,
+                    "cycle": cycle,
+                    "prompt": PROMPT,
+                    "temperature": options["temperature"],
+                    "top_p": options["top_p"],
+                    "top_k": options["top_k"],
+                    "min_p": options["min_p"],
+                    "num_ctx": options["num_ctx"],
+                    "num_predict": options["num_predict"],
+                    "repeat_penalty": options["repeat_penalty"],
+                    "response": "",
+                    "total_duration_s": "",
+                    "wall_time_s": "",
+                    "load_duration_s": "",
+                    "prompt_eval_count": "",
+                    "eval_count": "",
+                    "eval_duration_s": "",
+                    "tokens_per_second": "",
+                    "response_chars": "",
+                    "notes": "",
+                }
+
+                try:
+                    result = run_ollama(MODEL, PROMPT, options)
+                    row.update({
+                        "response": result["response"],
+                        "total_duration_s": result["total_duration_s"],
+                        "wall_time_s": result["wall_time_s"],
+                        "load_duration_s": result["load_duration_s"],
+                        "prompt_eval_count": result["prompt_eval_count"],
+                        "eval_count": result["eval_count"],
+                        "eval_duration_s": result["eval_duration_s"],
+                        "tokens_per_second": result["tokens_per_second"],
+                        "response_chars": len(result["response"]),
+                    })
+
+                except Exception as error:
+                    row["notes"] = str(error)
+
+                writer.writerow(row)
+
+print(f"Benchmark terminado. Resultados guardados en {OUTPUT_CSV}")
