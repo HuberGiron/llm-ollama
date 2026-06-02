@@ -107,7 +107,7 @@ num_ctx = 64000  → contexto largo para documentos, agentes o código
 
 Ollama define la longitud de contexto como el número máximo de tokens accesibles en memoria para el modelo. Su documentación indica que, por defecto, Ollama ajusta la longitud de contexto según la VRAM disponible: menos de 24 GiB usa 4k, entre 24 y 48 GiB usa 32k y 48 GiB o más usa 256k. También advierte que incrementar la ventana de contexto incrementa la memoria requerida [3].
 
-Para una práctica de clase, es recomendable iniciar con valores moderados:
+Para un tema experimental, es recomendable iniciar con valores moderados:
 
 ```text
 num_ctx = 2048 o 4096
@@ -116,7 +116,7 @@ num_predict = 100 a 200
 
 Esto ayuda a evitar que equipos con poca RAM o VRAM se saturen y permite comparar modelos bajo condiciones más controladas.
 
-> ⚠️ **Consideración técnica:** Aumentar `num_ctx` puede mejorar la capacidad para procesar documentos largos, pero también puede aumentar memoria, tiempo de procesamiento y riesgo de saturar la GPU.
+> ⚠️ **Consideración:** Aumentar `num_ctx` puede mejorar la capacidad para procesar documentos largos, pero también puede aumentar memoria, tiempo de procesamiento y riesgo de saturar la GPU.
 
 ---
 
