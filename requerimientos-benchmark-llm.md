@@ -164,6 +164,7 @@ Una API en la nube permite usar modelos potentes sin administrar directamente se
 [Benchmarking LLM API Pricing](https://benchlm.ai/llm-pricing)
 
 [Costos modelos Digital Ocean](https://docs.digitalocean.com/products/inference/details/pricing/)
+
 ---
 
 ### 3.3 Servidor propio en la nube con GPU
@@ -452,7 +453,7 @@ pip install pandas matplotlib
 
 Antes de ejecutar un benchmark con varios ciclos por modelo o por configuración, conviene realizar una prueba manual con un solo prompt, lo que permitira observar de manera directa cómo cambia la respuesta del modelo al modificar parámetros como `temperature`, `top_p`, `top_k`, `num_predict`, `num_ctx`, `repeat_penalty` o `seed`. La finalidad es comprender experimentalmente que un LLM no responde únicamente en función del prompt: también depende del modelo seleccionado, de la ventana de contexto, del límite de tokens y de los parámetros de muestreo configurados.
 
-En esta prueba se utilizará la API local de Ollama. Por defecto, Ollama expone un servicio local en `http://localhost:11434/api/generate`, desde el cual es posible enviar un modelo, un prompt y un conjunto de opciones de generación. Para este primer ejercicio se recomienda usar `stream: false`, porque de esta manera Ollama devuelve la respuesta completa y, al final, incluye métricas útiles como tiempo total, tiempo de carga, tokens de entrada, tokens de salida y duración de generación [15].
+En esta prueba se utilizará la API local de Ollama. Por defecto, Ollama expone un servicio local en `http://localhost:11434/api/generate`, desde el cual es posible enviar un modelo, un prompt y un conjunto de opciones de generación. Para este primer ejercicio se recomienda usar `stream: false`, porque de esta manera Ollama devuelve la respuesta completa y, al final, incluye métricas útiles como tiempo total, tiempo de carga, tokens de entrada, tokens de salida y duración de generación [2].
 
 Crea un archivo llamado `prueba_manual_parametros.py` y copia el siguiente código.
 
@@ -869,7 +870,6 @@ Ejecutar:
 ```bash
 python benchmark_modelos.py
 ```
-![Prueba manual de parámetros con Ollama3](assets/img/benchmark/c3.png)
 
 ---
 
@@ -1038,8 +1038,6 @@ Ejecutar:
 python benchmark_parametros.py
 ```
 
-![Prueba manual de parámetros con Ollama4](assets/img/benchmark/c4.png)
-
 ---
 
 ## 9. Análisis gráfico de resultados del benchmark
@@ -1055,7 +1053,7 @@ Este análisis permite responder preguntas como:
 - ¿Qué modelo tiene mejor equilibrio entre tiempo de respuesta, longitud de salida y calidad?
 - ¿Qué configuración sería más adecuada para una aplicación robótica donde la latencia es crítica?
 
-> **Nota:** en aplicaciones físicas, un modelo puede producir buenas respuestas, pero si su tiempo de respuesta es demasiado alto o muy variable, puede no ser adecuado para interacción humano-maquina, supervisión en línea o toma de decisiones de alto nivel.
+> ⚠️ **Consideración:** en aplicaciones físicas, un modelo puede producir buenas respuestas, pero si su tiempo de respuesta es demasiado alto o muy variable, puede no ser adecuado para interacción humano-maquina, supervisión en línea o toma de decisiones de alto nivel.
 
 El script utiliza como entrada el archivo CSV generado por los experimentos anteriores, por ejemplo:
 
@@ -1445,7 +1443,6 @@ def grafica_tokens_por_segundo(df: pd.DataFrame, out_dir: Path) -> None:
     fig.savefig(out_dir / "tokens_por_segundo_todos_los_grupos.png", dpi=160)
     plt.close(fig)
 
-
 def grafica_latencia_vs_tokens_salida(df: pd.DataFrame, out_dir: Path) -> None:
     if "eval_count" not in df.columns:
         return
@@ -1476,7 +1473,6 @@ def grafica_latencia_vs_tokens_salida(df: pd.DataFrame, out_dir: Path) -> None:
     fig.savefig(out_dir / "latencia_vs_tokens_salida.png", dpi=160)
     plt.close(fig)
 
-
 def grafica_latencia_vs_tokens_totales(df: pd.DataFrame, out_dir: Path) -> None:
     if "total_tokens" not in df.columns:
         return
@@ -1506,7 +1502,6 @@ def grafica_latencia_vs_tokens_totales(df: pd.DataFrame, out_dir: Path) -> None:
     fig.tight_layout()
     fig.savefig(out_dir / "latencia_vs_tokens_totales.png", dpi=160)
     plt.close(fig)
-
 
 def grafica_boxplot_latencia(df: pd.DataFrame, out_dir: Path) -> None:
     grupos = list(df["grupo"].dropna().unique())
@@ -1570,7 +1565,6 @@ def grafica_por_parametro(df: pd.DataFrame, out_dir: Path) -> None:
             dpi=160,
         )
         plt.close(fig)
-
 
 def limpiar_nombre_archivo(texto: str) -> str:
     texto = str(texto)
@@ -1663,51 +1657,57 @@ python benchmark_modelos.py
 Después, generar las gráficas:
 
 ```bash
-python graficar_benchmark.py --csv benchmark_modelos.csv --out graficas_benchmark
+python graficar_benchmark_llm.py --csv benchmark_modelos.csv --out graficas_modelos
 ```
 
 ### Interpretación de las gráficas
 
-#### 1. Latencia por iteración de cada modelo
+**Latencia por iteración de cada modelo**
 
 Esta gráfica muestra el tiempo de respuesta en cada repetición. La línea punteada representa la media y la banda sombreada representa una desviación estándar.
 
 Permite identificar:
 
-- estabilidad del modelo;
-- iteraciones lentas o atípicas;
-- efecto de carga inicial;
-- variabilidad durante las 100 pruebas.
+- Estabilidad del modelo;
+- Iteraciones lentas o atípicas;
+- Efecto de carga inicial;
+- Variabilidad durante las pruebas.
 
 Si un modelo tiene muchos puntos fuera de la banda de una desviación estándar, puede considerarse menos estable para aplicaciones donde la latencia debe ser predecible.
 
----
+[Modelo 1](assets/img/benchmark/latencia_iteracion_llama3_2_3b.png)
+[Modelo 2](assets/img/benchmark/latencia_iteracion_gemma3_4b.png)
+[Modelo 3](assets/img/benchmark/latencia_iteracion_deepseek-r1_8b-0528-qwen3-q4_k_m.png)
 
-#### 2. Latencia por iteración comparando todos los modelos
+
+**Latencia por iteración comparando todos los modelos**
 
 Esta gráfica coloca todos los modelos en la misma figura. Permite observar cuál modelo responde más rápido y cuál presenta mayor variabilidad.
 
-En robótica, esta gráfica es útil porque un modelo con menor latencia promedio puede ser preferible para interacción rápida, siempre que mantenga calidad suficiente en las respuestas.
+[Modelos](assets/img/benchmark/latencia_iteracion_todos_los_grupos.png)
+[Modelo 1](assets/img/benchmark/latencia_promedio_por_grupo.png)
 
----
 
-#### 3. Tokens por segundo
+
+**Tokens por segundo**
 
 La gráfica de tokens por segundo mide la velocidad de generación. Esta métrica es importante porque dos modelos pueden tener tiempos similares, pero uno puede producir muchas más palabras o tokens durante ese tiempo.
 
 Una velocidad mayor en tokens por segundo indica mejor rendimiento de generación, aunque no necesariamente mejor calidad.
 
----
+[Modelos](assets/img/benchmark/tokens_por_segundo_todos_los_grupos.png)
 
-#### 4. Latencia contra tokens de salida
+
+**Latencia contra tokens de salida**
 
 Esta gráfica permite observar si las respuestas más largas incrementan el tiempo total de respuesta. En general, mientras más tokens genera el modelo, mayor suele ser la latencia.
 
 Si se observa una relación muy fuerte entre tokens de salida y tiempo de respuesta, puede ser conveniente reducir `num_predict` o pedir respuestas más breves en el prompt.
 
----
+[Modelos](assets/img/benchmark/latencia_vs_tokens_salida.png)
 
-#### 5. Latencia contra tokens totales
+
+**Latencia contra tokens totales**
 
 Esta gráfica considera:
 
@@ -1715,11 +1715,9 @@ Esta gráfica considera:
 tokens_totales = tokens_entrada + tokens_salida
 ```
 
-Es útil para analizar el efecto combinado del tamaño del prompt y la longitud de la respuesta.
+[Modelos](assets/img/benchmark//latencia_vs_tokens_totales.png)
 
----
-
-#### 6. Boxplot de latencia por modelo
+**Boxplot de latencia por modelo**
 
 El boxplot permite comparar la distribución de latencia entre modelos. Muestra mediana, dispersión y valores atípicos.
 
@@ -1730,8 +1728,9 @@ Puede usarse para justificar una decisión técnica:
 - modelo con menos valores atípicos;
 - modelo con mejor consistencia entre iteraciones.
 
----
+[Modelos](assets/img/benchmark/boxplot_latencia_por_grupo.png)
 
+---
 
 ## 10. Análisis del CSV
 
@@ -1799,16 +1798,13 @@ Tabla esperada:
 | `qwen2.5:7b` | | | | | | |
 | `mistral:7b` | | | | | | |
 
-> 🖼️ **Espacio para captura:** CSV generado y resumen estadístico en terminal.  
-> Archivo sugerido: `assets/img/llm/tema2/captura-csv-benchmark.png`
-
 ---
 
 ## 11. Práctica 2: Selección de plataforma y benchmark de modelos LLM
 
 ### Parte A. Matriz de decisión para proyecto final
 
-El estudiante debe seleccionar que plataformas utilizara para el proyecto final, de cada una escribe las consideraciones de costos latencia, temas de privacidad, consideraciones de implementación y  escalabilidadlas cuales pueden ser:
+Para esta actividad deberas seleccionar que plataformas utilizaras para el proyecto final, de cada una escribe las consideraciones de costos, latencia, temas de privacidad, consideraciones de implementación y  escalabilidad; las cuales pueden ser:
 
 1. PC local con CPU;
 2. PC local con GPU;
@@ -1876,42 +1872,38 @@ Preguntas guía:
 2. ¿Qué configuración produjo mayor variabilidad?
 3. ¿Qué parámetro afectó más la longitud de la respuesta?
 4. ¿Qué parámetro afectó más la calidad?
-5. ¿Qué configuración sería más adecuada para una aplicación robótica?
+5. ¿Qué configuración sería más adecuada para una aplicación de IA física?
 6. ¿Qué configuración sería más adecuada para lluvia de ideas o generación creativa?
-7. Graficar la latencia de los modelos para compararlos
+7. Graficar la latencia y tokens de los modelos para compararlos
 
 ---
 
 ## 14. Referencias
 
-[1] Ollama. “Modelfile Reference.” Disponible en: <https://docs.ollama.com/modelfile>
+[1] Ollama. (s. f.). *Modelfile reference*. Documentación oficial de parámetros de generación como `temperature`, `top_k`, `top_p`, `min_p`, `num_ctx`, `num_predict`, `repeat_penalty`, `repeat_last_n`, `seed` y `stop`. Disponible en: <https://docs.ollama.com/modelfile>
 
-[2] Ollama. “Generate a response / API Reference.” Disponible en: <https://docs.ollama.com/api/generate>
+[2] Ollama. (s. f.). *Generate API*. Documentación oficial de la API `/api/generate`, incluyendo el uso de `stream`, `options`, `keep_alive` y métricas como `total_duration`, `load_duration`, `prompt_eval_count`, `eval_count` y `eval_duration`. Disponible en: <https://docs.ollama.com/api/generate>
 
-[3] Ollama. “Context length.” Disponible en: <https://docs.ollama.com/context-length>
+[3] Ollama. (s. f.). *Context length*. Documentación oficial sobre ventana de contexto y su relación con el uso de memoria. Disponible en: <https://docs.ollama.com/context-length>
 
-[4] Hugging Face. “Quantization.” *Transformers Documentation*. Disponible en: <https://huggingface.co/docs/transformers/en/main_classes/quantization>
+[4] Hugging Face. (s. f.). *Quantization*. Transformers Documentation. Disponible en: <https://huggingface.co/docs/transformers/en/main_classes/quantization>
 
-[5] Hugging Face. “Optimizing LLMs for Speed and Memory.” *Transformers Documentation*. Disponible en: <https://huggingface.co/docs/transformers/llm_tutorial_optimization>
+[5] Hugging Face. (s. f.). *Optimizing LLMs for speed and memory*. Transformers Documentation. Disponible en: <https://huggingface.co/docs/transformers/llm_tutorial_optimization>
 
-[6] NVIDIA. “Jetson Orin Nano Super Developer Kit.” Disponible en: <https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/>
+[6] NVIDIA. (s. f.). *Jetson Orin Nano Super Developer Kit*. Disponible en: <https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/>
 
-[7] Espressif Systems. “ESP32-S3-MINI-1 & ESP32-S3-MINI-1U Datasheet.” Disponible en: <https://documentation.espressif.com/esp32-s3-mini-1_mini-1u_datasheet_en.pdf>
+[7] Espressif Systems. (s. f.). *ESP32-S3-MINI-1 & ESP32-S3-MINI-1U datasheet*. Disponible en: <https://documentation.espressif.com/esp32-s3-mini-1_mini-1u_datasheet_en.pdf>
 
-[8] OpenAI. “API Pricing.” Disponible en: <https://developers.openai.com/api/docs/pricing>
+[8] OpenAI. (s. f.). *API pricing*. Disponible en: <https://developers.openai.com/api/docs/pricing>
 
-[9] Google AI for Developers. “Gemini Developer API Pricing.” Disponible en: <https://ai.google.dev/gemini-api/docs/pricing>
+[9] Google AI for Developers. (s. f.). *Gemini Developer API pricing*. Disponible en: <https://ai.google.dev/gemini-api/docs/pricing>
 
-[10] Ahn, M. et al. “Do As I Can, Not As I Say: Grounding Language in Robotic Affordances.” *arXiv*, 2022. Disponible en: <https://arxiv.org/abs/2204.01691>
+[10] Ahn, M., Brohan, A., Brown, N., Chebotar, Y., Cortes, O., David, B., Finn, C., Gopalakrishnan, K., Hausman, K., Herzog, A., Ho, D., Hsu, J., Ichter, B., Irpan, A., Jang, E., Ruano, R. J., Jeffrey, K., Jesmonth, S., Joshi, N. J., ... Zeng, A. (2022). *Do as I can, not as I say: Grounding language in robotic affordances*. arXiv. Disponible en: <https://arxiv.org/abs/2204.01691>
 
-[11] SayCan Project. “SayCan: Grounding Language in Robotic Affordances.” Disponible en: <https://say-can.github.io/>
+[11] SayCan Project. (s. f.). *SayCan: Grounding language in robotic affordances*. Disponible en: <https://say-can.github.io/>
 
-[12] Strubell, E., Ganesh, A., & McCallum, A. “Energy and Policy Considerations for Deep Learning in NLP.” *Proceedings of ACL*, 2019. Disponible en: <https://aclanthology.org/P19-1355/>
+[12] Strubell, E., Ganesh, A., & McCallum, A. (2019). *Energy and policy considerations for deep learning in NLP*. Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics, 3645–3650. Disponible en: <https://aclanthology.org/P19-1355/>
 
-[13] Fernandez, J., Na, C., Tiwari, V., Bisk, Y., Luccioni, S., & Strubell, E. “Energy Considerations of Large Language Model Inference and Efficiency Optimizations.” *ACL Anthology*, 2025. Disponible en: <https://aclanthology.org/2025.acl-long.1563/>
+[13] Fernandez, J., Na, C., Tiwari, V., Bisk, Y., Luccioni, S., & Strubell, E. (2025). *Energy considerations of large language model inference and efficiency optimizations*. ACL Anthology. Disponible en: <https://aclanthology.org/2025.acl-long.1563/>
 
-[14] NVIDIA. (s. f.). *What is Physical AI?* NVIDIA Glossary. Define la IA física como sistemas que permiten a máquinas autónomas percibir, comprender y realizar acciones complejas en el mundo físico.
-
-[15] Ollama. (s. f.). *Generate API*. Documentación oficial de la API `/api/generate`, incluyendo uso de `stream`, `options`, `keep_alive` y métricas como `total_duration`, `load_duration`, `prompt_eval_count`, `eval_count` y `eval_duration`. https://docs.ollama.com/api/generate
-
-[16] Ollama. (s. f.). *Modelfile reference*. Documentación oficial de parámetros de generación como `temperature`, `top_k`, `top_p`, `min_p`, `num_ctx`, `num_predict`, `repeat_penalty`, `repeat_last_n`, `seed` y `stop`. https://docs.ollama.com/modelfile
+[14] NVIDIA. (s. f.). *What is physical AI?* NVIDIA Glossary. Disponible en: <https://www.nvidia.com/en-us/glossary/generative-physical-ai/>
