@@ -1042,7 +1042,7 @@ python benchmark_parametros.py
 
 ---
 
-## Análisis gráfico de resultados del benchmark
+## 9. Análisis gráfico de resultados del benchmark
 
 Después de ejecutar los experimentos de benchmark, no basta con observar únicamente el tiempo promedio de respuesta. Es importante analizar la variabilidad entre iteraciones, la relación entre latencia y número de tokens, y la diferencia de comportamiento entre modelos. Para ello, se recomienda generar gráficas que permitan visualizar el desempeño de cada modelo a lo largo de las 100 repeticiones del experimento.
 
@@ -1055,7 +1055,7 @@ Este análisis permite responder preguntas como:
 - ¿Qué modelo tiene mejor equilibrio entre tiempo de respuesta, longitud de salida y calidad?
 - ¿Qué configuración sería más adecuada para una aplicación robótica donde la latencia es crítica?
 
-> **Nota:** en aplicaciones robóticas, la latencia no debe analizarse solamente como un dato técnico aislado. Un modelo puede producir buenas respuestas, pero si su tiempo de respuesta es demasiado alto o muy variable, puede no ser adecuado para interacción humano-robot, supervisión en línea o toma de decisiones de alto nivel.
+> **Nota:** en aplicaciones físicas, un modelo puede producir buenas respuestas, pero si su tiempo de respuesta es demasiado alto o muy variable, puede no ser adecuado para interacción humano-maquina, supervisión en línea o toma de decisiones de alto nivel.
 
 El script utiliza como entrada el archivo CSV generado por los experimentos anteriores, por ejemplo:
 
@@ -1375,7 +1375,7 @@ if __name__ == "__main__":
 python graficar_benchmark.py --csv benchmark_modelos.csv --out graficas_benchmark
 ```
 
-**Ejemplo de uso**
+### Ejemplo de uso
 
 Ejecutar el benchmark de modelos:
 
@@ -1456,7 +1456,7 @@ Puede usarse para justificar una decisión técnica:
 ---
 
 
-## 9. Análisis del CSV
+## 10. Análisis del CSV
 
 Guarda el siguiente archivo como `analizar_benchmark.py`.
 
@@ -1527,7 +1527,7 @@ Tabla esperada:
 
 ---
 
-## 10. Práctica 2: Selección de plataforma y benchmark de modelos LLM
+## 11. Práctica 2: Selección de plataforma y benchmark de modelos LLM
 
 ### Parte A. Matriz de decisión para proyecto final
 
@@ -1556,17 +1556,18 @@ El estudiante debe seleccionar que plataformas utilizara para el proyecto final,
 
 El estudiante debe:
 
-1. seleccionar mínimo 3 modelos;
-2. ejecutar 100 ciclos por modelo;
-3. usar el mismo prompt;
-4. limitar la respuesta con `num_predict`;
-5. exportar un CSV con las respuestas;
-6. calcular promedio, desviación estándar, mínimo y máximo de:
+1. Seleccionar mínimo 3 modelos;
+2. Ejecutar 100 ciclos por modelo;
+3. Usar el mismo prompt;
+4. Limitar la respuesta con `num_predict`;
+5. Exportar un CSV con las respuestas;
+6. Calcular promedio, desviación estándar, mínimo y máximo de:
    - tiempo total;
    - tokens de entrada;
    - tokens de salida;
    - tokens por segundo;
    - calidad estimada.
+7. Graficar la latencia de los modelos para compararlos
 
 Tabla final esperada:
 
@@ -1578,22 +1579,7 @@ Tabla final esperada:
 
 ---
 
-### Parte C. Evaluación de calidad
-
-Con el CSV de salida, el estudiante debe evaluar la calidad de al menos 10 respuestas por modelo. Puede usar la rúbrica de 0 a 10 propuesta en la sección 6.6.
-
-Preguntas guía:
-
-1. ¿El modelo responde correctamente al prompt?
-2. ¿Respeta el límite de longitud?
-3. ¿La respuesta es clara para el público objetivo?
-4. ¿Incluye errores conceptuales?
-5. ¿La respuesta es útil para una aplicación robótica?
-6. ¿El modelo repite frases o genera contenido innecesario?
-
----
-
-### Parte D. Variación de parámetros
+### Parte C. Variación de parámetros
 
 El estudiante debe seleccionar un solo modelo, usar un prompt fijo y variar tres parámetros diferentes, cada uno con tres configuraciones.
 
@@ -1615,44 +1601,7 @@ Preguntas guía:
 4. ¿Qué parámetro afectó más la calidad?
 5. ¿Qué configuración sería más adecuada para una aplicación robótica?
 6. ¿Qué configuración sería más adecuada para lluvia de ideas o generación creativa?
-
----
-
-## 11. Entregables
-
-Cada estudiante o equipo debe entregar:
-
-1. Captura de `ollama ls` con los modelos instalados.
-2. Captura de ejecución de al menos un modelo desde terminal.
-3. Archivo `benchmark_modelos.csv`.
-4. Archivo `resumen_benchmark_modelos.csv`.
-5. Archivo `benchmark_parametros.csv`.
-6. Matriz de decisión de plataformas.
-7. Tabla comparativa final de modelos.
-8. Breve justificación de selección de plataforma y modelo.
-9. Reflexión sobre limitaciones del experimento.
-
----
-
-## 12. Criterios de evaluación
-
-| Criterio | Porcentaje |
-|---|---:|
-| Instalación y ejecución correcta de Ollama | 10 % |
-| Diseño adecuado del benchmark | 20 % |
-| CSV completo y correctamente estructurado | 20 % |
-| Análisis estadístico de resultados | 15 % |
-| Evaluación de calidad de respuestas | 15 % |
-| Matriz de decisión de plataforma | 10 % |
-| Justificación técnica y académica | 10 % |
-
----
-
-## 13. Consideraciones finales
-
-Los LLM pueden ejecutarse localmente, en servidores propios, mediante APIs en la nube o como parte de arquitecturas híbridas. Cada opción implica compromisos. Una PC local puede ser adecuada para aprendizaje y prototipado, pero puede tener limitaciones de memoria y velocidad. Una API en la nube permite acceder a modelos avanzados, pero introduce costos por token, dependencia de internet y consideraciones de privacidad. Una tarjeta Jetson puede ser útil en robótica de borde, pero requiere seleccionar modelos pequeños o cuantizados. Un microcontrolador, por su parte, debe entenderse como un nodo de sensores, actuadores y comunicación, no como plataforma principal para ejecutar LLM modernos.
-
-La selección responsable de un modelo requiere medir. Por ello, el benchmark debe registrar no solo la respuesta del modelo, sino también tiempo, tokens, velocidad, variabilidad, longitud, calidad y condiciones de ejecución. Sin estos datos, la elección del modelo se vuelve subjetiva y poco reproducible.
+7. Graficar la latencia de los modelos para compararlos
 
 ---
 
