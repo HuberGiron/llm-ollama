@@ -1842,7 +1842,7 @@ El estudiante debe:
    - tokens de salida;
    - tokens por segundo;
    - calidad estimada.
-7. Graficar la latencia de los modelos para compararlos
+7. Graficar la latencia de los modelos para compararlos.
 
 Tabla final esperada:
 
@@ -1876,7 +1876,7 @@ Preguntas guía:
 4. ¿Qué parámetro afectó más la calidad?
 5. ¿Qué configuración sería más adecuada para una aplicación de IA física?
 6. ¿Qué configuración sería más adecuada para lluvia de ideas o generación creativa?
-7. Graficar la latencia y tokens de los modelos para compararlos
+7. Graficar la latencia y tokens de los modelos para compararlos.
 
 ---
 
