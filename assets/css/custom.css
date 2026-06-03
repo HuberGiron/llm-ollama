@@ -361,3 +361,177 @@ footer.site-footer { display: none !important; }
   width: 100%;
   height: 100%;
 }
+
+/* ============================================================
+   BLOQUES DE CÓDIGO MEJORADOS
+   - Terminal negra para bash / shell / powershell
+   - Bloques largos plegables
+   - Barra superior con lenguaje, copiar y descargar
+   ============================================================ */
+
+/* Contenedor general generado por Rouge/Jekyll */
+.code-enhanced {
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+/* Barra superior del bloque */
+.code-enhanced__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .55rem .75rem;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: .82rem;
+}
+
+/* Etiqueta de lenguaje */
+.code-enhanced__label {
+  font-weight: 600;
+  color: #334155;
+  letter-spacing: .2px;
+}
+
+/* Contenedor de botones */
+.code-enhanced__actions {
+  display: flex;
+  gap: .4rem;
+  align-items: center;
+}
+
+/* Botones copiar / descargar / mostrar */
+.code-enhanced__button {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 7px;
+  padding: .25rem .55rem;
+  font-size: .78rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.code-enhanced__button:hover {
+  background: #f8fafc;
+  color: #E00034;
+  border-color: #E00034;
+}
+
+/* Área de código */
+.code-enhanced pre {
+  margin: 0 !important;
+  padding: 1rem !important;
+  overflow-x: auto;
+  white-space: pre;
+  font-size: .88rem;
+  line-height: 1.45;
+}
+
+/* Código largo replegado por defecto */
+.code-enhanced.is-collapsible pre {
+  max-height: 0;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  overflow: hidden;
+  transition: max-height .25s ease, padding .25s ease;
+}
+
+/* Código largo abierto */
+.code-enhanced.is-collapsible.is-open pre {
+  max-height: 75vh;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  overflow: auto;
+}
+
+/* Mensaje cuando está replegado */
+.code-enhanced__collapsed-note {
+  display: none;
+  padding: .9rem 1rem;
+  color: #64748b;
+  font-size: .9rem;
+  background: #ffffff;
+}
+
+.code-enhanced.is-collapsible:not(.is-open) .code-enhanced__collapsed-note {
+  display: block;
+}
+
+/* Terminal: bash, shell, sh, zsh, powershell, ps1 */
+.code-enhanced.is-terminal {
+  border-color: #111827;
+  background: #0b1020;
+}
+
+.code-enhanced.is-terminal .code-enhanced__toolbar {
+  background: #111827;
+  border-bottom: 1px solid #1f2937;
+}
+
+.code-enhanced.is-terminal .code-enhanced__label {
+  color: #e5e7eb;
+}
+
+.code-enhanced.is-terminal .code-enhanced__button {
+  background: #1f2937;
+  color: #e5e7eb;
+  border-color: #374151;
+}
+
+.code-enhanced.is-terminal .code-enhanced__button:hover {
+  background: #374151;
+  color: #ffffff;
+  border-color: #E00034;
+}
+
+.code-enhanced.is-terminal pre,
+.code-enhanced.is-terminal code {
+  background: #0b1020 !important;
+  color: #e5e7eb !important;
+}
+
+/* Colores básicos para que la terminal se vea más natural */
+.code-enhanced.is-terminal .highlight,
+.code-enhanced.is-terminal .highlighter-rouge {
+  background: #0b1020 !important;
+}
+
+/* Nota plegada en terminal */
+.code-enhanced.is-terminal .code-enhanced__collapsed-note {
+  background: #0b1020;
+  color: #94a3b8;
+}
+
+/* Ajuste para código inline: no afectar `palabras` dentro del texto */
+p code,
+li code,
+td code {
+  background: #f1f5f9;
+  color: #E00034;
+  border-radius: 4px;
+  padding: .1rem .25rem;
+  font-size: .9em;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .code-enhanced__toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .code-enhanced__actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .code-enhanced__button {
+    font-size: .75rem;
+  }
+}
