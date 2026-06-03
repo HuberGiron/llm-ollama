@@ -12,12 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
     "ps1"
   ];
 
-  const textLanguages = [
-    "text",
-    "plaintext",
-    "txt"
-  ];
-
   const collapsibleLanguages = [
     "python",
     "javascript",
@@ -27,6 +21,12 @@ document.addEventListener("DOMContentLoaded", function () {
     "yml",
     "html",
     "css"
+  ];
+
+  const textLanguages = [
+    "text",
+    "plaintext",
+    "txt"
   ];
 
   const MAX_LINES_BEFORE_COLLAPSE = 18;
@@ -42,15 +42,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const language = detectLanguage(block, code);
     const codeText = code.innerText || code.textContent || "";
     const lineCount = codeText.split("\n").length;
+    const directives = readDirectives(block);
 
-    /*
-      Bloques tipo text/plaintext:
-      - Fondo negro
-      - Sin etiqueta
-      - Sin botones
-      - Sin descargar
-      - Sin copiar
-    */
+    /* Los bloques text/plaintext son cajas simples:
+       no toolbar, no copiar, no descargar, no plegado. */
     if (textLanguages.includes(language)) {
       block.classList.add("code-text-box");
       block.dataset.enhanced = "true";
@@ -63,8 +58,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const isTerminal = terminalLanguages.includes(language);
     const shouldCollapse =
-      lineCount > MAX_LINES_BEFORE_COLLAPSE ||
-      collapsibleLanguages.includes(language);
+      directives.open !== true &&
+      (
+        lineCount > MAX_LINES_BEFORE_COLLAPSE ||
+        collapsibleLanguages.includes(language)
+      );
 
     if (isTerminal) {
       wrapper.classList.add("is-terminal");
@@ -73,6 +71,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (shouldCollapse) {
       wrapper.classList.add("is-collapsible");
       wrapper.classList.remove("is-open");
+    } else if (directives.open === true) {
+      wrapper.classList.add("is-open");
     }
 
     const toolbar = document.createElement("div");
@@ -105,26 +105,41 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    const downloadButton = document.createElement("button");
-    downloadButton.className = "code-enhanced__button";
-    downloadButton.type = "button";
-    downloadButton.textContent = "Descargar";
-    downloadButton.addEventListener("click", () => {
-      const filename =
-        getConfiguredFilename(block) ||
-        `codigo_${String(index + 1).padStart(2, "0")}.${extensionForLanguage(language)}`;
-
-      downloadTextFile(filename, codeText);
-    });
-
     actions.appendChild(copyButton);
-    actions.appendChild(downloadButton);
 
-    if (shouldCollapse) {
+    /* Descarga:
+       - Terminal: sin botón descargar por default.
+       - Código: descarga activada por default.
+       - Cualquier bloque: se puede desactivar con:
+         <!-- code-download: false -->
+         <!-- no-download -->
+    */
+    const allowDownload =
+      !isTerminal &&
+      directives.download !== false;
+
+    if (allowDownload) {
+      const downloadButton = document.createElement("button");
+      downloadButton.className = "code-enhanced__button";
+      downloadButton.type = "button";
+      downloadButton.textContent = "Descargar";
+      downloadButton.addEventListener("click", () => {
+        const extension = extensionForLanguage(language);
+        const filename =
+          directives.filename ||
+          `codigo_${String(index + 1).padStart(2, "0")}.${extension}`;
+
+        downloadTextFile(filename, codeText);
+      });
+
+      actions.appendChild(downloadButton);
+    }
+
+    if (shouldCollapse || directives.open === true) {
       const toggleButton = document.createElement("button");
       toggleButton.className = "code-enhanced__button";
       toggleButton.type = "button";
-      toggleButton.textContent = "Mostrar";
+      toggleButton.textContent = wrapper.classList.contains("is-open") ? "Ocultar" : "Mostrar";
       toggleButton.addEventListener("click", () => {
         const isOpen = wrapper.classList.toggle("is-open");
         toggleButton.textContent = isOpen ? "Ocultar" : "Mostrar";
@@ -168,15 +183,11 @@ function detectLanguage(block, code) {
 
 
 function buildLabel(language, isTerminal) {
+  if (isTerminal) {
+    return "Bash";
+  }
+
   const readable = {
-    bash: "Bash",
-    shell: "Bash",
-    sh: "Bash",
-    zsh: "Bash",
-    console: "Bash",
-    terminal: "Bash",
-    powershell: "PowerShell",
-    ps1: "PowerShell",
     python: "Python",
     json: "JSON",
     yaml: "YAML",
@@ -186,10 +197,6 @@ function buildLabel(language, isTerminal) {
     javascript: "JavaScript",
     js: "JavaScript"
   };
-
-  if (isTerminal) {
-    return "Bash";
-  }
 
   return readable[language] || language.toUpperCase();
 }
@@ -212,48 +219,56 @@ function extensionForLanguage(language) {
     yaml: "yml",
     yml: "yml",
     html: "html",
-    css: "css"
+    css: "css",
+    text: "txt",
+    plaintext: "txt",
+    txt: "txt"
   };
 
   return extensions[language] || "txt";
 }
 
 
-/*
-  Nombre de archivo personalizado para descarga.
-
-  Opción recomendada en Markdown:
-
-  <!-- code-file: benchmark_modelos.py -->
-  ```python
-  ...
-  ```
-
-  También acepta:
-  <!-- filename: benchmark_modelos.py -->
-  <!-- file: benchmark_modelos.py -->
-
-  Nota:
-  El comentario HTML debe estar justo antes del bloque de código.
-*/
-function getConfiguredFilename(block) {
-  const fromParent = findFilenameInParents(block);
-  if (fromParent) return sanitizeFilename(fromParent);
+function readDirectives(block) {
+  const directives = {
+    filename: null,
+    open: false,
+    download: true
+  };
 
   let node = block.previousSibling;
-  let safetyCounter = 0;
+  let scanned = 0;
 
-  while (node && safetyCounter < 6) {
-    safetyCounter += 1;
-
-    if (node.nodeType === Node.COMMENT_NODE) {
-      const match = node.nodeValue.match(/(?:code-file|filename|file)\s*:\s*([^\n\r]+)/i);
-      if (match && match[1]) {
-        return sanitizeFilename(match[1].trim());
-      }
-    }
+  while (node && scanned < 8) {
+    scanned += 1;
 
     if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() === "") {
+      node = node.previousSibling;
+      continue;
+    }
+
+    if (node.nodeType === Node.COMMENT_NODE) {
+      const text = node.textContent.trim();
+
+      const fileMatch = text.match(/(?:code-file|filename|file)\s*:\s*([^\n\r]+)/i);
+      if (fileMatch && fileMatch[1]) {
+        directives.filename = sanitizeFilename(fileMatch[1].trim());
+      }
+
+      const openMatch = text.match(/code-open\s*:\s*(true|false)/i);
+      if (openMatch && openMatch[1]) {
+        directives.open = openMatch[1].toLowerCase() === "true";
+      }
+
+      const downloadMatch = text.match(/code-download\s*:\s*(true|false)/i);
+      if (downloadMatch && downloadMatch[1]) {
+        directives.download = downloadMatch[1].toLowerCase() === "true";
+      }
+
+      if (/no-download/i.test(text)) {
+        directives.download = false;
+      }
+
       node = node.previousSibling;
       continue;
     }
@@ -261,26 +276,13 @@ function getConfiguredFilename(block) {
     break;
   }
 
-  return null;
-}
-
-
-function findFilenameInParents(block) {
-  let node = block.parentElement;
-
-  while (node && node !== document.body) {
-    if (node.dataset && node.dataset.codeFile) return node.dataset.codeFile;
-    if (node.dataset && node.dataset.filename) return node.dataset.filename;
-    node = node.parentElement;
-  }
-
-  return null;
+  return directives;
 }
 
 
 function sanitizeFilename(filename) {
   return filename
-    .replace(/[\\/:*?"<>|]/g, "_")
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, "_")
     .replace(/\s+/g, "_")
     .trim();
 }

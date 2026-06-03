@@ -362,78 +362,92 @@ footer.site-footer { display: none !important; }
   height: 100%;
 }
 
+
 /* ============================================================
-   BLOQUES DE CÓDIGO MEJORADOS
-   - Terminal negra para bash / shell / powershell
-   - Bloques largos plegables
-   - Barra superior con lenguaje, copiar y descargar
+   BLOQUES DE CÓDIGO Y TERMINAL — VERSIÓN OSCURA
+   - Fondo negro para terminal, código y texto
+   - Alto contraste inspirado en temas oscuros de GitHub/VS Code
+   - Terminal sin botón de descarga
+   - Bloques text sin barra, sin copiar y sin descargar
    ============================================================ */
 
-/* Contenedor general generado por Rouge/Jekyll */
 .code-enhanced {
   margin: 1.5rem 0;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
-  background: #f8fafc;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border: 1px solid #30363d;
+  background: #0d1117;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
 }
 
-/* Barra superior del bloque */
+/* Barra superior */
 .code-enhanced__toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: .75rem;
   padding: .55rem .75rem;
-  background: #f1f5f9;
-  border-bottom: 1px solid #e5e7eb;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
   font-size: .82rem;
 }
 
-/* Etiqueta de lenguaje */
+/* Etiqueta: Python, JSON, Bash, etc. */
 .code-enhanced__label {
-  font-weight: 600;
-  color: #334155;
+  font-weight: 700;
+  color: #f0f6fc;
   letter-spacing: .2px;
 }
 
-/* Contenedor de botones */
+/* Acciones */
 .code-enhanced__actions {
   display: flex;
   gap: .4rem;
   align-items: center;
 }
 
-/* Botones copiar / descargar / mostrar */
+/* Botones */
 .code-enhanced__button {
-  border: 1px solid #cbd5e1;
-  background: #ffffff;
-  color: #334155;
+  border: 1px solid #3d444d;
+  background: #21262d;
+  color: #f0f6fc;
   border-radius: 7px;
-  padding: .25rem .55rem;
+  padding: .25rem .6rem;
   font-size: .78rem;
   line-height: 1.2;
   cursor: pointer;
 }
 
 .code-enhanced__button:hover {
-  background: #f8fafc;
-  color: #E00034;
+  background: #30363d;
+  color: #ffffff;
   border-color: #E00034;
 }
 
-/* Área de código */
+.code-enhanced__button:focus {
+  outline: 2px solid #58a6ff;
+  outline-offset: 2px;
+}
+
+/* Área principal */
 .code-enhanced pre {
   margin: 0 !important;
   padding: 1rem !important;
   overflow-x: auto;
   white-space: pre;
-  font-size: .88rem;
-  line-height: 1.45;
+  font-size: .9rem;
+  line-height: 1.48;
+  background: #0d1117 !important;
 }
 
-/* Código largo replegado por defecto */
+.code-enhanced code,
+.code-enhanced pre code {
+  background: #0d1117 !important;
+  color: #e6edf3 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Plegado */
 .code-enhanced.is-collapsible pre {
   max-height: 0;
   padding-top: 0 !important;
@@ -442,7 +456,6 @@ footer.site-footer { display: none !important; }
   transition: max-height .25s ease, padding .25s ease;
 }
 
-/* Código largo abierto */
 .code-enhanced.is-collapsible.is-open pre {
   max-height: 75vh;
   padding-top: 1rem !important;
@@ -450,65 +463,178 @@ footer.site-footer { display: none !important; }
   overflow: auto;
 }
 
-/* Mensaje cuando está replegado */
 .code-enhanced__collapsed-note {
   display: none;
   padding: .9rem 1rem;
-  color: #64748b;
+  color: #c9d1d9;
   font-size: .9rem;
-  background: #ffffff;
+  background: #0d1117;
 }
 
 .code-enhanced.is-collapsible:not(.is-open) .code-enhanced__collapsed-note {
   display: block;
 }
 
-/* Terminal: bash, shell, sh, zsh, powershell, ps1 */
-.code-enhanced.is-terminal {
-  border-color: #111827;
-  background: #0b1020;
+/* Terminal */
+.code-enhanced.is-terminal,
+.code-enhanced.is-terminal pre,
+.code-enhanced.is-terminal code {
+  background: #050a12 !important;
 }
 
 .code-enhanced.is-terminal .code-enhanced__toolbar {
-  background: #111827;
-  border-bottom: 1px solid #1f2937;
+  background: #0b1020;
+  border-bottom-color: #1f2937;
 }
 
 .code-enhanced.is-terminal .code-enhanced__label {
-  color: #e5e7eb;
+  color: #f8fafc;
 }
 
-.code-enhanced.is-terminal .code-enhanced__button {
-  background: #1f2937;
-  color: #e5e7eb;
-  border-color: #374151;
+/* Bloques text/plaintext: caja negra simple, sin toolbar */
+.code-text-box {
+  margin: 1.25rem 0;
+  border: 1px solid #30363d;
+  border-left: 4px solid #E00034;
+  border-radius: 12px;
+  background: #0d1117;
+  overflow-x: auto;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
 }
 
-.code-enhanced.is-terminal .code-enhanced__button:hover {
-  background: #374151;
-  color: #ffffff;
-  border-color: #E00034;
+.code-text-box pre {
+  margin: 0 !important;
+  padding: 1rem !important;
+  background: #0d1117 !important;
+  color: #e6edf3 !important;
+  font-size: .92rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
 }
 
-.code-enhanced.is-terminal pre,
-.code-enhanced.is-terminal code {
-  background: #0b1020 !important;
-  color: #e5e7eb !important;
+.code-text-box code {
+  background: #0d1117 !important;
+  color: #e6edf3 !important;
 }
 
-/* Colores básicos para que la terminal se vea más natural */
-.code-enhanced.is-terminal .highlight,
-.code-enhanced.is-terminal .highlighter-rouge {
-  background: #0b1020 !important;
+/* ============================================================
+   COLORES DE SINTAXIS ROUGE / JEKYLL SOBRE FONDO OSCURO
+   ============================================================ */
+
+.code-enhanced .highlight {
+  background: #0d1117 !important;
 }
 
-/* Nota plegada en terminal */
-.code-enhanced.is-terminal .code-enhanced__collapsed-note {
-  background: #0b1020;
-  color: #94a3b8;
+/* Comentarios */
+.code-enhanced .c,
+.code-enhanced .cm,
+.code-enhanced .c1,
+.code-enhanced .cs {
+  color: #8b949e !important;
+  font-style: italic;
 }
 
-/* Ajuste para código inline: no afectar `palabras` dentro del texto */
+/* Keywords */
+.code-enhanced .k,
+.code-enhanced .kc,
+.code-enhanced .kd,
+.code-enhanced .kn,
+.code-enhanced .kp,
+.code-enhanced .kr,
+.code-enhanced .kt,
+.code-enhanced .ow {
+  color: #ff7b72 !important;
+}
+
+/* Strings */
+.code-enhanced .s,
+.code-enhanced .sa,
+.code-enhanced .sb,
+.code-enhanced .sc,
+.code-enhanced .dl,
+.code-enhanced .sd,
+.code-enhanced .s2,
+.code-enhanced .se,
+.code-enhanced .sh,
+.code-enhanced .si,
+.code-enhanced .sx,
+.code-enhanced .sr,
+.code-enhanced .s1,
+.code-enhanced .ss {
+  color: #a5d6ff !important;
+}
+
+/* Números y constantes */
+.code-enhanced .m,
+.code-enhanced .mb,
+.code-enhanced .mf,
+.code-enhanced .mh,
+.code-enhanced .mi,
+.code-enhanced .il,
+.code-enhanced .mo,
+.code-enhanced .no {
+  color: #79c0ff !important;
+}
+
+/* Funciones y clases */
+.code-enhanced .nf,
+.code-enhanced .fm,
+.code-enhanced .nc {
+  color: #d2a8ff !important;
+}
+
+/* Variables, atributos y nombres */
+.code-enhanced .na,
+.code-enhanced .nv,
+.code-enhanced .vc,
+.code-enhanced .vg,
+.code-enhanced .vi,
+.code-enhanced .vm {
+  color: #7ee787 !important;
+}
+
+/* Tags HTML/XML */
+.code-enhanced .nt {
+  color: #7ee787 !important;
+}
+
+/* Operadores y puntuación */
+.code-enhanced .o,
+.code-enhanced .p {
+  color: #e6edf3 !important;
+}
+
+/* Builtins / soporte */
+.code-enhanced .nb,
+.code-enhanced .bp {
+  color: #ffa657 !important;
+}
+
+/* Errores */
+.code-enhanced .err {
+  color: #f85149 !important;
+  background: transparent !important;
+}
+
+/* Terminal: coloreado simple y legible */
+.code-enhanced.is-terminal .c,
+.code-enhanced.is-terminal .c1,
+.code-enhanced.is-terminal .cm {
+  color: #94a3b8 !important;
+}
+
+.code-enhanced.is-terminal .s,
+.code-enhanced.is-terminal .s1,
+.code-enhanced.is-terminal .s2 {
+  color: #a7f3d0 !important;
+}
+
+.code-enhanced.is-terminal .k,
+.code-enhanced.is-terminal .nb {
+  color: #93c5fd !important;
+}
+
+/* Código inline: se mantiene claro en el texto normal */
 p code,
 li code,
 td code {
@@ -534,120 +660,4 @@ td code {
   .code-enhanced__button {
     font-size: .75rem;
   }
-}
-
-/* ============================================================
-   AJUSTE FINAL BLOQUES DE CÓDIGO / TEXTO
-   - Fondo negro para terminal, código y texto
-   - Sin conteo de líneas en barra
-   - Text sin barra, sin copiar, sin descargar
-   - Descarga con nombre configurable desde comentario HTML
-   ============================================================ */
-
-/* Todos los bloques mejorados usan fondo negro */
-.code-enhanced,
-.code-text-box {
-  margin: 1.5rem 0;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #1f2937;
-  background: #0b1020 !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
-}
-
-/* Barra superior oscura para todos los lenguajes con toolbar */
-.code-enhanced__toolbar {
-  background: #111827 !important;
-  border-bottom: 1px solid #1f2937 !important;
-}
-
-/* Etiqueta: solo tipo de bloque, sin número de líneas */
-.code-enhanced__label {
-  color: #e5e7eb !important;
-  font-weight: 600;
-  letter-spacing: .2px;
-}
-
-/* Botones oscuros */
-.code-enhanced__button {
-  background: #1f2937 !important;
-  color: #e5e7eb !important;
-  border: 1px solid #374151 !important;
-  border-radius: 7px;
-  padding: .25rem .55rem;
-  font-size: .78rem;
-  line-height: 1.2;
-  cursor: pointer;
-}
-
-.code-enhanced__button:hover {
-  background: #374151 !important;
-  color: #ffffff !important;
-  border-color: #E00034 !important;
-}
-
-/* Área de código: negro para todos */
-.code-enhanced pre,
-.code-enhanced code,
-.code-enhanced .highlight,
-.code-enhanced .highlighter-rouge,
-.code-text-box pre,
-.code-text-box code,
-.code-text-box .highlight,
-.code-text-box .highlighter-rouge {
-  background: #0b1020 !important;
-  color: #e5e7eb !important;
-}
-
-/* Código de bloque */
-.code-enhanced pre,
-.code-text-box pre {
-  margin: 0 !important;
-  padding: 1rem !important;
-  overflow-x: auto;
-  font-size: .88rem;
-  line-height: 1.45;
-}
-
-/* Bloque text: sin toolbar; se ve como cajita negra */
-.code-text-box {
-  border-left: 4px solid #E00034;
-}
-
-.code-text-box pre {
-  white-space: pre-wrap;
-}
-
-/* Mensaje de código replegado en oscuro */
-.code-enhanced__collapsed-note {
-  background: #0b1020 !important;
-  color: #94a3b8 !important;
-}
-
-/* Código largo replegado por defecto */
-.code-enhanced.is-collapsible pre {
-  max-height: 0;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  overflow: hidden;
-  transition: max-height .25s ease, padding .25s ease;
-}
-
-/* Código largo abierto */
-.code-enhanced.is-collapsible.is-open pre {
-  max-height: 75vh;
-  padding-top: 1rem !important;
-  padding-bottom: 1rem !important;
-  overflow: auto;
-}
-
-/* Código inline conserva estilo claro para lectura dentro de párrafos */
-p code,
-li code,
-td code {
-  background: #f1f5f9 !important;
-  color: #E00034 !important;
-  border-radius: 4px;
-  padding: .1rem .25rem;
-  font-size: .9em;
 }
