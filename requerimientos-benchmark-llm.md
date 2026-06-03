@@ -1796,11 +1796,11 @@ python analizar_benchmark.py
 
 Ejemplo Tabla esperada:
 
-| Modelo | Tiempo promedio | Tokens entrada | Tokens salida | Tokens/s | Calidad promedio | Observación |
-|---|---:|---:|---:|---:|---:|---|
-| `llama3.2:3b` | 1.86 s | 55.0 | 153.04 | 104.16 | 9.99 | Fue el modelo más rápido y con mayor velocidad de generación. Presentó muy buena calidad promedio y baja variabilidad. |
-| `gemma3:4b` | 2.54 s | 36.0 | 151.40 | 73.14 | 9.76 | Mostró buen equilibrio entre tiempo, calidad y longitud de respuesta. Fue más lento que `llama3.2:3b`, pero mantuvo calidad alta. |
-| `deepseek-r1:8b-0528-qwen3-q4_K_M` | 3.82 s | 33.0 | 160.00 | 46.27 | 0.00 | Fue el modelo más lento y obtuvo calidad promedio nula en esta evaluación. Conviene revisar si respondió vacío, en formato no esperado o si la rúbrica automática no detectó contenido válido. |
+| Modelo | Tiempo promedio | Tokens entrada | Tokens salida | Tokens/s | Calidad promedio | 
+|---|---:|---:|---:|---:|---:|
+| `llama3.2:3b` | 1.86 s | 55.0 | 153.04 | 104.16 | 9.99 |
+| `gemma3:4b` | 2.54 s | 36.0 | 151.40 | 73.14 | 9.76 | 
+| `deepseek-r1:8b-0528-qwen3-q4_K_M` | 3.82 s | 33.0 | 160.00 | 46.27 | 0.00 |
 
 En este experimento, `llama3.2:3b` fue el modelo con mejor desempeño general, ya que obtuvo el menor tiempo promedio de respuesta, la mayor velocidad de generación en tokens por segundo y una calidad promedio prácticamente máxima. `gemma3:4b` también mostró un desempeño adecuado, aunque con mayor latencia y menor velocidad de generación. El modelo `deepseek-r1:8b-0528-qwen3-q4_K_M` generó el mayor número de tokens de salida permitido, pero presentó mayor latencia, menor velocidad y una calidad promedio de 0.00, por lo que se recomienda revisar manualmente sus respuestas antes de descartarlo definitivamente.
 
