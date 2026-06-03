@@ -378,6 +378,7 @@ Los parámetros de generación modifican el comportamiento del modelo. No cambia
 
 Ejemplo de uso desde la API de Ollama:
 
+<!-- code-open: true -->
 ```json
 {
   "model": "llama3.2:3b",
@@ -456,6 +457,7 @@ En esta prueba se utilizará la API local de Ollama. Por defecto, Ollama expone 
 
 Crea un archivo llamado `prueba_manual_parametros.py` y copia el siguiente código.
 
+<!-- code-file: prueba_manual_parametros.py -->
 ```python
 import requests
 import time
@@ -594,6 +596,7 @@ Total:
 
 Condiciones recomendadas:
 
+<!-- code-open: true -->
 ```json
 {
   "temperature": 0.7,
@@ -674,6 +677,7 @@ El CSV debe incluir variables suficientes para reproducir y analizar el experime
 
 Guarda el siguiente archivo como `benchmark_modelos.py`.
 
+<!-- code-file: benchmark_modelos.py -->
 ```python
 import csv
 import time
@@ -876,6 +880,7 @@ python benchmark_modelos.py
 
 Guarda el siguiente archivo como `benchmark_parametros.py`.
 
+<!-- code-file: benchmark_parametros.py -->
 ```python
 import csv
 import time
@@ -1078,6 +1083,7 @@ El script completo está disponible como archivo independiente. Su función es l
 
 Guarda el siguiente archivo como `graficar_benchmark_llm.py`.
 
+<!-- code-file: graficar_benchmark_llm.pys -->
 ```python
 import argparse
 from pathlib import Path
@@ -1735,6 +1741,7 @@ Puede usarse para justificar una decisión técnica:
 
 Guarda el siguiente archivo como `analizar_benchmark.py`.
 
+<!-- code-file: analizar_benchmark.py -->
 ```python
 import pandas as pd
 
