@@ -661,3 +661,96 @@ td code {
     font-size: .75rem;
   }
 }
+
+/* ============================================================
+   AJUSTE DE CONTRASTE PARA CÓDIGO PYTHON EN FONDO NEGRO
+   Compatible con Rouge / Jekyll / Just the Docs
+   ============================================================ */
+
+/* Texto base dentro de bloques de código */
+.code-enhanced pre,
+.code-enhanced code,
+.code-enhanced .highlight {
+  background: #0d1117 !important;
+  color: #e6edf3 !important;
+}
+
+/* Keywords generales: import, from, as, def, class, return, if, for, while */
+.code-enhanced .highlight .k,
+.code-enhanced .highlight .kd,
+.code-enhanced .highlight .kn,
+.code-enhanced .highlight .kp,
+.code-enhanced .highlight .kr,
+.code-enhanced .highlight .kt {
+  color: #7dd3fc !important; /* cian brillante */
+  font-weight: 700;
+}
+
+/* Nombres de módulos en import: requests, pandas, pathlib, etc. */
+.code-enhanced .highlight .nn,
+.code-enhanced .highlight .nc {
+  color: #93c5fd !important; /* azul claro */
+  font-weight: 600;
+}
+
+/* Funciones: print, requests.post, pd.read_csv, etc. */
+.code-enhanced .highlight .nf,
+.code-enhanced .highlight .fm {
+  color: #c084fc !important; /* violeta */
+  font-weight: 600;
+}
+
+/* Variables y nombres generales */
+.code-enhanced .highlight .n,
+.code-enhanced .highlight .na,
+.code-enhanced .highlight .nb,
+.code-enhanced .highlight .bp {
+  color: #e6edf3 !important;
+}
+
+/* Strings */
+.code-enhanced .highlight .s,
+.code-enhanced .highlight .s1,
+.code-enhanced .highlight .s2,
+.code-enhanced .highlight .sa,
+.code-enhanced .highlight .sb,
+.code-enhanced .highlight .sc,
+.code-enhanced .highlight .dl {
+  color: #86efac !important; /* verde claro */
+}
+
+/* Números */
+.code-enhanced .highlight .m,
+.code-enhanced .highlight .mi,
+.code-enhanced .highlight .mf,
+.code-enhanced .highlight .mh {
+  color: #facc15 !important; /* amarillo */
+}
+
+/* Comentarios */
+.code-enhanced .highlight .c,
+.code-enhanced .highlight .c1,
+.code-enhanced .highlight .cm,
+.code-enhanced .highlight .cp {
+  color: #94a3b8 !important; /* gris azulado claro */
+  font-style: italic;
+}
+
+/* Operadores: =, +, -, /, :, etc. */
+.code-enhanced .highlight .o,
+.code-enhanced .highlight .ow,
+.code-enhanced .highlight .p {
+  color: #f8fafc !important;
+}
+
+/* Decoradores de Python */
+.code-enhanced .highlight .nd {
+  color: #f0abfc !important;
+  font-weight: 600;
+}
+
+/* Errores o tokens especiales */
+.code-enhanced .highlight .err {
+  color: #fecaca !important;
+  background: #7f1d1d !important;
+}
