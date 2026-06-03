@@ -458,7 +458,6 @@ En esta prueba se utilizará la API local de Ollama. Por defecto, Ollama expone 
 Crea un archivo llamado `prueba_manual_parametros.py` y copia el siguiente código.
 
 <!-- code-file: prueba_manual_parametros.py -->
-<!-- code-open: true -->
 ```python
 import requests
 import time
@@ -679,7 +678,6 @@ El CSV debe incluir variables suficientes para reproducir y analizar el experime
 Guarda el siguiente archivo como `benchmark_modelos.py`.
 
 <!-- code-file: benchmark_modelos.py -->
-<!-- code-open: true -->
 ```python
 import csv
 import time
@@ -883,7 +881,6 @@ python benchmark_modelos.py
 Guarda el siguiente archivo como `benchmark_parametros.py`.
 
 <!-- code-file: benchmark_parametros.py -->
-<!-- code-open: true -->
 ```python
 import csv
 import time
@@ -1087,7 +1084,6 @@ El script completo está disponible como archivo independiente. Su función es l
 Guarda el siguiente archivo como `graficar_benchmark_llm.py`.
 
 <!-- code-file: graficar_benchmark_llm.py -->
-<!-- code-open: true -->
 ```python
 import argparse
 from pathlib import Path
@@ -1746,7 +1742,6 @@ Puede usarse para justificar una decisión técnica:
 Guarda el siguiente archivo como `analizar_benchmark.py`.
 
 <!-- code-file: analizar_benchmark.py -->
-<!-- code-open: true -->
 ```python
 import pandas as pd
 
