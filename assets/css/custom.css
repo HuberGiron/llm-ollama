@@ -535,3 +535,119 @@ td code {
     font-size: .75rem;
   }
 }
+
+/* ============================================================
+   AJUSTE FINAL BLOQUES DE CÓDIGO / TEXTO
+   - Fondo negro para terminal, código y texto
+   - Sin conteo de líneas en barra
+   - Text sin barra, sin copiar, sin descargar
+   - Descarga con nombre configurable desde comentario HTML
+   ============================================================ */
+
+/* Todos los bloques mejorados usan fondo negro */
+.code-enhanced,
+.code-text-box {
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #1f2937;
+  background: #0b1020 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+}
+
+/* Barra superior oscura para todos los lenguajes con toolbar */
+.code-enhanced__toolbar {
+  background: #111827 !important;
+  border-bottom: 1px solid #1f2937 !important;
+}
+
+/* Etiqueta: solo tipo de bloque, sin número de líneas */
+.code-enhanced__label {
+  color: #e5e7eb !important;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+/* Botones oscuros */
+.code-enhanced__button {
+  background: #1f2937 !important;
+  color: #e5e7eb !important;
+  border: 1px solid #374151 !important;
+  border-radius: 7px;
+  padding: .25rem .55rem;
+  font-size: .78rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.code-enhanced__button:hover {
+  background: #374151 !important;
+  color: #ffffff !important;
+  border-color: #E00034 !important;
+}
+
+/* Área de código: negro para todos */
+.code-enhanced pre,
+.code-enhanced code,
+.code-enhanced .highlight,
+.code-enhanced .highlighter-rouge,
+.code-text-box pre,
+.code-text-box code,
+.code-text-box .highlight,
+.code-text-box .highlighter-rouge {
+  background: #0b1020 !important;
+  color: #e5e7eb !important;
+}
+
+/* Código de bloque */
+.code-enhanced pre,
+.code-text-box pre {
+  margin: 0 !important;
+  padding: 1rem !important;
+  overflow-x: auto;
+  font-size: .88rem;
+  line-height: 1.45;
+}
+
+/* Bloque text: sin toolbar; se ve como cajita negra */
+.code-text-box {
+  border-left: 4px solid #E00034;
+}
+
+.code-text-box pre {
+  white-space: pre-wrap;
+}
+
+/* Mensaje de código replegado en oscuro */
+.code-enhanced__collapsed-note {
+  background: #0b1020 !important;
+  color: #94a3b8 !important;
+}
+
+/* Código largo replegado por defecto */
+.code-enhanced.is-collapsible pre {
+  max-height: 0;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  overflow: hidden;
+  transition: max-height .25s ease, padding .25s ease;
+}
+
+/* Código largo abierto */
+.code-enhanced.is-collapsible.is-open pre {
+  max-height: 75vh;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  overflow: auto;
+}
+
+/* Código inline conserva estilo claro para lectura dentro de párrafos */
+p code,
+li code,
+td code {
+  background: #f1f5f9 !important;
+  color: #E00034 !important;
+  border-radius: 4px;
+  padding: .1rem .25rem;
+  font-size: .9em;
+}
