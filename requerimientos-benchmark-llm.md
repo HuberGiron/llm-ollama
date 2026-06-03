@@ -1083,7 +1083,7 @@ El script completo está disponible como archivo independiente. Su función es l
 
 Guarda el siguiente archivo como `graficar_benchmark_llm.py`.
 
-<!-- code-file: graficar_benchmark_llm.pys -->
+<!-- code-file: graficar_benchmark_llm.py -->
 ```python
 import argparse
 from pathlib import Path
