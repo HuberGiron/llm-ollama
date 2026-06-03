@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const collapsedNote = document.createElement("div");
     collapsedNote.className = "code-enhanced__collapsed-note";
-    collapsedNote.textContent = "Bloque de código replegado. Usa “Mostrar” para verlo completo.";
+    collapsedNote.textContent = "Bloque de código extenso. Usa “Mostrar” para verlo completo.";
 
     block.parentNode.insertBefore(wrapper, block);
     wrapper.appendChild(toolbar);

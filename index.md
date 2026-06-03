@@ -459,36 +459,38 @@ La siguiente tabla se llena con información de Hugging Face, Ollama y la termin
 
 ## Referencias
 
-[1] Google for Developers, “Machine Learning Crash Course,” *Google Machine Learning Education*. [En línea]. Disponible en: https://developers.google.com/machine-learning/crash-course?hl=es-419
+## Referencias
 
-[2] Google for Developers, “Introducción a los modelos de lenguaje grandes,” *Machine Learning Crash Course*. [En línea]. Disponible en: https://developers.google.com/machine-learning/crash-course/llm?hl=es-419
+[1] Google for Developers. *Machine Learning Crash Course*. Google Machine Learning Education. Disponible en: <https://developers.google.com/machine-learning/crash-course?hl=es-419>
 
-[3] Google for Developers, “LLM: ¿Cuál es un modelo grande de lenguaje? Transformers y autoatención,” *Machine Learning Crash Course*. [En línea]. Disponible en: https://developers.google.com/machine-learning/crash-course/llm/transformers?hl=es-419
+[2] Google for Developers. *Introducción a los modelos de lenguaje grandes*. Machine Learning Crash Course. Disponible en: <https://developers.google.com/machine-learning/crash-course/llm?hl=es-419>
 
-[4] Ollama, “CLI Reference,” *Ollama Documentation*. [En línea]. Disponible en: https://docs.ollama.com/cli
+[3] Google for Developers. *Transformers y autoatención*. Machine Learning Crash Course. Disponible en: <https://developers.google.com/machine-learning/crash-course/llm/transformers?hl=es-419>
 
-[5] Hugging Face, “Use Ollama with any GGUF Model on Hugging Face Hub,” *Hugging Face Docs*. [En línea]. Disponible en: https://huggingface.co/docs/hub/ollama
+[4] Ollama. *CLI reference*. Documentación oficial de comandos de terminal para instalar, ejecutar, listar, detener y administrar modelos locales. Disponible en: <https://docs.ollama.com/cli>
 
-[6] Hugging Face, “Model Cards,” *Hugging Face Docs*. [En línea]. Disponible en: https://huggingface.co/docs/hub/en/model-cards
+[5] Hugging Face. *Use Ollama with any GGUF model on Hugging Face Hub*. Hugging Face Docs. Disponible en: <https://huggingface.co/docs/hub/ollama>
 
-[7] Meta, “Llama-3.2-3B-Instruct,” *Hugging Face Model Card*. [En línea]. Disponible en: https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct
+[6] Hugging Face. *Model cards*. Hugging Face Docs. Documentación sobre tarjetas de modelo, metadatos, uso previsto, limitaciones, licencias y reproducibilidad. Disponible en: <https://huggingface.co/docs/hub/en/model-cards>
 
-[8] Google, “Gemma 3 4B IT,” *Hugging Face Model Card*. [En línea]. Disponible en: https://huggingface.co/google/gemma-3-4b-it
+[7] Meta. *Llama-3.2-3B-Instruct*. Hugging Face Model Card. Disponible en: <https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct>
 
-[9] Qwen, “Qwen2.5-7B-Instruct,” *Hugging Face Model Card*. [En línea]. Disponible en: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct
+[8] Google. *Gemma 3 4B IT*. Hugging Face Model Card. Disponible en: <https://huggingface.co/google/gemma-3-4b-it>
 
-[10] Mistral AI, “Mistral-7B-Instruct-v0.3,” *Hugging Face Model Card*. [En línea]. Disponible en: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3
+[9] Qwen. *Qwen2.5-7B-Instruct*. Hugging Face Model Card. Disponible en: <https://huggingface.co/Qwen/Qwen2.5-7B-Instruct>
 
-[11] Microsoft, “Phi-4-mini-instruct,” *Hugging Face Model Card*. [En línea]. Disponible en: https://huggingface.co/microsoft/Phi-4-mini-instruct
+[10] Mistral AI. *Mistral-7B-Instruct-v0.3*. Hugging Face Model Card. Disponible en: <https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3>
 
-[12] TinyLlama, “TinyLlama-1.1B-Chat-v1.0,” *Hugging Face Model Card*. [En línea]. Disponible en: https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0
+[11] Microsoft. *Phi-4-mini-instruct*. Hugging Face Model Card. Disponible en: <https://huggingface.co/microsoft/Phi-4-mini-instruct>
 
-[13] Ollama, “llama3.2,” *Ollama Library*. [En línea]. Disponible en: https://ollama.com/library/llama3.2
+[12] TinyLlama. *TinyLlama-1.1B-Chat-v1.0*. Hugging Face Model Card. Disponible en: <https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0>
 
-[14] Ollama, “gemma3:4b,” *Ollama Library*. [En línea]. Disponible en: https://ollama.com/library/gemma3:4b
+[13] Ollama. *llama3.2*. Ollama Library. Disponible en: <https://ollama.com/library/llama3.2>
 
-[15] Ollama, “phi4-mini,” *Ollama Library*. [En línea]. Disponible en: https://ollama.com/library/phi4-mini
+[14] Ollama. *gemma3:4b*. Ollama Library. Disponible en: <https://ollama.com/library/gemma3:4b>
 
-[16] Qwen, “Qwen2.5-7B-Instruct-GGUF,” *Hugging Face Model Card*. [En línea]. Disponible en: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF
+[15] Ollama. *phi4-mini*. Ollama Library. Disponible en: <https://ollama.com/library/phi4-mini>
+
+[16] Qwen. *Qwen2.5-7B-Instruct-GGUF*. Hugging Face Model Card. Disponible en: <https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF>
 
 ---
