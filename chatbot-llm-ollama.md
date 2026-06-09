@@ -1155,7 +1155,7 @@ También modifica parámetros y observa:
 
 ---
 
-## 15. Actividad 3: Implementación de chatbot web con LLM local
+## 15. Práctica 3: Implementación de chatbot web con LLM local
 
 ### Objetivo
 
@@ -1189,7 +1189,7 @@ El sistema debe incluir:
 10. Manejo básico de errores.
 ```
 
-### Entregables
+### Entregables en el reporte
 
 ```text
 - Código del backend.
@@ -1213,26 +1213,13 @@ Responder:
 4. ¿Qué ocurre al modificar temperature?
 5. ¿Por qué es útil mostrar tokens y latencia?
 6. ¿Por qué se recomienda usar backend en vez de conectar el navegador directamente a Ollama?
-7. ¿Cómo extenderías este chatbot para una aplicación robótica o de IA física?
+7. ¿Cómo extenderías este chatbot para tu proyecto?
 ```
 
 ---
 
-## 16. Evaluación sugerida
 
-| Criterio | Puntaje |
-|---|---:|
-| Backend funcional con `/chat` | 20 |
-| Integración correcta con Ollama | 20 |
-| Frontend funcional con formulario e historial | 20 |
-| Parámetros configurables desde frontend | 15 |
-| Métricas visibles y correctas | 15 |
-| Evidencias y reflexión técnica | 10 |
-| **Total** | **100** |
-
----
-
-## 17. Consideraciones finales
+## 16. Consideraciones finales
 
 El chatbot desarrollado en este tema representa una arquitectura mínima pero extensible. Aunque el ejemplo se ejecuta localmente, la misma estructura puede adaptarse a otras configuraciones.
 
@@ -1251,7 +1238,7 @@ En robótica e IA física, el chatbot no debe entenderse como un controlador dir
 
 ---
 
-## 18. Referencias
+## 17. Referencias
 
 [1] Ollama. (s. f.). *Generate API*. Documentación oficial del endpoint `/api/generate`, parámetros de generación, `stream`, `options`, `keep_alive` y métricas de inferencia. Disponible en: <https://docs.ollama.com/api/generate>
 
@@ -1266,3 +1253,5 @@ En robótica e IA física, el chatbot no debe entenderse como un controlador dir
 [6] MDN Web Docs. (s. f.). *Fetch API*. Documentación oficial sobre solicitudes HTTP desde JavaScript en el navegador. Disponible en: <https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API>
 
 [7] MDN Web Docs. (s. f.). *Window: fetch() method*. Documentación oficial del método `fetch()` para iniciar solicitudes de red desde el navegador. Disponible en: <https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch>
+
+[8] Python Software Foundation. (s. f.). *venv — Creation of virtual environments*. Python Documentation. Disponible en: <https://docs.python.org/3/library/venv.html>
