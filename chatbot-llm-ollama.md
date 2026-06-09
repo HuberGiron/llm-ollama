@@ -364,6 +364,76 @@ Python global del sistema
     └── .venv independiente
 ```
 
+Las principales ventajas de usar un entorno virtual son:
+
+| Ventaja | Explicación |
+|---|---|
+| Aislamiento | Cada proyecto mantiene sus propias dependencias. |
+| Reproducibilidad | Permite compartir un archivo `requirements.txt` para reinstalar las mismas bibliotecas. |
+| Menos conflictos | Evita problemas entre versiones diferentes de paquetes. |
+| Limpieza | No contamina la instalación global de Python. |
+| Portabilidad | Facilita mover el proyecto a otra computadora o servidor. |
+| Buenas prácticas | Es el flujo recomendado para proyectos Python profesionales y académicos. |
+
+En esta práctica, el entorno virtual se crea dentro de la carpeta `backend`, porque es ahí donde se ejecutará la API en Python.
+
+```bash
+cd backend
+python -m venv .venv
+```
+
+Después de crearlo, debe activarse. En Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+En macOS o Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Cuando el entorno virtual está activo, el nombre del entorno suele aparecer al inicio de la línea de comandos:
+
+```text
+(.venv) C:\Users\usuario\proyecto\backend>
+```
+
+Esto indica que los paquetes instalados con `pip` quedarán dentro del entorno virtual del proyecto, no en el Python global del sistema.
+
+Una vez activado el entorno, se instalan las dependencias:
+
+```bash
+pip install fastapi uvicorn requests pydantic
+```
+
+Finalmente, se genera el archivo `requirements.txt`:
+
+```bash
+pip freeze > requirements.txt
+```
+
+El archivo `requirements.txt` registra las bibliotecas instaladas y sus versiones. Esto permite que otra persona pueda reconstruir el mismo entorno con:
+
+```bash
+pip install -r requirements.txt
+```
+
+> ⚠️ **Consideración:** el entorno virtual no debe subirse completo al repositorio. Normalmente, la carpeta `.venv` se agrega al archivo `.gitignore`. Lo que sí se comparte es el archivo `requirements.txt`, porque contiene la lista de dependencias necesarias para reconstruir el entorno.
+
+Ejemplo de `.gitignore`:
+
+```text
+.venv/
+__pycache__/
+*.pyc
+```
+
+Con esta práctica, el proyecto queda más ordenado y reproducible: el código se mantiene separado de las dependencias, y cualquier estudiante puede instalar el mismo entorno en su computadora siguiendo los mismos pasos.
+
+---
+
 Windows PowerShell:
 
 ```powershell
