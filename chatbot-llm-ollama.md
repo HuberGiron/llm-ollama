@@ -38,35 +38,7 @@ En esta arquitectura, el navegador no se comunica directamente con el modelo. El
 
 La arquitectura propuesta se divide en cuatro capas principales.
 
-```text
-┌──────────────────────────────────────────────┐
-│ Usuario                                      │
-│ Escribe una pregunta o instrucción            │
-└───────────────────────┬──────────────────────┘
-                        ↓
-┌──────────────────────────────────────────────┐
-│ Frontend web                                 │
-│ HTML + CSS + JavaScript                      │
-│ Formulario, parámetros, historial, métricas  │
-└───────────────────────┬──────────────────────┘
-                        ↓ HTTP POST /chat
-┌──────────────────────────────────────────────┐
-│ Backend Python                               │
-│ FastAPI                                      │
-│ Valida, construye payload, llama a Ollama    │
-└───────────────────────┬──────────────────────┘
-                        ↓ HTTP POST /api/chat
-┌──────────────────────────────────────────────┐
-│ Ollama API local                             │
-│ Ejecuta el modelo LLM                        │
-│ Devuelve respuesta y métricas                │
-└───────────────────────┬──────────────────────┘
-                        ↓
-┌──────────────────────────────────────────────┐
-│ Modelo LLM local                             │
-│ llama3.2, gemma3, qwen, mistral, etc.        │
-└──────────────────────────────────────────────┘
-```
+![arquitectura](assets/img/chat/diagrama.png)
 
 ---
 
