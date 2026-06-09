@@ -332,12 +332,6 @@ ollama ls
 ollama run llama3.2:3b
 ```
 
-**Espacio para captura sugerida:**
-
-```md
-![Ollama funcionando](assets/img/chatbot/ollama-ls.png)
-```
-
 ---
 
 ### 9.2 Crear estructura de carpetas
@@ -351,6 +345,24 @@ mkdir backend frontend
 ---
 
 ### 9.3 Crear entorno virtual
+
+### 9.3.1 ¿Por qué usar un entorno virtual en Python?
+
+En Python, un **entorno virtual** es una carpeta aislada que contiene una instalación propia de paquetes y dependencias para un proyecto específico. Su objetivo es evitar que las bibliotecas instaladas para una práctica afecten otros proyectos de Python instalados en la misma computadora.
+
+Cuando se desarrolla una API con FastAPI para conectar un frontend web con Ollama, se requieren paquetes como `fastapi`, `uvicorn`, `requests` y `pydantic`. Si estos paquetes se instalan directamente en el Python global del sistema, pueden mezclarse con dependencias de otros proyectos, generar conflictos de versiones o dificultar la reproducción del proyecto en otra computadora.
+
+Por ejemplo, un proyecto puede requerir una versión específica de `fastapi`, mientras que otro proyecto puede necesitar una versión distinta. El entorno virtual permite que cada proyecto tenga sus propias dependencias sin modificar el entorno global de Python. Esto mejora la organización, reduce errores y facilita compartir el proyecto mediante un archivo `requirements.txt`.
+
+```text
+Python global del sistema
+├── Proyecto A
+│   └── .venv con sus propias dependencias
+├── Proyecto B
+│   └── .venv con otras dependencias
+└── Proyecto C
+    └── .venv independiente
+```
 
 Windows PowerShell:
 
