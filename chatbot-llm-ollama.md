@@ -18,7 +18,7 @@ El tema se apoya en documentación oficial de Ollama, FastAPI y MDN Web Docs. Ol
 
 En los temas anteriores se trabajó con modelos LLM desde terminal, scripts de Python y pruebas de benchmark. Ese enfoque permite comprender cómo instalar modelos, modificar parámetros de generación, medir latencia, analizar tokens y comparar modelos. Sin embargo, una aplicación real normalmente requiere una interfaz más accesible para el usuario.
 
-Un chatbot con LLM no es únicamente una caja de texto conectada a un modelo. Es una arquitectura de software compuesta por una interfaz, una API intermedia, un servicio de inferencia y un modelo. Cada componente tiene una función específica.
+Un chatbot con LLM es una arquitectura de software compuesta por una interfaz, una API intermedia, un servicio de inferencia y un modelo. Cada componente tiene una función específica.
 
 ```text
 Usuario
@@ -26,11 +26,9 @@ Usuario
 → Backend Python
 → API local de Ollama
 → Modelo LLM
-→ Respuesta + métricas
-→ Frontend
 ```
 
-En esta arquitectura, el navegador no se comunica directamente con el modelo. El frontend envía una solicitud al backend; el backend valida los datos, construye la solicitud compatible con Ollama, consulta el modelo y devuelve una respuesta estructurada. Esta separación permite controlar parámetros, agregar seguridad, registrar métricas, validar entradas y preparar la aplicación para futuras extensiones.
+En esta arquitectura, el navegador no se comunica directamente con el modelo. El frontend envía una solicitud al backend; el backend valida los datos, construye la solicitud compatible con Ollama, consulta el modelo y devuelve una respuesta estructurada.
 
 > ⚠️ **Consideración:** Aunque Ollama expone una API local, en una arquitectura académica o profesional es recomendable usar un backend intermedio. Esto facilita validación, control de modelos, registro de métricas, manejo de errores y extensión posterior hacia bases de datos, RAG, autenticación, sensores o robótica.
 
@@ -68,12 +66,6 @@ La arquitectura propuesta se divide en cuatro capas principales.
 │ Modelo LLM local                             │
 │ llama3.2, gemma3, qwen, mistral, etc.        │
 └──────────────────────────────────────────────┘
-```
-
-**Espacio para imagen sugerida:**
-
-```md
-![Arquitectura chatbot LLM](assets/img/chatbot/arquitectura-chatbot-llm.png)
 ```
 
 ---
@@ -143,6 +135,7 @@ Ollama documenta `/api/chat` como el endpoint para generar el siguiente mensaje 
 
 El endpoint `/api/generate` recibe un prompt como texto. Es útil para pruebas sencillas.
 
+<!-- code-open: true -->
 ```json
 {
   "model": "llama3.2:3b",
@@ -159,6 +152,7 @@ Este enfoque es simple, pero no representa naturalmente un chatbot. Si se quiere
 
 El endpoint `/api/chat` recibe una lista de mensajes.
 
+<!-- code-open: true -->
 ```json
 {
   "model": "llama3.2:3b",
@@ -192,6 +186,7 @@ POST http://localhost:8000/chat
 
 Ejemplo:
 
+<!-- code-open: true -->
 ```json
 {
   "message": "Explica qué es un sensor ultrasónico.",
@@ -212,6 +207,7 @@ Esta solicitud pertenece a nuestra aplicación. El frontend no necesita conocer 
 
 El backend transforma la solicitud anterior en un payload compatible con Ollama:
 
+<!-- code-open: true -->
 ```json
 {
   "model": "llama3.2:3b",
@@ -245,6 +241,7 @@ Se recomienda usar `stream: false` en esta primera versión porque la respuesta 
 
 El backend debe devolver una respuesta simplificada:
 
+<!-- code-open: true -->
 ```json
 {
   "model": "llama3.2:3b",
