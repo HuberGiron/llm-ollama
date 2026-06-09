@@ -638,19 +638,6 @@ def chat(request: ChatRequest):
     )
 ```
 
-Crea el archivo:
-
-```text
-backend/requirements.txt
-```
-
-```text
-fastapi
-uvicorn
-requests
-pydantic
-```
-
 ---
 
 ## 11. Probar backend sin frontend
@@ -667,6 +654,8 @@ Abrir documentación automática:
 ```text
 http://localhost:8000/docs
 ```
+
+![backend](assets/img/chat/back.png)
 
 Probar endpoint de salud:
 
@@ -1141,7 +1130,7 @@ Abrir en el navegador:
 ```text
 http://localhost:5500
 ```
-
+![frontend](assets/img/chat/front.png)
 ---
 
 ## 14. Pruebas sugeridas
