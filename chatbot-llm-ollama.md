@@ -254,7 +254,7 @@ El backend debe validar estos valores. Esto evita solicitudes excesivas, configu
 
 ## 7. Métricas visibles en el chatbot
 
-Una parte central de esta práctica es mostrar métricas después de cada respuesta. El objetivo es que el estudiante observe la relación entre parámetros, tokens, latencia y comportamiento del modelo.
+Una parte central de esta práctica es mostrar métricas después de cada respuesta. El objetivo es observar la relación entre parámetros, tokens, latencia y comportamiento del modelo.
 
 | Métrica | Fuente | Interpretación |
 |---|---|---|
@@ -1137,7 +1137,6 @@ Implementar un chatbot web cliente-servidor que permita conversar con un LLM loc
 
 El sistema debe incluir:
 
-```text
 1. Backend en Python con FastAPI.
 2. Endpoint POST /chat.
 3. Conexión backend → Ollama API.
@@ -1159,11 +1158,9 @@ El sistema debe incluir:
    - tokens totales
    - tokens por segundo
 10. Manejo básico de errores.
-```
 
 ### Entregables en el reporte
 
-```text
 - Código del backend.
 - Código del frontend.
 - Captura de Ollama con modelo instalado.
@@ -1172,13 +1169,9 @@ El sistema debe incluir:
 - Captura del frontend funcionando.
 - Captura de métricas visibles.
 - Reflexión técnica breve.
-```
 
 ### Reflexión técnica
 
-Responder:
-
-```text
 1. ¿Qué modelo local utilizaste?
 2. ¿Qué parámetros configuraste desde el frontend?
 3. ¿Qué ocurre al aumentar num_predict?
@@ -1186,7 +1179,6 @@ Responder:
 5. ¿Por qué es útil mostrar tokens y latencia?
 6. ¿Por qué se recomienda usar backend en vez de conectar el navegador directamente a Ollama?
 7. ¿Cómo extenderías este chatbot para tu proyecto?
-```
 
 ---
 
