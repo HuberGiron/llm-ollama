@@ -385,6 +385,7 @@ python -m venv .venv
 Después de crearlo, debe activarse. En Windows PowerShell:
 
 ```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\Activate.ps1
 ```
 
@@ -439,6 +440,7 @@ Windows PowerShell:
 ```powershell
 cd backend
 python -m venv .venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\Activate.ps1
 ```
 
@@ -464,6 +466,7 @@ pip freeze > requirements.txt
 ## 10. Backend FastAPI
 
 Crea el archivo:
+
 
 ```text
 backend/main.py
@@ -673,6 +676,7 @@ curl http://localhost:8000/health
 
 Respuesta esperada:
 
+<!-- code-open: true -->
 ```json
 {
   "status": "ok"
@@ -691,12 +695,6 @@ curl -X POST http://localhost:8000/chat   -H "Content-Type: application/json"   
     "num_ctx": 4096,
     "repeat_penalty": 1.1
   }'
-```
-
-**Espacio para captura sugerida:**
-
-```md
-![Prueba endpoint chat](assets/img/chatbot/prueba-endpoint-chat.png)
 ```
 
 ---
@@ -1142,12 +1140,6 @@ Abrir en el navegador:
 
 ```text
 http://localhost:5500
-```
-
-**Espacio para captura sugerida:**
-
-```md
-![Chatbot funcionando](assets/img/chatbot/chatbot-funcionando.png)
 ```
 
 ---
