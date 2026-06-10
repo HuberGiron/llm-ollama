@@ -1233,19 +1233,18 @@ Compara:
 | Nivel adecuado | | |
 | Advertencias técnicas | | |
 | Formato | | |
-| Utilidad para clase | | |
+| Utilidad | | |
 
 ---
 
-## 16. Actividad 4: Diseñar un copiloto especializado
+## 16. Práctica 4: Diseñar un copiloto especializado
 
 ### Objetivo
 
-Modificar el chatbot local del Tema 3 para convertirlo en un copiloto especializado mediante perfiles de sistema, prompting estructurado, parámetros configurables y evaluación crítica de respuestas.
+Modificar el chatbot local del Tema 3: Chatbot LLM para convertirlo en un copiloto especializado mediante perfiles de sistema (**Es ideal usar perfiles que puedas ocupar en tu proyecto**), prompting estructurado, parámetros configurables y evaluación crítica de respuestas.
 
-### Requerimientos mínimos
+### Requerimientos
 
-```text
 1. Selector de perfil de copiloto en frontend.
 2. Al menos 3 perfiles de copiloto.
 3. Campo editable para system_prompt.
@@ -1270,7 +1269,6 @@ Modificar el chatbot local del Tema 3 para convertirlo en un copiloto especializ
 
 Responder:
 
-```text
 1. ¿Qué perfil fue más útil y por qué?
 2. ¿Qué diferencias observaste entre prompt genérico y system_prompt especializado?
 3. ¿Qué instrucciones redujeron ambigüedad?
@@ -1278,23 +1276,10 @@ Responder:
 5. ¿El modelo inventó información? ¿En qué caso?
 6. ¿Qué guardrails agregarías?
 7. ¿Cómo conectarías este copiloto con documentos propios en un sistema RAG?
-```
 
 ---
 
-## 17. Evaluación sugerida
 
-| Criterio | Puntaje |
-|---|---:|
-| Integración correcta del `system_prompt` | 20 |
-| Perfiles de copiloto funcionales | 20 |
-| Frontend permite seleccionar o editar contexto | 15 |
-| Backend valida perfil, parámetros y longitud | 15 |
-| Comparación genérico vs especializado | 15 |
-| Evidencias, reflexión y análisis de límites | 15 |
-| **Total** | **100** |
-
----
 
 ## 18. Consideraciones finales
 
