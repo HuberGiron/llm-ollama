@@ -6,11 +6,9 @@ nav_order: 4
 
 # Ingeniería de prompting y copilotos especializados con Ollama
 
-Esta sección continúa el trabajo del tema anterior, donde se construyó un chatbot local con **frontend HTML/CSS/JavaScript**, **backend en Python con FastAPI** y conexión a la **API local de Ollama**. En este tema, el objetivo ya no es solamente conversar con un LLM, sino **controlar su comportamiento** para convertirlo en un copiloto especializado.
+Esta sección continúa el trabajo del tema anterior, donde se construyó un chatbot local con **frontend HTML/CSS/JavaScript**, **backend en Python con FastAPI** y conexión a la **API local de Ollama**. En este tema, el objetivo ya no es **controlar su comportamiento** para convertirlo en un copiloto especializado.
 
-El cambio principal no consiste en entrenar un nuevo modelo, sino en modificar el **contexto**, la **instrucción de sistema**, el **rol**, las **reglas**, el **formato de respuesta** y los **límites** que recibe el modelo antes de responder. Ollama permite construir conversaciones mediante `/api/chat`, enviando mensajes con roles como `system`, `user` y `assistant` [1]. Esto permite que el backend defina una instrucción persistente para el modelo y luego agregue la pregunta del usuario.
-
-El tema se apoya en documentación oficial de Ollama, OpenAI, Google AI, Microsoft, FastAPI y OWASP. Las notas del curso de copilotos se usarán únicamente como mapa temático para organizar conceptos como prompting estructurado, instrucciones de sistema, guardrails, alucinaciones, perfiles de copiloto y ciclos de prueba e iteración. El desarrollo técnico se mantiene en el modelo trabajado en este curso: **Ollama + Python + frontend/backend**.
+El cambio principal consiste en modificar el **contexto**, la **instrucción de sistema**, el **rol**, las **reglas**, el **formato de respuesta** y los **límites** que recibe el modelo antes de responder. Ollama permite construir conversaciones mediante `/api/chat`, enviando mensajes con roles como `system`, `user` y `assistant` [1]. Esto permite que el backend defina una instrucción persistente para el modelo y luego agregue la pregunta del usuario.
 
 > 🎯 **Objetivo de aprendizaje:** Al finalizar esta actividad, el estudiante será capaz de distinguir un chatbot genérico de un copiloto especializado; diseñar instrucciones de sistema; aplicar técnicas básicas de prompting; crear perfiles de copiloto en el frontend; validar y enviar el contexto al backend; comparar respuestas genéricas contra respuestas especializadas; y evaluar límites, alucinaciones y riesgos de seguridad asociados al uso de LLM.
 
@@ -20,24 +18,9 @@ El tema se apoya en documentación oficial de Ollama, OpenAI, Google AI, Microso
 
 En el Tema 3 se construyó una arquitectura cliente-servidor para conversar con un LLM local. Esa arquitectura puede representarse así:
 
-```text
-Usuario
-→ Frontend web
-→ Backend Python
-→ Ollama API local
-→ Modelo LLM local
-→ Respuesta + métricas
-```
+![arquitectura](assets/img/chat/diagrama.png)
 
-En esa versión, el modelo respondía como un asistente general. Ahora se busca que el mismo modelo actúe como un **copiloto especializado**, por ejemplo:
-
-```text
-Copiloto docente
-Copiloto de robótica
-Copiloto de programación
-Copiloto de investigación
-Copiloto evaluador de rúbricas
-```
+En esa versión, el modelo respondía como un asistente general. Ahora se busca que el mismo modelo actúe como un **copiloto especializado**, p
 
 La diferencia puede resumirse así:
 
