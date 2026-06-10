@@ -20,9 +20,7 @@ En el Tema 3 se construyó una arquitectura cliente-servidor para conversar con 
 
 ![arquitectura](assets/img/chat/diagrama.png)
 
-En esa versión, el modelo respondía como un asistente general. Ahora se busca que el mismo modelo actúe como un **copiloto especializado**, p
-
-La diferencia puede resumirse así:
+En esa versión, el modelo respondía como un asistente general. Ahora se busca que el mismo modelo actúe como un **copiloto especializado**, la diferencia puede resumirse así:
 
 ```text
 Chatbot genérico =
@@ -236,7 +234,7 @@ Este enfoque reduce ambigüedad y facilita convertir el prompt en una plantilla 
 
 ## 6. Instrucciones de sistema en Ollama `/api/chat`
 
-En el backend del Tema 3 ya existe la estructura básica para enviar mensajes a Ollama. El cambio técnico del Tema 4 consiste en controlar explícitamente el contenido del mensaje `system`.
+En el backend del Tema 3: Chatbot LLM ya existe la estructura básica para enviar mensajes a Ollama. El cambio técnico en esta nueva actividad consiste en controlar explícitamente el contenido del mensaje `system`.
 
 Antes:
 
@@ -292,7 +290,7 @@ Respuesta esperada de un copiloto bien configurado:
 No puedo ignorar mis instrucciones de sistema. Puedo ayudarte dentro del rol y los límites configurados.
 ```
 
-> ⚠️ **Consideración:** Las instrucciones de sistema ayudan, pero no son una barrera de seguridad absoluta. Deben complementarse con validaciones de backend, listas de modelos permitidos, límites de longitud, control de herramientas y revisión humana.
+> ⚠️ **Consideración:** Las instrucciones de sistema ayudan, pero no son una barrera de seguridad absoluta. Deben complementarse con **validaciones de backend**, **listas de modelos permitidos**, límites de longitud, **control de herramientas** y revisión humana.
 
 ---
 
@@ -320,7 +318,7 @@ Si la pregunta requiere datos específicos de hardware, pregunta primero por mod
 
 ## 9. Contexto: volver especialista al modelo sin reentrenarlo
 
-En este tema, “cambiar el contexto” no significa modificar los pesos del modelo. Significa modificar la información que se le entrega antes de responder.
+En este tema, “cambiar el contexto” significa modificar la información que se le entrega antes de responder.
 
 | Nivel de contexto | Implementación | Ejemplo |
 |---|---|---|
@@ -343,46 +341,7 @@ genera respuesta condicionada por rol, contexto y límites
 
 ---
 
-## 10. Arquitectura actualizada
-
-La arquitectura conserva el mismo patrón del Tema 3, pero agrega la selección de perfil y la instrucción de sistema.
-
-```text
-Usuario
-  ↓
-Frontend
-  - mensaje
-  - modelo
-  - parámetros
-  - perfil de copiloto
-  - system_prompt editable
-  ↓
-Backend FastAPI
-  - valida parámetros
-  - valida perfil
-  - selecciona plantilla de system_prompt
-  - construye messages[0] como system
-  - llama a Ollama
-  ↓
-Ollama /api/chat
-  - ejecuta LLM
-  - devuelve respuesta y métricas
-  ↓
-Frontend
-  - muestra respuesta
-  - muestra perfil usado
-  - muestra métricas
-```
-
-**Espacio para imagen sugerida:**
-
-```md
-![Arquitectura prompting copilotos](assets/img/prompting/arquitectura-copilotos.png)
-```
-
----
-
-## 11. Cambios técnicos sobre el proyecto del Tema 3
+## 11. Cambios técnicos sobre el proyecto del Tema 3: Chatbot LL,
 
 ### 11.1 Cambios en backend
 
@@ -397,23 +356,6 @@ Se agregará:
 - respuesta con system_prompt_used;
 - respuesta con copilot_profile usado.
 ```
-
-### 11.2 Cambios en frontend
-
-Se agregará:
-
-```text
-- selector de perfil de copiloto;
-- textarea editable para system_prompt;
-- botón para cargar plantilla;
-- botón para restaurar plantilla;
-- visualización del perfil usado;
-- opción para comparar manualmente respuesta genérica vs especializada.
-```
-
----
-
-## 12. Backend actualizado
 
 Crea o reemplaza el archivo:
 
@@ -661,11 +603,682 @@ def chat(request: ChatRequest):
     )
 ```
 
+### 11.2 Cambios en frontend
+
+Se agregará:
+
+```text
+- selector de perfil de copiloto;
+- textarea editable para system_prompt;
+- botón para cargar plantilla;
+- botón para restaurar plantilla;
+- visualización del perfil usado;
+- opción para comparar manualmente respuesta genérica vs especializada.
+```
+
 ---
 
 ## 13. Frontend actualizado
 
-Los archivos de frontend se incluyen en la carpeta `scripts/frontend/` del material descargable.
+El frontend del Tema 4 extiende la interfaz desarrollada en el Tema 3. La diferencia principal es que ahora el usuario no solo escribe un mensaje y ajusta parámetros del modelo, sino que también puede seleccionar un **perfil de copiloto** y editar el `system_prompt`.
+
+Este cambio convierte el chatbot genérico en una interfaz para diseñar copilotos especializados. El frontend envía al backend:
+
+```text
+- mensaje del usuario;
+- modelo seleccionado;
+- parámetros de generación;
+- perfil de copiloto;
+- system_prompt editable.
+```
+
+El backend recibe esos datos, valida el perfil, construye el mensaje de sistema `messages[0]`, consulta Ollama mediante `/api/chat` y devuelve al frontend la respuesta, el perfil usado y las métricas de inferencia.
+
+La carpeta del frontend debe quedar así:
+
+```text
+frontend/
+├── index.html
+├── styles.css
+└── app.js
+```
+
+---
+
+### 13.1 Archivo `index.html`
+
+El archivo `index.html` define la estructura visual de la aplicación. Incluye:
+
+```text
+- selector de modelo;
+- selector de perfil de copiloto;
+- botón para cargar la plantilla del perfil;
+- campo editable para system_prompt;
+- controles de parámetros;
+- área de conversación;
+- panel de métricas.
+```
+
+Guarda el siguiente contenido como:
+
+```text
+frontend/index.html
+```
+
+<!-- code-file: index.html -->
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Copilotos especializados con Ollama</title>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="header">
+      <h1>Copilotos especializados con Ollama</h1>
+      <p>
+        Chatbot local con perfiles de system prompt, parámetros configurables y métricas de inferencia.
+      </p>
+    </section>
+
+    <section class="layout">
+      <aside class="controls">
+        <h2>Configuración</h2>
+
+        <label>
+          Modelo
+          <select id="model">
+            <option value="llama3.2:3b">llama3.2:3b</option>
+            <option value="gemma3:4b">gemma3:4b</option>
+            <option value="qwen2.5:7b">qwen2.5:7b</option>
+            <option value="mistral:7b">mistral:7b</option>
+          </select>
+        </label>
+
+        <label>
+          Perfil de copiloto
+          <select id="copilot_profile">
+            <option value="generico">Asistente genérico</option>
+            <option value="docente">Copiloto docente universitario</option>
+            <option value="robotica">Copiloto de robótica móvil</option>
+            <option value="programacion">Copiloto de programación Python</option>
+            <option value="investigacion">Copiloto de investigación académica</option>
+          </select>
+        </label>
+
+        <button id="loadProfileBtn" type="button">Cargar plantilla</button>
+
+        <label>
+          System prompt
+          <textarea id="system_prompt" rows="9"></textarea>
+        </label>
+
+        <label>
+          Temperatura
+          <input id="temperature" type="number" min="0" max="1.2" step="0.1" value="0.7" />
+        </label>
+
+        <label>
+          Top-p
+          <input id="top_p" type="number" min="0.1" max="1" step="0.05" value="0.9" />
+        </label>
+
+        <label>
+          Tokens máximos de salida
+          <input id="num_predict" type="number" min="20" max="1000" step="10" value="180" />
+        </label>
+
+        <label>
+          Contexto
+          <select id="num_ctx">
+            <option value="2048">2048</option>
+            <option value="4096" selected>4096</option>
+            <option value="8192">8192</option>
+          </select>
+        </label>
+
+        <label>
+          Repeat penalty
+          <input id="repeat_penalty" type="number" min="1" max="2" step="0.1" value="1.1" />
+        </label>
+
+        <button id="clearBtn" type="button">Limpiar conversación</button>
+      </aside>
+
+      <section class="chat-panel">
+        <div class="comparison-note">
+          <strong>Prueba sugerida:</strong>
+          ejecuta el mismo prompt con el perfil <em>Asistente genérico</em> y luego con un perfil especializado.
+        </div>
+
+        <div id="chat" class="chat"></div>
+
+        <form id="chatForm" class="chat-form">
+          <textarea
+            id="message"
+            rows="4"
+            placeholder="Escribe tu mensaje para el copiloto..."
+            required
+          ></textarea>
+
+          <button id="sendBtn" type="submit">Enviar</button>
+        </form>
+
+        <section class="metrics">
+          <h2>Métricas de la última respuesta</h2>
+          <div id="profileInfo" class="profile-info">Sin perfil usado todavía</div>
+          <div id="metricsGrid" class="metrics-grid">
+            <span>Sin datos todavía</span>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
+```
+
+---
+
+### 13.2 Archivo `styles.css`
+
+El archivo `styles.css` define el aspecto visual de la interfaz. Mantiene una estructura limpia de dos columnas: configuración del copiloto a la izquierda y conversación a la derecha.
+
+Guarda el siguiente contenido como:
+
+```text
+frontend/styles.css
+```
+
+<!-- code-file: styles.css -->
+```css
+:root {
+  --ibero-red: #E00034;
+  --dark: #1f2937;
+  --text: #333333;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --blue: #2563eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.app {
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  margin: 0 0 .5rem;
+  color: var(--ibero-red);
+}
+
+.header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 1rem;
+}
+
+.controls,
+.chat-panel,
+.metrics {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.controls h2,
+.metrics h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: .9rem;
+  font-weight: 600;
+}
+
+input,
+select,
+textarea,
+button {
+  width: 100%;
+  margin-top: .35rem;
+  padding: .65rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  border: none;
+  color: #ffffff;
+  background: var(--ibero-red);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+#clearBtn {
+  background: var(--dark);
+}
+
+#loadProfileBtn {
+  margin-bottom: .9rem;
+  background: var(--blue);
+}
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 720px;
+}
+
+.comparison-note {
+  padding: .8rem 1rem;
+  margin-bottom: 1rem;
+  background: #fff7ed;
+  border-left: 4px solid #f97316;
+  border-radius: 10px;
+  color: #7c2d12;
+}
+
+.chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: .5rem;
+  border-radius: 12px;
+  background: #f3f4f6;
+  margin-bottom: 1rem;
+}
+
+.message {
+  margin: .75rem 0;
+  padding: .85rem 1rem;
+  border-radius: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.message.user {
+  background: #fee2e2;
+  border-left: 4px solid var(--ibero-red);
+}
+
+.message.assistant {
+  background: #ffffff;
+  border-left: 4px solid var(--blue);
+}
+
+.message.error {
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+}
+
+.message strong {
+  display: block;
+  margin-bottom: .25rem;
+}
+
+.chat-form {
+  display: grid;
+  gap: .75rem;
+}
+
+.metrics {
+  margin-top: 1rem;
+}
+
+.profile-info {
+  margin-bottom: .75rem;
+  padding: .6rem .75rem;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--muted);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: .75rem;
+}
+
+.metric-card {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .75rem;
+}
+
+.metric-card small {
+  display: block;
+  color: var(--muted);
+  margin-bottom: .25rem;
+}
+
+.metric-card strong {
+  font-size: 1.05rem;
+}
+
+@media (max-width: 950px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+```
+
+---
+
+### 13.3 Archivo `app.js`
+
+El archivo `app.js` implementa la lógica del frontend. Sus responsabilidades son:
+
+```text
+- cargar los perfiles desde GET /profiles;
+- llenar el campo system_prompt con la plantilla seleccionada;
+- leer el formulario;
+- enviar el JSON al backend mediante POST /chat;
+- mostrar la respuesta del copiloto;
+- mostrar métricas de latencia y tokens;
+- manejar errores de conexión o backend.
+```
+
+Guarda el siguiente contenido como:
+
+```text
+frontend/app.js
+```
+
+<!-- code-file: app.js -->
+```javascript
+const API_URL = "http://localhost:8000/chat";
+const PROFILES_URL = "http://localhost:8000/profiles";
+
+const form = document.getElementById("chatForm");
+const chat = document.getElementById("chat");
+const metricsGrid = document.getElementById("metricsGrid");
+const profileInfo = document.getElementById("profileInfo");
+const sendBtn = document.getElementById("sendBtn");
+const clearBtn = document.getElementById("clearBtn");
+const loadProfileBtn = document.getElementById("loadProfileBtn");
+
+const messageInput = document.getElementById("message");
+const systemPromptInput = document.getElementById("system_prompt");
+const profileSelect = document.getElementById("copilot_profile");
+
+let profiles = {};
+
+async function loadProfiles() {
+  try {
+    const response = await fetch(PROFILES_URL);
+
+    if (!response.ok) {
+      throw new Error("No se pudo consultar el endpoint /profiles.");
+    }
+
+    profiles = await response.json();
+    loadSelectedProfile();
+
+  } catch (error) {
+    console.error("No se pudieron cargar los perfiles:", error);
+    systemPromptInput.value =
+      "No se pudieron cargar los perfiles desde el backend. Verifica que FastAPI esté ejecutándose en http://localhost:8000.";
+  }
+}
+
+function loadSelectedProfile() {
+  const profileId = profileSelect.value;
+
+  if (profiles[profileId]) {
+    systemPromptInput.value = profiles[profileId].system_prompt;
+  }
+}
+
+function getConfig() {
+  return {
+    model: document.getElementById("model").value,
+    copilot_profile: profileSelect.value,
+    system_prompt: systemPromptInput.value,
+    temperature: Number(document.getElementById("temperature").value),
+    top_p: Number(document.getElementById("top_p").value),
+    num_predict: Number(document.getElementById("num_predict").value),
+    num_ctx: Number(document.getElementById("num_ctx").value),
+    repeat_penalty: Number(document.getElementById("repeat_penalty").value)
+  };
+}
+
+function addMessage(role, content, type = "assistant") {
+  const div = document.createElement("div");
+  div.className = `message ${type}`;
+  div.innerHTML = `<strong>${escapeHtml(role)}</strong>${escapeHtml(content)}`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function renderMetrics(data) {
+  const metrics = data.metrics;
+
+  profileInfo.innerHTML = `
+    <strong>Perfil usado:</strong> ${escapeHtml(data.copilot_label)}
+    <br>
+    <strong>Modelo:</strong> ${escapeHtml(data.model)}
+  `;
+
+  const items = [
+    ["Tiempo backend", `${metrics.wall_time_s.toFixed(3)} s`],
+    ["Tiempo Ollama", `${metrics.total_duration_s.toFixed(3)} s`],
+    ["Carga modelo", `${metrics.load_duration_s.toFixed(3)} s`],
+    ["Tokens entrada", metrics.prompt_eval_count],
+    ["Tokens salida", metrics.eval_count],
+    ["Tokens totales", metrics.total_tokens],
+    ["Generación", `${metrics.eval_duration_s.toFixed(3)} s`],
+    ["Tokens/s", metrics.tokens_per_second.toFixed(2)]
+  ];
+
+  metricsGrid.innerHTML = items
+    .map(([label, value]) => `
+      <div class="metric-card">
+        <small>${label}</small>
+        <strong>${value}</strong>
+      </div>
+    `)
+    .join("");
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const message = messageInput.value.trim();
+
+  if (!message) {
+    return;
+  }
+
+  const payload = {
+    message,
+    ...getConfig()
+  };
+
+  addMessage("Usuario", message, "user");
+  messageInput.value = "";
+  sendBtn.disabled = true;
+  sendBtn.textContent = "Generando...";
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Error desconocido");
+    }
+
+    addMessage(`Copiloto (${data.copilot_label})`, data.reply, "assistant");
+    renderMetrics(data);
+
+  } catch (error) {
+    addMessage("Error", error.message, "error");
+
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Enviar";
+  }
+});
+
+clearBtn.addEventListener("click", () => {
+  chat.innerHTML = "";
+  profileInfo.textContent = "Sin perfil usado todavía";
+  metricsGrid.innerHTML = "<span>Sin datos todavía</span>";
+});
+
+loadProfileBtn.addEventListener("click", loadSelectedProfile);
+profileSelect.addEventListener("change", loadSelectedProfile);
+
+loadProfiles();
+
+```
+
+---
+
+### 13.4 Ejecución del frontend
+
+Con el backend activo en:
+
+```text
+http://localhost:8000
+```
+
+abre una segunda terminal y ejecuta:
+
+```bash
+cd frontend
+python -m http.server 5500
+```
+
+Luego abre en el navegador:
+
+```text
+http://localhost:5500
+```
+
+---
+
+### 13.5 Verificación rápida
+
+Antes de probar la interfaz completa, verifica que el backend exponga los perfiles:
+
+```text
+http://localhost:8000/profiles
+```
+
+Si ese endpoint responde con los perfiles, el frontend podrá llenar automáticamente el campo `system_prompt`.
+
+---
+
+### 13.6 Prueba sugerida
+
+Usa el mismo prompt con dos perfiles distintos.
+
+Prompt:
+
+```text
+Explícame qué es la odometría diferencial y dame un ejemplo para estudiantes de primer semestre.
+```
+
+Primera prueba:
+
+```text
+Perfil: Asistente genérico
+```
+
+Segunda prueba:
+
+```text
+Perfil: Copiloto de robótica móvil
+```
+
+Compara:
+
+| Criterio | Asistente genérico | Copiloto de robótica |
+|---|---|---|
+| Nivel de explicación | | |
+| Uso de ejemplos | | |
+| Advertencias técnicas | | |
+| Claridad | | |
+| Utilidad para clase | | |
+| Tokens de salida | | |
+| Latencia | | |
+
+---
+
+### 13.7 Errores comunes
+
+| Error | Posible causa | Solución |
+|---|---|---|
+| El frontend no carga perfiles | Backend apagado | Ejecutar `uvicorn main:app --reload --port 8000` |
+| Error de CORS | Origen no permitido | Revisar `CORSMiddleware` en `main.py` |
+| Modelo no encontrado | Modelo no instalado en Ollama | Ejecutar `ollama pull nombre:modelo` |
+| Respuesta tarda demasiado | `num_predict` alto o modelo pesado | Reducir tokens de salida o usar modelo más pequeño |
+| El perfil no cambia la respuesta | `system_prompt` vacío o no cargado | Presionar “Cargar plantilla” o verificar `/profiles` |
+
 
 ---
 
