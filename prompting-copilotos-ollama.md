@@ -605,21 +605,6 @@ def chat(request: ChatRequest):
 
 ### 11.2 Cambios en frontend
 
-Se agregará:
-
-```text
-- selector de perfil de copiloto;
-- textarea editable para system_prompt;
-- botón para cargar plantilla;
-- botón para restaurar plantilla;
-- visualización del perfil usado;
-- opción para comparar manualmente respuesta genérica vs especializada.
-```
-
----
-
-## 13. Frontend actualizado
-
 El frontend del Tema 4 extiende la interfaz desarrollada en el Tema 3. La diferencia principal es que ahora el usuario no solo escribe un mensaje y ajusta parámetros del modelo, sino que también puede seleccionar un **perfil de copiloto** y editar el `system_prompt`.
 
 Este cambio convierte el chatbot genérico en una interfaz para diseñar copilotos especializados. El frontend envía al backend:
@@ -648,22 +633,6 @@ frontend/
 ### 13.1 Archivo `index.html`
 
 El archivo `index.html` define la estructura visual de la aplicación. Incluye:
-
-```text
-- selector de modelo;
-- selector de perfil de copiloto;
-- botón para cargar la plantilla del perfil;
-- campo editable para system_prompt;
-- controles de parámetros;
-- área de conversación;
-- panel de métricas.
-```
-
-Guarda el siguiente contenido como:
-
-```text
-frontend/index.html
-```
 
 <!-- code-file: index.html -->
 ```html
@@ -786,17 +755,7 @@ frontend/index.html
 
 ```
 
----
-
-### 13.2 Archivo `styles.css`
-
 El archivo `styles.css` define el aspecto visual de la interfaz. Mantiene una estructura limpia de dos columnas: configuración del copiloto a la izquierda y conversación a la derecha.
-
-Guarda el siguiente contenido como:
-
-```text
-frontend/styles.css
-```
 
 <!-- code-file: styles.css -->
 ```css
@@ -1012,27 +971,7 @@ button:disabled {
 
 ```
 
----
-
-### 13.3 Archivo `app.js`
-
 El archivo `app.js` implementa la lógica del frontend. Sus responsabilidades son:
-
-```text
-- cargar los perfiles desde GET /profiles;
-- llenar el campo system_prompt con la plantilla seleccionada;
-- leer el formulario;
-- enviar el JSON al backend mediante POST /chat;
-- mostrar la respuesta del copiloto;
-- mostrar métricas de latencia y tokens;
-- manejar errores de conexión o backend.
-```
-
-Guarda el siguiente contenido como:
-
-```text
-frontend/app.js
-```
 
 <!-- code-file: app.js -->
 ```javascript
@@ -1195,90 +1134,6 @@ profileSelect.addEventListener("change", loadSelectedProfile);
 loadProfiles();
 
 ```
-
----
-
-### 13.4 Ejecución del frontend
-
-Con el backend activo en:
-
-```text
-http://localhost:8000
-```
-
-abre una segunda terminal y ejecuta:
-
-```bash
-cd frontend
-python -m http.server 5500
-```
-
-Luego abre en el navegador:
-
-```text
-http://localhost:5500
-```
-
----
-
-### 13.5 Verificación rápida
-
-Antes de probar la interfaz completa, verifica que el backend exponga los perfiles:
-
-```text
-http://localhost:8000/profiles
-```
-
-Si ese endpoint responde con los perfiles, el frontend podrá llenar automáticamente el campo `system_prompt`.
-
----
-
-### 13.6 Prueba sugerida
-
-Usa el mismo prompt con dos perfiles distintos.
-
-Prompt:
-
-```text
-Explícame qué es la odometría diferencial y dame un ejemplo para estudiantes de primer semestre.
-```
-
-Primera prueba:
-
-```text
-Perfil: Asistente genérico
-```
-
-Segunda prueba:
-
-```text
-Perfil: Copiloto de robótica móvil
-```
-
-Compara:
-
-| Criterio | Asistente genérico | Copiloto de robótica |
-|---|---|---|
-| Nivel de explicación | | |
-| Uso de ejemplos | | |
-| Advertencias técnicas | | |
-| Claridad | | |
-| Utilidad para clase | | |
-| Tokens de salida | | |
-| Latencia | | |
-
----
-
-### 13.7 Errores comunes
-
-| Error | Posible causa | Solución |
-|---|---|---|
-| El frontend no carga perfiles | Backend apagado | Ejecutar `uvicorn main:app --reload --port 8000` |
-| Error de CORS | Origen no permitido | Revisar `CORSMiddleware` en `main.py` |
-| Modelo no encontrado | Modelo no instalado en Ollama | Ejecutar `ollama pull nombre:modelo` |
-| Respuesta tarda demasiado | `num_predict` alto o modelo pesado | Reducir tokens de salida o usar modelo más pequeño |
-| El perfil no cambia la respuesta | `system_prompt` vacío o no cargado | Presionar “Cargar plantilla” o verificar `/profiles` |
-
 
 ---
 
