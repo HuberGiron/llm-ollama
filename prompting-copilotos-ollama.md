@@ -36,7 +36,7 @@ Un chatbot genérico puede responder de forma plausible, pero no necesariamente 
 
 ## 2. ¿Qué es ingeniería de prompting?
 
-La **ingeniería de prompting** es el proceso de diseñar, probar y ajustar instrucciones para obtener respuestas más útiles, consistentes y alineadas con una tarea. No se limita a escribir una pregunta “bonita”; implica definir:
+La **ingeniería de prompting** es el proceso de diseñar, probar y ajustar instrucciones para obtener respuestas más útiles, consistentes y alineadas con una tarea:
 
 - rol;
 - tarea;
@@ -341,7 +341,7 @@ genera respuesta condicionada por rol, contexto y límites
 
 ---
 
-## 11. Cambios técnicos sobre el proyecto del Tema 3: Chatbot LL,
+## 11. Cambios técnicos sobre el proyecto del Tema 3: Chatbot LLM,
 
 ### 11.1 Cambios en backend
 
@@ -1283,7 +1283,6 @@ Un copiloto especializado es una forma de **configurar el comportamiento de un m
 Sin embargo, esta especialización tiene límites. El modelo sigue siendo probabilístico, puede equivocarse, puede interpretar mal instrucciones y puede ser vulnerable a entradas diseñadas para alterar su comportamiento. Por ello, un copiloto útil debe combinar:
 
 ```text
-+ buen prompting
 + instrucciones de sistema claras
 + validación de backend
 + límites de seguridad
