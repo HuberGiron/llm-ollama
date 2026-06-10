@@ -628,10 +628,6 @@ frontend/
 └── app.js
 ```
 
----
-
-### 13.1 Archivo `index.html`
-
 El archivo `index.html` define la estructura visual de la aplicación. Incluye:
 
 <!-- code-file: index.html -->
@@ -1137,9 +1133,9 @@ loadProfiles();
 
 ---
 
-## 14. Ejecución del proyecto
+## 12. Ejecución del proyecto
 
-### 14.1 Backend
+### 12.1 Backend
 
 ```bash
 cd backend
@@ -1184,7 +1180,7 @@ http://localhost:8000/profiles
 
 ---
 
-### 14.2 Frontend
+### 12.2 Frontend
 
 En otra terminal:
 
@@ -1202,7 +1198,7 @@ http://localhost:5500
 
 ---
 
-## 15. Prueba guiada: genérico vs especializado
+## 13. Prueba guiada: genérico vs especializado
 
 Usa el mismo prompt en dos perfiles diferentes.
 
@@ -1237,7 +1233,7 @@ Compara:
 
 ---
 
-## 16. Práctica 4: Diseñar un copiloto especializado
+## 14. Práctica 4: Diseñar un copiloto especializado
 
 ### Objetivo
 
@@ -1254,7 +1250,6 @@ Modificar el chatbot local del Tema 3: Chatbot LLM para convertirlo en un copilo
 7. Comparación entre asistente genérico y copiloto especializado.
 8. Pruebas con mínimo 3 prompts por perfil.
 9. Reflexión sobre calidad, utilidad, límites y riesgos.
-```
 
 ### Tabla de pruebas
 
@@ -1281,14 +1276,14 @@ Responder:
 
 
 
-## 18. Consideraciones finales
+## 15. Consideraciones finales
 
-Un copiloto especializado no es un modelo nuevo, sino una forma de **configurar el comportamiento de un modelo existente** mediante contexto e instrucciones. Esta técnica permite adaptar un LLM local a tareas académicas, técnicas o de investigación sin modificar sus pesos.
+Un copiloto especializado es una forma de **configurar el comportamiento de un modelo existente** mediante contexto e instrucciones. Esta técnica permite adaptar un LLM local a tareasespecificas sin modificar sus pesos.
 
 Sin embargo, esta especialización tiene límites. El modelo sigue siendo probabilístico, puede equivocarse, puede interpretar mal instrucciones y puede ser vulnerable a entradas diseñadas para alterar su comportamiento. Por ello, un copiloto útil debe combinar:
 
 ```text
-buen prompting
++ buen prompting
 + instrucciones de sistema claras
 + validación de backend
 + límites de seguridad
@@ -1300,7 +1295,7 @@ Este tema deja preparado el camino para un siguiente paso: agregar **conocimient
 
 ---
 
-## 19. Referencias
+## 16. Referencias
 
 [1] Ollama. (s. f.). *Chat API*. Documentación oficial del endpoint `/api/chat` para conversaciones con modelos locales mediante mensajes con roles. Disponible en: <https://docs.ollama.com/api/chat>
 
