@@ -40,7 +40,6 @@ Un chatbot genérico puede responder de forma plausible, pero no necesariamente 
 
 La **ingeniería de prompting** es el proceso de diseñar, probar y ajustar instrucciones para obtener respuestas más útiles, consistentes y alineadas con una tarea. No se limita a escribir una pregunta “bonita”; implica definir:
 
-```text
 - rol;
 - tarea;
 - contexto;
@@ -50,11 +49,10 @@ La **ingeniería de prompting** es el proceso de diseñar, probar y ajustar inst
 - ejemplos;
 - criterios de éxito;
 - límites.
-```
 
 OpenAI define la ingeniería de prompting como el proceso de escribir instrucciones efectivas para que un modelo genere salidas que cumplan requisitos específicos [3]. Google AI también presenta estrategias de diseño de prompts para mejorar la calidad, especificidad y control de las respuestas generadas por modelos Gemini [5]. Aunque esas guías pertenecen a otros ecosistemas, sus principios se pueden aplicar a un chatbot local con Ollama.
 
-Para esta clase usaremos una fórmula práctica:
+Para esta clase usaremos la fórmula:
 
 ```text
 Prompt útil = Rol + Tarea + Contexto + Formato + Límites
