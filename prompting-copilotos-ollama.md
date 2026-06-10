@@ -1178,6 +1178,10 @@ http://localhost:8000/docs
 http://localhost:8000/profiles
 ```
 
+![docs](assets/img/prompt/back.png)
+
+![profiles](assets/img/prompt/profiles.png)
+
 ---
 
 ### 14.2 Frontend
@@ -1194,6 +1198,7 @@ Abrir:
 ```text
 http://localhost:5500
 ```
+![front](assets/img/prompt/front.png)
 
 ---
 
