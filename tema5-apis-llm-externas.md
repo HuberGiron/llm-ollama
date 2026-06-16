@@ -123,12 +123,12 @@ La siguiente tabla resume proveedores que pueden servir para prácticas académi
 | Logo | Proveedor | Liga oficial | Acceso gratuito o de evaluación | Modelos sugeridos | Parámetros publicados | Uso didáctico |
 |---|---|---|---|---|---|---|
 | ![Gemini](assets/img/apis/logo-gemini.png) | Google Gemini API | https://ai.google.dev/gemini-api/docs | Tier gratuito o free trial con límites por proyecto | `gemini-2.5-flash`, `gemini-2.5-flash-lite` | No divulgado | Comparar un modelo cerrado de alto rendimiento contra Ollama local. |
-| `[LOGO: Groq]` | GroqCloud | https://console.groq.com/docs | Free plan con límites de solicitudes y tokens | `llama-3.3-70b-versatile`, `llama-3.1-8b-instant` | 70B y 8B aproximados | Medir velocidad de inferencia en infraestructura optimizada. |
-| `[LOGO: Mistral]` | Mistral AI | https://docs.mistral.ai/ | Free mode para evaluación y prototipado | `ministral-8b`, `mistral-small` | 8B en Ministral; otros no siempre divulgados | Probar modelos eficientes y discutir modelos europeos. |
-| `[LOGO: Cohere]` | Cohere | https://docs.cohere.com/ | Evaluation key gratuita con uso limitado | `command-r`, `command-r7b`, `command-a` | 7B en Command R7B; 111B en Command A | Discutir RAG, agentes, tool use y modelos enterprise. |
-| `[LOGO: Hugging Face]` | Hugging Face Inference Providers | https://huggingface.co/docs/inference-providers | Créditos mensuales gratuitos pequeños | Modelos Llama, Qwen, Mistral u otros | Depende del modelo | Conectar modelos abiertos con inferencia alojada. |
-| `[LOGO: OpenRouter]` | OpenRouter | https://openrouter.ai/docs | Modelos `:free` con límite diario | Modelos `:free` disponibles en catálogo | Depende del modelo | Probar varios modelos con una sola API compatible con OpenAI. |
-| `[LOGO: OpenAI]` | OpenAI API | https://platform.openai.com/docs | Normalmente requiere facturación o créditos | Modelos económicos vigentes | No divulgado | Referencia industrial, pero no ideal si se busca evitar cobros. |
+| ![LOGO: Groq](assets/img/apis/groq.png) | GroqCloud | https://console.groq.com/docs | Free plan con límites de solicitudes y tokens | `llama-3.3-70b-versatile`, `llama-3.1-8b-instant` | 70B y 8B aproximados | Medir velocidad de inferencia en infraestructura optimizada. |
+| ![LOGO: Mistral](assets/img/apis/mistral.png) | Mistral AI | https://docs.mistral.ai/ | Free mode para evaluación y prototipado | `ministral-8b`, `mistral-small` | 8B en Ministral; otros no siempre divulgados | Probar modelos eficientes y discutir modelos europeos. |
+| ![LOGO: Cohere](assets/img/apis/Cohere-Logo.png) | Cohere | https://docs.cohere.com/ | Evaluation key gratuita con uso limitado | `command-r`, `command-r7b`, `command-a` | 7B en Command R7B; 111B en Command A | Discutir RAG, agentes, tool use y modelos enterprise. |
+| ![LOGO: Hugging Face]` | Hugging Face Inference Providers | https://huggingface.co/docs/inference-providers | Créditos mensuales gratuitos pequeños | Modelos Llama, Qwen, Mistral u otros | Depende del modelo | Conectar modelos abiertos con inferencia alojada. |
+| ![LOGO: OpenRouter](assets/img/apis/openrouter-icon.webp) | OpenRouter | https://openrouter.ai/docs | Modelos `:free` con límite diario | Modelos `:free` disponibles en catálogo | Depende del modelo | Probar varios modelos con una sola API compatible con OpenAI. |
+| ![LOGO: OpenAI](assets/img/apis/openai.webp) | OpenAI API | https://platform.openai.com/docs | Normalmente requiere facturación o créditos | Modelos económicos vigentes | No divulgado | Referencia industrial, pero no ideal si se busca evitar cobros. |
 
 ---
 
