@@ -122,14 +122,14 @@ La siguiente tabla resume proveedores que pueden servir para prácticas académi
 
 | Logo | Proveedor | Liga oficial | Acceso gratuito o de evaluación | Modelos sugeridos | Parámetros publicados | Uso didáctico |
 |---|---|---|---|---|---|---|
-| ![Gemini](assets/img/apis/logo-gemini.png) | Google Gemini API | https://ai.google.dev/gemini-api/docs | Tier gratuito o free trial con límites por proyecto | `gemini-2.5-flash`, `gemini-2.5-flash-lite` | No divulgado | Comparar un modelo cerrado de alto rendimiento contra Ollama local. |
-| ![LOGO: Groq](assets/img/apis/groq.png) | GroqCloud | https://console.groq.com/docs | Free plan con límites de solicitudes y tokens | `llama-3.3-70b-versatile`, `llama-3.1-8b-instant` | 70B y 8B aproximados | Medir velocidad de inferencia en infraestructura optimizada. |
-| ![LOGO: Mistral](assets/img/apis/mistral.png) | Mistral AI | https://docs.mistral.ai/ | Free mode para evaluación y prototipado | `ministral-8b`, `mistral-small` | 8B en Ministral; otros no siempre divulgados | Probar modelos eficientes y discutir modelos europeos. |
-| ![LOGO: Cohere](assets/img/apis/Cohere-Logo.png) | Cohere | https://docs.cohere.com/ | Evaluation key gratuita con uso limitado | `command-r`, `command-r7b`, `command-a` | 7B en Command R7B; 111B en Command A | Discutir RAG, agentes, tool use y modelos enterprise. |
-| ![LOGO: Hugging Face]` | Hugging Face Inference Providers | https://huggingface.co/docs/inference-providers | Créditos mensuales gratuitos pequeños | Modelos Llama, Qwen, Mistral u otros | Depende del modelo | Conectar modelos abiertos con inferencia alojada. |
-| ![LOGO: OpenRouter](assets/img/apis/openrouter-icon.webp) | OpenRouter | https://openrouter.ai/docs | Modelos `:free` con límite diario | Modelos `:free` disponibles en catálogo | Depende del modelo | Probar varios modelos con una sola API compatible con OpenAI. |
-| ![LOGO: OpenAI](assets/img/apis/openai.webp) | OpenAI API | https://platform.openai.com/docs | Normalmente requiere facturación o créditos | Modelos económicos vigentes | No divulgado | Referencia industrial, pero no ideal si se busca evitar cobros. |
-| ![LOGO: Claude](assets/img/apis/claude-icon-logo.png) | Anthropic Claude API | https://docs.anthropic.com/ | Créditos iniciales pequeños para probar la API; después pago por uso | `claude-haiku`, `claude-sonnet`, `claude-opus` según disponibilidad vigente | No divulgado | Comparar modelos cerrados de alto desempeño, buena redacción, razonamiento y análisis de documentos. |
+| <img src="assets/img/apis/logo-gemini.png" alt="Gemini" width="72"> | Google Gemini API | https://ai.google.dev/gemini-api/docs | Tier gratuito o free trial con límites por proyecto | `gemini-2.5-flash`, `gemini-2.5-flash-lite` | No divulgado | Comparar un modelo cerrado de alto rendimiento contra Ollama local. |
+| <img src="assets/img/apis/groq.png" alt="Groq" width="72"> | GroqCloud | https://console.groq.com/docs | Free plan con límites de solicitudes y tokens | `llama-3.3-70b-versatile`, `llama-3.1-8b-instant` | 70B y 8B aproximados | Medir velocidad de inferencia en infraestructura optimizada. |
+| <img src="assets/img/apis/mistral.png" alt="Mistral AI" width="72"> | Mistral AI | https://docs.mistral.ai/ | Free mode para evaluación y prototipado | `ministral-8b`, `mistral-small` | 8B en Ministral; otros no siempre divulgados | Probar modelos eficientes y discutir modelos europeos. |
+| <img src="assets/img/apis/Cohere-Logo.png" alt="Cohere" width="72"> | Cohere | https://docs.cohere.com/ | Evaluation key gratuita con uso limitado | `command-r`, `command-r7b`, `command-a` | 7B en Command R7B; 111B en Command A | Discutir RAG, agentes, tool use y modelos enterprise. |
+| <img src="assets/img/apis/huggingface.png" alt="Hugging Face" width="72"> | Hugging Face Inference Providers | https://huggingface.co/docs/inference-providers | Créditos mensuales gratuitos pequeños | Modelos Llama, Qwen, Mistral u otros | Depende del modelo | Conectar modelos abiertos con inferencia alojada. |
+| <img src="assets/img/apis/openrouter-icon.webp" alt="OpenRouter" width="72"> | OpenRouter | https://openrouter.ai/docs | Modelos `:free` con límite diario | Modelos `:free` disponibles en catálogo | Depende del modelo | Probar varios modelos con una sola API compatible con OpenAI. |
+| <img src="assets/img/apis/openai.webp" alt="OpenAI" width="72"> | OpenAI API | https://platform.openai.com/docs | Normalmente requiere facturación o créditos | Modelos económicos vigentes | No divulgado | Referencia industrial de modelos cerrados mediante API. |
+| <img src="assets/img/apis/claude-icon-logo.png" alt="Claude" width="72"> | Anthropic Claude API | https://docs.anthropic.com/ | Créditos iniciales pequeños para probar la API; después pago por uso | `claude-haiku`, `claude-sonnet`, `claude-opus` según disponibilidad vigente | No divulgado | Comparar modelos cerrados de alto desempeño, redacción, razonamiento y análisis de documentos. |
 
 ---
 
@@ -173,34 +173,7 @@ En esta práctica se compararán variables similares a las usadas en el benchmar
 | `model` | Modelo usado |
 | `copilot_profile` | Perfil de copiloto usado |
 
-En Ollama se obtienen métricas como `prompt_eval_count`, `eval_count`, `total_duration` y `eval_duration`. En APIs externas, las métricas dependen del proveedor. Algunos devuelven `usage`, otros no reportan todos los campos o los reportan con nombres diferentes.
-
-Por eso, el backend debe convertir todas las respuestas a un formato común.
-
----
-
-## 8. Nota sobre parámetros del modelo
-
-Cuando un modelo se describe como `3B`, `7B`, `8B`, `70B` o `111B`, la letra `B` se refiere a *billion* en inglés:
-
-```text
-1B = 1,000 millones de parámetros
-```
-
-Por lo tanto:
-
-```text
-3B = 3,000 millones de parámetros
-70B = 70,000 millones de parámetros
-```
-
-En español conviene decir **mil millones de parámetros** para evitar confusión con la palabra “billón”.
-
-No todos los proveedores publican el número de parámetros. Esto también forma parte de la caracterización del modelo. En la tabla de resultados se puede escribir:
-
-```text
-No divulgado públicamente
-```
+> ⚠️ **Consideración:** En Ollama se obtienen métricas como `prompt_eval_count`, `eval_count`, `total_duration` y `eval_duration`. En APIs externas, las métricas dependen del proveedor. Algunos devuelven `usage`, otros no reportan todos los campos o los reportan con nombres diferentes. Por eso, el backend debe convertir todas las respuestas a un formato común.
 
 ---
 
