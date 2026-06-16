@@ -165,8 +165,6 @@ Una respuesta suele incluir:
 
 La siguiente tabla resume proveedores que pueden servir para prácticas académicas. Las cuotas gratuitas, modelos disponibles y límites cambian con el tiempo, por lo que se recomienda revisar las ligas oficiales antes de realizar la práctica.
 
-```
-
 | Logo | Proveedor | Liga oficial | Acceso gratuito o de evaluación | Modelos sugeridos | Parámetros publicados | Uso didáctico |
 |---|---|---|---|---|---|---|
 | ![Gemini](assets/img/apis/logo-gemini.png) | Google Gemini API | https://ai.google.dev/gemini-api/docs | Tier gratuito o free trial con límites por proyecto | `gemini-2.5-flash`, `gemini-2.5-flash-lite` | No divulgado | Comparar un modelo cerrado de alto rendimiento contra Ollama local. |
