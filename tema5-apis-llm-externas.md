@@ -282,18 +282,7 @@ openai
 
 ## 10. Backend FastAPI actualizado
 
-El backend conserva la lógica del Tema 4:
-
-```text
-- perfiles de copiloto;
-- system_prompt editable;
-- validación de parámetros;
-- métricas;
-- endpoint /profiles;
-- endpoint /chat.
-```
-
-La diferencia es que ahora el request incluye:
+El backend conserva la lógica del Tema 4, la diferencia es que ahora el request incluye:
 
 ```text
 provider: ollama | gemini | groq | openrouter
@@ -825,12 +814,10 @@ Ejemplo para probar `POST /chat` con Groq:
 
 El frontend mantiene la idea del Tema 4, pero agrega:
 
-```text
 - selector de proveedor;
 - selector de modelo dinámico;
 - métricas con proveedor/modelo;
 - tokens normalizados para Ollama y APIs externas.
-```
 
 ### 12.1 Archivo `index.html`
 
