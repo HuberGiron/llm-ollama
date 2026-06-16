@@ -37,7 +37,7 @@ La arquitectura sigue usando el backend como intermediario. Esto es especialment
 
 ---
 
-## 3. ¿Qué cambia respecto al LLM Local?
+## 2. ¿Qué cambia respecto al LLM Local?
 
 La lógica de la arquitectura se mantiene, solo cambia a quien consulta el backend: Ollama o al proveedor externo.
 
@@ -57,7 +57,7 @@ Lo que cambia es el destino de la solicitud.
 
 ---
 
-## 4. ¿Qué es una API de LLM?
+## 3. ¿Qué es una API de LLM?
 
 Una **API de LLM** es una interfaz HTTP que permite enviar mensajes a un modelo de lenguaje alojado en servidores externos. En lugar de ejecutar el modelo en la computadora local, el backend envía una solicitud por internet y recibe una respuesta generada por el modelo.
 
@@ -116,7 +116,7 @@ Una respuesta suele incluir:
 
 ---
 
-## 5. Proveedores recomendados para experimentación
+## 4. Proveedores recomendados para experimentación
 
 La siguiente tabla resume proveedores que pueden servir para prácticas académicas. Las cuotas gratuitas, modelos disponibles y límites cambian con el tiempo, por lo que se recomienda revisar las ligas oficiales antes de realizar la práctica.
 
@@ -133,7 +133,7 @@ La siguiente tabla resume proveedores que pueden servir para prácticas académi
 
 ---
 
-## 6. Selección recomendada para esta práctica
+## 5. Selección recomendada para esta práctica
 
 Para evitar que la práctica se vuelva demasiado extensa, se recomienda trabajar con:
 
@@ -158,7 +158,7 @@ Esta combinación permite comparar:
 
 ---
 
-## 7. Tokens, parámetros y métricas
+## 6. Tokens, parámetros y métricas
 
 En esta práctica se compararán variables similares a las usadas en el benchmark con Ollama:
 
@@ -177,9 +177,9 @@ En esta práctica se compararán variables similares a las usadas en el benchmar
 
 ---
 
-## 9. Estructura del proyecto
+## 7. Estructura del proyecto
 
-Se reutiliza el proyecto del Tema 4. La estructura queda así:
+Se reutiliza el proyecto del Tema 4, agregando la petición a proveedor y la API Key. La estructura queda así:
 
 ```text
 chatbot-copilotos-apis/
@@ -206,7 +206,7 @@ chatbot-copilotos-apis/
 
 ---
 
-## 10. Variables de entorno y seguridad
+## 8. Variables de entorno y seguridad
 
 En el backend, crear un archivo `.env`:
 
@@ -228,7 +228,7 @@ Agregar `.env` al archivo `.gitignore`:
 
 ---
 
-## 11. Instalación de dependencias
+## 9. Instalación de dependencias
 
 En la carpeta del backend:
 
@@ -280,7 +280,7 @@ openai
 
 ---
 
-## 12. Backend FastAPI actualizado
+## 10. Backend FastAPI actualizado
 
 El backend conserva la lógica del Tema 4:
 
