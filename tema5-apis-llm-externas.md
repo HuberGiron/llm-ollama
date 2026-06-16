@@ -129,6 +129,7 @@ La siguiente tabla resume proveedores que pueden servir para prácticas académi
 | ![LOGO: Hugging Face]` | Hugging Face Inference Providers | https://huggingface.co/docs/inference-providers | Créditos mensuales gratuitos pequeños | Modelos Llama, Qwen, Mistral u otros | Depende del modelo | Conectar modelos abiertos con inferencia alojada. |
 | ![LOGO: OpenRouter](assets/img/apis/openrouter-icon.webp) | OpenRouter | https://openrouter.ai/docs | Modelos `:free` con límite diario | Modelos `:free` disponibles en catálogo | Depende del modelo | Probar varios modelos con una sola API compatible con OpenAI. |
 | ![LOGO: OpenAI](assets/img/apis/openai.webp) | OpenAI API | https://platform.openai.com/docs | Normalmente requiere facturación o créditos | Modelos económicos vigentes | No divulgado | Referencia industrial, pero no ideal si se busca evitar cobros. |
+| ![LOGO: Claude](assets/img/apis/claude-icon-logo.png) | Anthropic Claude API | https://docs.anthropic.com/ | Créditos iniciales pequeños para probar la API; después pago por uso | `claude-haiku`, `claude-sonnet`, `claude-opus` según disponibilidad vigente | No divulgado | Comparar modelos cerrados de alto desempeño, buena redacción, razonamiento y análisis de documentos. |
 
 ---
 
@@ -1723,6 +1724,9 @@ Para prototipos académicos, la comparación entre ambos enfoques es especialmen
 
 [16] OpenAI. (s. f.). *API Documentation*. Disponible en: <https://platform.openai.com/docs>
 
+[17] Anthropic. (s. f.). Claude API Documentation. Disponible en: <https://docs.anthropic.com/>
+
+[18] Anthropic. (s. f.). Claude API Pricing. Disponible en: <https://docs.anthropic.com/en/docs/about-claude/pricing>
 ---
 
 ## 26. Anexo: plantilla de reporte
