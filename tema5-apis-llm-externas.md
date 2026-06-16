@@ -1557,19 +1557,11 @@ El uso de APIs externas permite acceder a modelos más grandes, rápidos o espec
 
 Ollama local, por otro lado, ofrece más control, privacidad y bajo costo recurrente, pero queda limitado por el hardware disponible.
 
-La decisión no debe plantearse como:
+La decisión debe plantearse como una decisión de arquitectura:
 
-```text
-Ollama o API externa
-```
+**¿Dónde conviene ejecutar el modelo para esta tarea, con estos datos, este presupuesto y esta latencia esperada?**
 
-sino como una decisión de arquitectura:
-
-```text
-¿Dónde conviene ejecutar el modelo para esta tarea, con estos datos, este presupuesto y esta latencia esperada?
-```
-
-Para prototipos académicos, la comparación entre ambos enfoques es especialmente valiosa porque permite observar que un LLM no es solo un modelo, sino parte de un sistema completo que incluye interfaz, backend, red, costos, seguridad y experiencia del usuario.
+Para prototipos, la comparación entre ambos enfoques es especialmente valiosa porque permite observar que un LLM no es solo un modelo, sino parte de un sistema completo que incluye interfaz, backend, red, costos, seguridad y experiencia del usuario.
 
 
 ### 15.1 Ventajas de Ollama local
