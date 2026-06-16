@@ -6,17 +6,14 @@ nav_order: 5
 
 # Uso de APIs externas para LLM: Gemini, Groq y comparación con Ollama
 
-Esta sección continúa el trabajo de los temas anteriores, donde se construyó un chatbot local con **frontend HTML/CSS/JavaScript**, **backend en Python con FastAPI**, conexión a **Ollama** mediante `/api/chat`, parámetros configurables, métricas de inferencia y perfiles de copiloto mediante `system_prompt`.
+Esta sección continúa el trabajo de los temas anteriores, se modifica esa misma arquitectura para que el backend pueda llamar no solo a Ollama local, sino también a **modelos alojados por proveedores externos** mediante APIs en línea. El objetivo es comparar tres formas de usar modelos de lenguaje:
 
-En este tema se modifica esa misma arquitectura para que el backend pueda llamar no solo a Ollama local, sino también a **modelos alojados por proveedores externos** mediante APIs en línea. El objetivo no es abandonar Ollama, sino comparar tres formas de usar modelos de lenguaje:
-
-```text
 1. Modelo local con Ollama.
 2. Modelo cerrado mediante API externa.
 3. Modelo abierto alojado en infraestructura externa.
-```
 
-Esta comparación permite analizar diferencias de **velocidad**, **costo**, **tamaño del modelo**, **tokens**, **privacidad**, **facilidad de integración** y **dependencia de internet**. También permite que el estudiante observe una diferencia importante: en Ollama se controla el entorno local, mientras que en una API externa se consume un servicio remoto con sus propias reglas, límites y costos.
+
+Esta comparación permite analizar diferencias de **velocidad**, **costo**, **tamaño del modelo**, **tokens**, **privacidad**, **facilidad de integración** y **dependencia de internet**. También permite observar una diferencia importante: en Ollama se controla el entorno local, mientras que en una API externa se consume un servicio remoto con sus propias reglas, límites y costos.
 
 El tema se apoya en documentación oficial de Ollama, FastAPI, Google Gemini API, GroqCloud, Mistral AI, Cohere, Hugging Face, OpenRouter y OpenAI [1]–[16].
 
@@ -28,53 +25,15 @@ El tema se apoya en documentación oficial de Ollama, FastAPI, Google Gemini API
 
 En el Tema 3 se construyó un chatbot local con esta arquitectura:
 
-```text
-Usuario
-→ Frontend web
-→ Backend FastAPI
-→ Ollama /api/chat
-→ Modelo local
-```
+![arquitectura](assets/img/chat/diagrama.png)
 
-En el Tema 4 se agregó el concepto de copiloto especializado:
+Ahora se agrega una nueva capa de decisión: el **proveedor de inferencia**.
 
-```text
-Usuario
-→ Frontend
-→ Backend FastAPI
-→ messages[0] = system_prompt
-→ Ollama /api/chat
-→ Respuesta especializada
-```
-
-Ahora se agrega una nueva capa de decisión: el **proveedor**.
-
-```text
-Usuario
-→ Frontend
-→ Backend FastAPI
-→ Selección de proveedor
-    ├── Ollama local
-    ├── Gemini API
-    ├── Groq API
-    └── OpenRouter / Mistral / Cohere / Hugging Face
-→ Modelo seleccionado
-→ Respuesta y métricas
-```
+![arquitectura](assets/img/chat/diagrama.png)
 
 La arquitectura sigue usando el backend como intermediario. Esto es especialmente importante porque las API keys no deben exponerse en el navegador.
 
 > ⚠️ **Consideración:** El frontend nunca debe contener una API key. Si la llave se coloca en JavaScript, cualquier usuario podría verla desde las herramientas de desarrollador del navegador. Por eso, las llaves se guardan en el backend mediante variables de entorno.
-
----
-
-## 2. Arquitectura propuesta
-
-La arquitectura del tema se puede representar así:
-
-![arquitectura apis](assets/img/apis/diagrama-apis-llm.png)
-
-> Espacio sugerido para imagen:
 
 ```text
 [IMAGEN 1: Diagrama de arquitectura]
@@ -118,7 +77,7 @@ Frontend
 
 ---
 
-## 3. ¿Qué cambia respecto al Tema 4?
+## 3. ¿Qué cambia respecto al LLM Local?
 
 La lógica del copiloto se mantiene:
 
@@ -135,12 +94,11 @@ Lo que cambia es el destino de la solicitud.
 |---|---|---|
 | Modelo | Local | Local o remoto |
 | Proveedor | Ollama | Ollama, Gemini, Groq u otro |
-| API key | No necesaria | Necesaria en proveedores externos |
+| API key | No necesaria | Necesaria |
 | Métricas | Devueltas por Ollama | Dependen del proveedor |
 | Costo | Hardware local | Puede tener cuota gratuita o costo por tokens |
 | Privacidad | Los datos se quedan localmente | El prompt se envía a un proveedor externo |
 | Dependencia de internet | No después de instalar el modelo | Sí |
-| Código base | Chatbot/copiloto anterior | Se reutiliza y se extiende |
 
 ---
 
@@ -156,7 +114,7 @@ Una solicitud de chat generalmente incluye:
 - límite de tokens de salida;
 - API key para autenticación.
 
-Ejemplo conceptual:
+Ejemplo:
 
 <!-- code-open: true -->
 ```json
@@ -199,44 +157,19 @@ Una respuesta suele incluir:
 }
 ```
 
-La estructura exacta depende del proveedor, por eso el backend debe **normalizar** la respuesta antes de enviarla al frontend.
+> ⚠️ **Consideración:** La estructura exacta depende del proveedor, por eso el backend debe **normalizar** la respuesta antes de enviar la solicitud al proveedor o al recibir la respuesta.
 
 ---
 
 ## 5. Proveedores recomendados para experimentación
 
-La siguiente tabla resume proveedores que pueden servir para prácticas académicas. Las cuotas gratuitas, modelos disponibles y límites cambian con el tiempo, por lo que se recomienda revisar las ligas oficiales antes de impartir la práctica.
+La siguiente tabla resume proveedores que pueden servir para prácticas académicas. Las cuotas gratuitas, modelos disponibles y límites cambian con el tiempo, por lo que se recomienda revisar las ligas oficiales antes de realizar la práctica.
 
-> Espacio sugerido para logos:
-
-```text
-[IMAGEN 2: Logos de proveedores]
-
-Google Gemini | Groq | Mistral AI | Cohere | Hugging Face | OpenRouter | OpenAI
-```
-
-También puedes crear una carpeta:
-
-```text
-assets/img/apis/
-├── logo-gemini.png
-├── logo-groq.png
-├── logo-mistral.png
-├── logo-cohere.png
-├── logo-huggingface.png
-├── logo-openrouter.png
-└── logo-openai.png
-```
-
-Y usar los logos dentro de la tabla:
-
-```markdown
-![Gemini](assets/img/apis/logo-gemini.png)
 ```
 
 | Logo | Proveedor | Liga oficial | Acceso gratuito o de evaluación | Modelos sugeridos | Parámetros publicados | Uso didáctico |
 |---|---|---|---|---|---|---|
-| `[LOGO: Gemini]` | Google Gemini API | https://ai.google.dev/gemini-api/docs | Tier gratuito o free trial con límites por proyecto | `gemini-2.5-flash`, `gemini-2.5-flash-lite` | No divulgado | Comparar un modelo cerrado de alto rendimiento contra Ollama local. |
+| ![Gemini](assets/img/apis/logo-gemini.png) | Google Gemini API | https://ai.google.dev/gemini-api/docs | Tier gratuito o free trial con límites por proyecto | `gemini-2.5-flash`, `gemini-2.5-flash-lite` | No divulgado | Comparar un modelo cerrado de alto rendimiento contra Ollama local. |
 | `[LOGO: Groq]` | GroqCloud | https://console.groq.com/docs | Free plan con límites de solicitudes y tokens | `llama-3.3-70b-versatile`, `llama-3.1-8b-instant` | 70B y 8B aproximados | Medir velocidad de inferencia en infraestructura optimizada. |
 | `[LOGO: Mistral]` | Mistral AI | https://docs.mistral.ai/ | Free mode para evaluación y prototipado | `ministral-8b`, `mistral-small` | 8B en Ministral; otros no siempre divulgados | Probar modelos eficientes y discutir modelos europeos. |
 | `[LOGO: Cohere]` | Cohere | https://docs.cohere.com/ | Evaluation key gratuita con uso limitado | `command-r`, `command-r7b`, `command-a` | 7B en Command R7B; 111B en Command A | Discutir RAG, agentes, tool use y modelos enterprise. |
