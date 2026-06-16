@@ -29,64 +29,19 @@ En el Tema 3 se construyó un chatbot local con esta arquitectura:
 
 Ahora se agrega una nueva capa de decisión: el **proveedor de inferencia**.
 
-![arquitectura](assets/img/chat/diagrama.png)
+![arquitectura](assets/img/apis/arquitectura-proveedor.png)
 
 La arquitectura sigue usando el backend como intermediario. Esto es especialmente importante porque las API keys no deben exponerse en el navegador.
 
 > ⚠️ **Consideración:** El frontend nunca debe contener una API key. Si la llave se coloca en JavaScript, cualquier usuario podría verla desde las herramientas de desarrollador del navegador. Por eso, las llaves se guardan en el backend mediante variables de entorno.
 
-```text
-[IMAGEN 1: Diagrama de arquitectura]
-
-Usuario
-  ↓
-Frontend
-  - mensaje
-  - proveedor
-  - modelo
-  - parámetros
-  - perfil de copiloto
-  - system_prompt editable
-  ↓
-Backend FastAPI
-  - valida parámetros
-  - valida perfil
-  - selecciona plantilla de system_prompt
-  - construye messages
-  - selecciona proveedor
-  - lee API key desde .env
-  - llama a Ollama o API externa
-  ↓
-Proveedor de inferencia
-  - Ollama local
-  - Gemini API
-  - Groq API
-  - OpenRouter
-  ↓
-Backend FastAPI
-  - normaliza respuesta
-  - calcula latencia
-  - extrae tokens
-  ↓
-Frontend
-  - muestra respuesta
-  - muestra proveedor/modelo
-  - muestra perfil usado
-  - muestra métricas
-```
-
 ---
 
 ## 3. ¿Qué cambia respecto al LLM Local?
 
-La lógica del copiloto se mantiene:
+La lógica de la arquitectura se mantiene, solo cambia a quien consulta el backend: Ollama o al proveedor externo.
 
-```text
-perfil de copiloto
-+ system_prompt
-+ mensaje del usuario
-+ parámetros
-```
+![arquitectura](assets/img/apis/arquitectura-vs.png)
 
 Lo que cambia es el destino de la solicitud.
 
