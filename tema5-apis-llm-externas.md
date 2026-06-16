@@ -738,7 +738,7 @@ def chat(request: ChatRequest):
 
 ---
 
-## 13. Probar backend sin frontend
+## 11. Probar backend sin frontend
 
 Ejecutar el backend:
 
@@ -821,7 +821,7 @@ Ejemplo para probar `POST /chat` con Groq:
 
 ---
 
-## 14. Frontend actualizado
+## 12. Frontend actualizado
 
 El frontend mantiene la idea del Tema 4, pero agrega:
 
@@ -832,7 +832,7 @@ El frontend mantiene la idea del Tema 4, pero agrega:
 - tokens normalizados para Ollama y APIs externas.
 ```
 
-### 14.1 Archivo `index.html`
+### 12.1 Archivo `index.html`
 
 Guarda el siguiente contenido como:
 
@@ -965,7 +965,7 @@ frontend/index.html
 </html>
 ```
 
-### 14.2 Archivo `styles.css`
+### 12.2 Archivo `styles.css`
 
 Se puede reutilizar el archivo del Tema 4. Si quieres dejarlo completo en este tema, usa:
 
@@ -1182,7 +1182,7 @@ button:disabled {
 }
 ```
 
-### 14.3 Archivo `app.js`
+### 12.3 Archivo `app.js`
 
 Guarda el siguiente contenido como:
 
@@ -1391,9 +1391,9 @@ loadProviders();
 
 ---
 
-## 15. Ejecución del proyecto
+## 13. Ejecución del proyecto
 
-### 15.1 Backend
+### 13.1 Backend
 
 En la carpeta `backend/`:
 
@@ -1420,7 +1420,7 @@ Ver proveedores:
 http://localhost:8000/providers
 ```
 
-### 15.2 Frontend
+### 13.2 Frontend
 
 En la carpeta `frontend/`:
 
@@ -1437,7 +1437,36 @@ http://localhost:5500
 
 ---
 
-## 16. Prueba guiada
+## 14. Práctica 5: Chatbot híbrido con APIs externas
+
+### Objetivo
+
+Modificar el chatbot/copiloto desarrollado en los temas anteriores para que pueda conversar con un modelo local en Ollama y con al menos dos modelos remotos mediante APIs externas.
+
+### Entregables
+
+Cada equipo deberá entregar:
+
+1. Código del backend actualizado.
+2. Código del frontend actualizado.
+3. Capturas de pantalla de las tres pruebas.
+4. Tabla de métricas.
+5. Tabla de evaluación cualitativa.
+6. Reflexión comparativa.
+
+### Requisitos mínimos
+
+El sistema debe permitir:
+
+- seleccionar proveedor;
+- seleccionar modelo;
+- seleccionar perfil de copiloto;
+- editar `system_prompt`;
+- modificar `temperature`, `top_p` y tokens máximos;
+- mostrar respuesta;
+- mostrar tokens de entrada, salida y totales cuando estén disponibles;
+- mostrar tiempo total;
+- manejar errores de conexión o API key faltante.
 
 Usar el mismo prompt en los tres proveedores:
 
@@ -1470,7 +1499,7 @@ Probar:
 
 ---
 
-## 17. Tabla de caracterización
+**Tabla de caracterización**
 
 Cada equipo debe completar:
 
@@ -1494,7 +1523,7 @@ Cada equipo debe completar:
 
 ---
 
-## 18. Evaluación cualitativa de respuestas
+**Evaluación cualitativa de respuestas**
 
 Además de las métricas, evaluar la respuesta generada.
 
@@ -1519,47 +1548,7 @@ Escala sugerida:
 5 = excelente
 ```
 
----
-
-## 19. Comparación local vs API externa
-
-### 19.1 Ventajas de Ollama local
-
-- Mayor control sobre el entorno.
-- No requiere enviar datos a terceros.
-- No depende de cuotas por token.
-- Puede funcionar sin internet después de instalar el modelo.
-- Permite experimentar con modelos abiertos.
-
-### 19.2 Limitaciones de Ollama local
-
-- Depende del hardware disponible.
-- Los modelos grandes requieren mucha RAM o VRAM.
-- La velocidad puede ser baja en computadoras modestas.
-- La instalación inicial puede ser pesada.
-- No siempre se tiene acceso a modelos de frontera.
-
-### 19.3 Ventajas de APIs externas
-
-- Acceso rápido a modelos grandes.
-- No requiere GPU local.
-- Integración sencilla por HTTP.
-- Escalabilidad mayor para prototipos.
-- Algunos proveedores ofrecen modelos multimodales.
-- Métricas de uso de tokens integradas.
-
-### 19.4 Limitaciones de APIs externas
-
-- Requieren internet.
-- Requieren API key.
-- Pueden tener costo por tokens.
-- Tienen límites por minuto, día o mes.
-- El proveedor puede cambiar modelos, precios o políticas.
-- Hay implicaciones de privacidad y gobernanza de datos.
-
----
-
-## 20. Preguntas de análisis
+**Preguntas de análisis**
 
 1. ¿Qué modelo respondió más rápido?
 2. ¿Qué modelo generó la mejor explicación técnica?
@@ -1572,76 +1561,10 @@ Escala sugerida:
 9. ¿Qué proveedor fue más fácil de integrar?
 10. ¿Qué información técnica no fue publicada por el proveedor?
 
----
-
-## 21. Práctica 5: Chatbot híbrido con APIs externas
-
-### Objetivo
-
-Modificar el chatbot/copiloto desarrollado en los temas anteriores para que pueda conversar con un modelo local en Ollama y con al menos dos modelos remotos mediante APIs externas.
-
-### Entregables
-
-Cada equipo deberá entregar:
-
-1. Código del backend actualizado.
-2. Código del frontend actualizado.
-3. Capturas de pantalla de las tres pruebas.
-4. Tabla de métricas.
-5. Tabla de evaluación cualitativa.
-6. Reflexión comparativa.
-
-### Requisitos mínimos
-
-El sistema debe permitir:
-
-- seleccionar proveedor;
-- seleccionar modelo;
-- seleccionar perfil de copiloto;
-- editar `system_prompt`;
-- modificar `temperature`, `top_p` y tokens máximos;
-- mostrar respuesta;
-- mostrar tokens de entrada, salida y totales cuando estén disponibles;
-- mostrar tiempo total;
-- manejar errores de conexión o API key faltante.
 
 ---
 
-## 22. Rúbrica de evaluación
-
-| Criterio | Puntos |
-|---|---:|
-| Reutiliza correctamente el chatbot/copiloto anterior | 10 |
-| Implementa selección de proveedor y modelo | 15 |
-| Configura API keys de forma segura con `.env` | 10 |
-| Integra al menos dos APIs externas | 15 |
-| Ejecuta el mismo prompt en Ollama y APIs externas | 10 |
-| Registra correctamente tokens y latencia | 15 |
-| Caracteriza modelos, parámetros y límites | 10 |
-| Compara críticamente calidad, costo, privacidad y dependencia | 10 |
-| Evidencias y claridad del reporte | 5 |
-| **Total** | **100** |
-
----
-
-## 23. Consideraciones de privacidad
-
-Cuando se usa Ollama local, el prompt puede permanecer en la computadora o servidor propio. Cuando se usa una API externa, el prompt se envía a un proveedor externo.
-
-Por ello, en esta práctica no se deben enviar:
-
-- datos personales;
-- contraseñas;
-- API keys;
-- información institucional sensible;
-- documentos confidenciales;
-- datos privados de pacientes, estudiantes o usuarios.
-
-> ⚠️ **Consideración:** Para ejercicios académicos, usar prompts técnicos genéricos. Si en el futuro se usan documentos institucionales, reglamentos o bases de conocimiento internas, se deberá revisar la política de datos del proveedor.
-
----
-
-## 24. Consideraciones finales
+## 15. Consideraciones finales
 
 El uso de APIs externas permite acceder a modelos más grandes, rápidos o especializados sin instalar pesos localmente ni contar con una GPU potente. Sin embargo, esta comodidad implica dependencia de internet, límites de uso, costos por tokens, cambios de disponibilidad y consideraciones de privacidad.
 
@@ -1661,9 +1584,61 @@ sino como una decisión de arquitectura:
 
 Para prototipos académicos, la comparación entre ambos enfoques es especialmente valiosa porque permite observar que un LLM no es solo un modelo, sino parte de un sistema completo que incluye interfaz, backend, red, costos, seguridad y experiencia del usuario.
 
+
+### 15.1 Ventajas de Ollama local
+
+- Mayor control sobre el entorno.
+- No requiere enviar datos a terceros.
+- No depende de cuotas por token.
+- Puede funcionar sin internet después de instalar el modelo.
+- Permite experimentar con modelos abiertos.
+
+### 15.2 Limitaciones de Ollama local
+
+- Depende del hardware disponible.
+- Los modelos grandes requieren mucha RAM o VRAM.
+- La velocidad puede ser baja en computadoras modestas.
+- La instalación inicial puede ser pesada.
+- No siempre se tiene acceso a modelos de frontera.
+
+### 15.3 Ventajas de APIs externas
+
+- Acceso rápido a modelos grandes.
+- No requiere GPU local.
+- Integración sencilla por HTTP.
+- Escalabilidad mayor para prototipos.
+- Algunos proveedores ofrecen modelos multimodales.
+- Métricas de uso de tokens integradas.
+
+### 15.4 Limitaciones de APIs externas
+
+- Requieren internet.
+- Requieren API key.
+- Pueden tener costo por tokens.
+- Tienen límites por minuto, día o mes.
+- El proveedor puede cambiar modelos, precios o políticas.
+- Hay implicaciones de privacidad y gobernanza de datos.
+
 ---
 
-## 25. Referencias
+## 16. Consideraciones de privacidad
+
+Cuando se usa Ollama local, el prompt puede permanecer en la computadora o servidor propio. Cuando se usa una API externa, el prompt se envía a un proveedor externo.
+
+Por ello, en esta práctica no se deben enviar:
+
+- datos personales;
+- contraseñas;
+- API keys;
+- información institucional sensible;
+- documentos confidenciales;
+- datos privados de pacientes, estudiantes o usuarios.
+
+> ⚠️ **Consideración:** Para ejercicios académicos, usar prompts técnicos genéricos. Si en el futuro se usan documentos institucionales, reglamentos o bases de conocimiento internas, se deberá revisar la política de datos del proveedor.
+
+---
+
+## 17. Referencias
 
 [1] Ollama. (s. f.). *Chat API*. Disponible en: <https://docs.ollama.com/api/chat>
 
@@ -1700,71 +1675,3 @@ Para prototipos académicos, la comparación entre ambos enfoques es especialmen
 [17] Anthropic. (s. f.). Claude API Documentation. Disponible en: <https://docs.anthropic.com/>
 
 [18] Anthropic. (s. f.). Claude API Pricing. Disponible en: <https://docs.anthropic.com/en/docs/about-claude/pricing>
----
-
-## 26. Anexo: plantilla de reporte
-
-# Reporte de práctica: Chatbot híbrido con APIs externas
-
-## Equipo
-
-```text
-Nombre de integrantes:
-Fecha:
-Curso:
-```
-
-## Modelos evaluados
-
-| Proveedor | Modelo | Tipo | Parámetros | Liga |
-|---|---|---|---:|---|
-| Ollama | | Local | | |
-| Gemini | | API externa | | |
-| Groq | | API externa | | |
-
-## Prompt usado
-
-```text
-Pegar aquí el prompt utilizado.
-```
-
-## Resultados cuantitativos
-
-| Modelo | Tiempo total | Tokens entrada | Tokens salida | Tokens totales | Tokens/s |
-|---|---:|---:|---:|---:|---:|
-| Ollama | | | | | |
-| Gemini | | | | | |
-| Groq | | | | | |
-
-## Resultados cualitativos
-
-| Modelo | Claridad | Precisión | Ejemplo | Errores | Comentario |
-|---|---:|---:|---:|---:|---|
-| Ollama | | | | | |
-| Gemini | | | | | |
-| Groq | | | | | |
-
-## Evidencias
-
-```text
-[CAPTURA 1: Prueba con Ollama]
-[CAPTURA 2: Prueba con Gemini]
-[CAPTURA 3: Prueba con Groq]
-```
-
-## Análisis
-
-```text
-Responder:
-- ¿Qué modelo fue más rápido?
-- ¿Qué modelo fue más claro?
-- ¿Qué modelo fue más preciso?
-- ¿Qué modelo convendría usar en una aplicación real?
-- ¿Qué riesgos tendría usar una API externa?
-```
-
-## Conclusión
-
-```text
-Escribir una conclusión de 150 a 250 palabras.
-```
