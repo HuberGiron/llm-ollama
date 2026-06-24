@@ -95,22 +95,68 @@ El backend debe rechazar cualquier respuesta que no cumpla el esquema esperado.
 
 ---
 
-## 5. Metricas de arquitecturas con LLM
+## 5. Métricas de arquitecturas con LLM
 
 ### 5.1 Clasificación de intención
 
-La tarea se modela como clasificación multiclase. Cada muestra corresponde a un prompt; cada prompt tiene una etiqueta esperada; el LLM produce una predicción.
+La tarea se modela como un problema de **clasificación multiclase**. Cada muestra corresponde a un prompt escrito por el usuario, cada prompt tiene una etiqueta esperada y el LLM produce una predicción.
+
+En esta práctica, la entrada no es una imagen, una tabla o una señal numérica, sino una instrucción en lenguaje natural.
 
 ```text
-y_true = etiqueta esperada
-y_pred = acción generada por el LLM
+prompt_usuario → modelo LLM → acción predicha
 ```
 
-Clases:
+Ejemplo:
+
+| Prompt del usuario | Etiqueta esperada | Predicción del LLM |
+|---|---|---|
+| `enciende el led` | `on` | `on` |
+| `apaga el led` | `off` | `off` |
+| `explícame qué es MQTT` | `none` | `none` |
+
+Para calcular métricas se usan dos listas:
 
 ```text
-on, off, none
+y_true = etiquetas reales o esperadas
+y_pred = etiquetas predichas por el modelo
 ```
+
+Donde:
+
+| Elemento | Significado en esta práctica |
+|---|---|
+| `y_true` | Lista de acciones correctas definidas en el dataset. |
+| `y_pred` | Lista de acciones generadas por el LLM. |
+| `expected_action` | Acción esperada para un prompt específico. |
+| `llm_action` | Acción generada por el LLM para ese prompt. |
+| Muestra | Un prompt evaluado. |
+| Clase | Una de las acciones posibles: `on`, `off` o `none`. |
+
+Clases del experimento:
+
+```text
+on   → encender LED
+off  → apagar LED
+none → no ejecutar acción de control
+```
+
+Ejemplo de listas para evaluación:
+
+```text
+y_true = ["on", "off", "none", "on", "none"]
+y_pred = ["on", "none", "none", "on", "off"]
+```
+
+Lectura:
+
+| Posición | `y_true` | `y_pred` | Interpretación |
+|---:|---|---|---|
+| 1 | `on` | `on` | Acierto |
+| 2 | `off` | `none` | Error: el modelo ignoró una instrucción de apagado |
+| 3 | `none` | `none` | Acierto |
+| 4 | `on` | `on` | Acierto |
+| 5 | `none` | `off` | Error: el modelo activó una acción cuando no debía |
 
 Scikit-learn documenta funciones de evaluación para clasificación, incluyendo accuracy, precision, recall, F1-score y matriz de confusión [1]–[4].
 
@@ -118,11 +164,19 @@ Scikit-learn documenta funciones de evaluación para clasificación, incluyendo 
 
 ### 5.2 Accuracy
 
-Accuracy mide la proporción de predicciones correctas respecto al total:
+**Accuracy** mide la proporción de predicciones correctas respecto al total de pruebas.
 
 ```text
 accuracy = predicciones_correctas / total_de_pruebas
 ```
+
+Donde:
+
+| Elemento | Significado |
+|---|---|
+| `predicciones_correctas` | Número de casos donde `llm_action` coincide con `expected_action`. |
+| `total_de_pruebas` | Número total de prompts evaluados. |
+| `accuracy` | Proporción de aciertos del sistema. Su valor va de 0 a 1. |
 
 Ejemplo:
 
@@ -132,95 +186,283 @@ Ejemplo:
 | `apaga el led` | `off` | `none` | no |
 | `qué es MQTT` | `none` | `none` | sí |
 
-Si hay 80 aciertos en 100 pruebas:
+En este ejemplo:
 
 ```text
+predicciones_correctas = 2
+total_de_pruebas = 3
+accuracy = 2 / 3 = 0.6667
+```
+
+Interpretación:
+
+```text
+El sistema clasificó correctamente 66.67 % de los prompts.
+```
+
+Ejemplo con 100 pruebas:
+
+```text
+predicciones_correctas = 80
+total_de_pruebas = 100
 accuracy = 80 / 100 = 0.80
 ```
+
+Interpretación:
+
+```text
+El sistema tuvo 80 % de aciertos.
+```
+
+Accuracy es una métrica fácil de interpretar, pero puede ocultar problemas si el dataset está desbalanceado. Por ejemplo, si hay demasiados prompts de clase `none`, un modelo que predice `none` con mucha frecuencia puede obtener una accuracy alta y fallar en instrucciones reales de encendido o apagado.
 
 ---
 
 ### 5.3 Precision
 
-Precision mide la confiabilidad de las predicciones de una clase.
+**Precision** mide la confiabilidad de las predicciones positivas de una clase.
 
 ```text
 precision = TP / (TP + FP)
 ```
 
+Donde:
+
+| Elemento | Significado general | Significado en esta práctica |
+|---|---|---|
+| `TP` | True Positives, verdaderos positivos | Casos donde el modelo predijo una clase y esa clase era correcta. |
+| `FP` | False Positives, falsos positivos | Casos donde el modelo predijo una clase, pero la clase correcta era otra. |
+| `TP + FP` | Total de predicciones hechas para esa clase | Todas las veces que el modelo dijo que la acción era una clase específica. |
+| `precision` | Proporción de predicciones correctas dentro de todas las predicciones de una clase | Qué tan confiable es el modelo cuando predice una acción. |
+
 Para la clase `on`:
 
 ```text
-precision_on =
-veces que el modelo predijo on correctamente
-/
-todas las veces que el modelo predijo on
+precision_on = TP_on / (TP_on + FP_on)
+```
+
+Donde:
+
+| Elemento | Significado para la clase `on` |
+|---|---|
+| `TP_on` | Casos donde `expected_action = on` y `llm_action = on`. |
+| `FP_on` | Casos donde `llm_action = on`, pero `expected_action` era `off` o `none`. |
+| `TP_on + FP_on` | Todas las veces que el modelo predijo `on`. |
+| `precision_on` | Qué tan confiable es el modelo cuando dice que debe encender el LED. |
+
+Ejemplo:
+
+| Prompt | Esperado | Predicho | Resultado para clase `on` |
+|---|---|---|---|
+| `enciende el led` | `on` | `on` | `TP_on` |
+| `prende la luz` | `on` | `on` | `TP_on` |
+| `qué es MQTT` | `none` | `on` | `FP_on` |
+| `no enciendas el led` | `none` | `on` | `FP_on` |
+
+En este ejemplo:
+
+```text
+TP_on = 2
+FP_on = 2
+precision_on = 2 / (2 + 2) = 0.50
 ```
 
 Interpretación:
 
 ```text
-Cuando el modelo dice que debe encender el LED, ¿qué tan frecuente es correcto?
+Cuando el modelo predijo on, solo acertó en 50 % de los casos.
 ```
 
-En sistemas físicos, precision es importante porque un falso positivo puede activar hardware sin instrucción válida.
+En sistemas físicos, precision es importante porque un falso positivo puede activar hardware sin instrucción válida. Para el caso del LED, un `FP_on` significa que el sistema podría encender el LED cuando no debía hacerlo.
 
 ---
 
 ### 5.4 Recall
 
-Recall mide qué tanto detecta el modelo una clase cuando realmente aparece.
+**Recall** mide qué tanto recupera o detecta el modelo una clase cuando realmente aparece.
 
 ```text
 recall = TP / (TP + FN)
 ```
 
+Donde:
+
+| Elemento | Significado general | Significado en esta práctica |
+|---|---|---|
+| `TP` | True Positives, verdaderos positivos | Casos donde el modelo predijo correctamente una clase. |
+| `FN` | False Negatives, falsos negativos | Casos donde la clase correcta era una específica, pero el modelo predijo otra. |
+| `TP + FN` | Total de casos reales de esa clase | Todas las veces que una acción realmente debía ocurrir. |
+| `recall` | Proporción de casos reales detectados correctamente | Qué tanto detecta el modelo una acción cuando sí debía reconocerla. |
+
 Para la clase `on`:
 
 ```text
-recall_on =
-veces que el modelo predijo on correctamente
-/
-todas las veces que realmente debía ser on
+recall_on = TP_on / (TP_on + FN_on)
+```
+
+Donde:
+
+| Elemento | Significado para la clase `on` |
+|---|---|
+| `TP_on` | Casos donde `expected_action = on` y `llm_action = on`. |
+| `FN_on` | Casos donde `expected_action = on`, pero `llm_action` fue `off` o `none`. |
+| `TP_on + FN_on` | Todas las veces que realmente se debía encender el LED. |
+| `recall_on` | Qué proporción de instrucciones de encendido detectó correctamente el modelo. |
+
+Ejemplo:
+
+| Prompt | Esperado | Predicho | Resultado para clase `on` |
+|---|---|---|---|
+| `enciende el led` | `on` | `on` | `TP_on` |
+| `prende la luz` | `on` | `none` | `FN_on` |
+| `activa el led` | `on` | `on` | `TP_on` |
+| `enciende la salida` | `on` | `off` | `FN_on` |
+
+En este ejemplo:
+
+```text
+TP_on = 2
+FN_on = 2
+recall_on = 2 / (2 + 2) = 0.50
 ```
 
 Interpretación:
 
 ```text
-De todos los prompts que pedían encender el LED, ¿cuántos detectó correctamente?
+De todas las instrucciones que pedían encender el LED, el modelo detectó correctamente 50 %.
 ```
 
-Un recall bajo indica que el sistema ignora instrucciones válidas.
+Un recall bajo indica que el sistema ignora instrucciones válidas. En esta práctica, un `FN_on` puede significar que el usuario pidió encender el LED y el sistema no ejecutó la acción.
 
 ---
 
 ### 5.5 F1-score
 
-F1-score combina precision y recall mediante media armónica:
+**F1-score** combina precision y recall en una sola métrica. Se calcula con una media armónica:
 
 ```text
 F1 = 2 * (precision * recall) / (precision + recall)
 ```
 
-También puede expresarse como:
+Donde:
+
+| Elemento | Significado |
+|---|---|
+| `precision` | Qué tan confiable es el modelo cuando predice una clase. |
+| `recall` | Qué tanto detecta el modelo esa clase cuando realmente aparece. |
+| `precision * recall` | Producto entre ambas métricas. |
+| `precision + recall` | Suma de ambas métricas. |
+| `F1` | Balance entre precision y recall. Su valor va de 0 a 1. |
+
+F1 también puede expresarse con `TP`, `FP` y `FN`:
 
 ```text
 F1 = 2TP / (2TP + FP + FN)
 ```
 
-En esta práctica se recomienda usar **macro F1**:
+Donde:
+
+| Elemento | Significado |
+|---|---|
+| `TP` | Verdaderos positivos de la clase evaluada. |
+| `FP` | Falsos positivos de la clase evaluada. |
+| `FN` | Falsos negativos de la clase evaluada. |
+| `2TP` | Peso duplicado de los aciertos positivos. |
+| `2TP + FP + FN` | Total ponderado de aciertos y errores relevantes para la clase. |
+
+Ejemplo para la clase `on`:
+
+```text
+precision_on = 0.80
+recall_on = 0.60
+```
+
+Entonces:
+
+```text
+F1_on = 2 * (0.80 * 0.60) / (0.80 + 0.60)
+F1_on = 2 * 0.48 / 1.40
+F1_on = 0.6857
+```
+
+Interpretación:
+
+```text
+El balance entre confiabilidad y detección de la clase on fue 0.6857.
+```
+
+F1 es útil cuando se necesita equilibrar dos tipos de error:
+
+```text
+1. Actuar cuando no se debía actuar.
+2. No actuar cuando sí se debía actuar.
+```
+
+En sistemas físicos, ambos errores son importantes. Activar hardware sin instrucción válida puede ser riesgoso; ignorar una instrucción válida puede hacer que el sistema no cumpla la tarea.
+
+---
+
+### 5.6 Macro F1
+
+En clasificación multiclase, se puede calcular un F1-score por cada clase:
+
+```text
+F1_on
+F1_off
+F1_none
+```
+
+Después se promedian:
 
 ```text
 macro_F1 = promedio(F1_on, F1_off, F1_none)
 ```
 
-Macro F1 da peso similar a las tres clases. Esto ayuda cuando el dataset no tiene el mismo número de ejemplos por clase.
+Equivalente:
+
+```text
+macro_F1 = (F1_on + F1_off + F1_none) / 3
+```
+
+Donde:
+
+| Elemento | Significado |
+|---|---|
+| `F1_on` | F1-score calculado para la clase `on`. |
+| `F1_off` | F1-score calculado para la clase `off`. |
+| `F1_none` | F1-score calculado para la clase `none`. |
+| `3` | Número total de clases evaluadas. |
+| `macro_F1` | Promedio simple del F1 de todas las clases. |
+
+Ejemplo:
+
+```text
+F1_on = 0.90
+F1_off = 0.85
+F1_none = 0.70
+```
+
+Entonces:
+
+```text
+macro_F1 = (0.90 + 0.85 + 0.70) / 3
+macro_F1 = 2.45 / 3
+macro_F1 = 0.8167
+```
+
+Interpretación:
+
+```text
+El desempeño promedio balanceado entre las tres clases fue 0.8167.
+```
+
+Macro F1 da el mismo peso a todas las clases, aunque el dataset tenga más ejemplos de una clase que de otra. Esto es útil en esta práctica porque interesa evaluar por separado si el sistema reconoce `on`, `off` y `none`.
 
 ---
 
-### 5.6 Matriz de confusión
+### 5.7 Matriz de confusión
 
-La matriz de confusión muestra aciertos y errores por clase.
+La **matriz de confusión** muestra cómo se distribuyen los aciertos y errores entre clases. Las filas representan la clase esperada y las columnas representan la clase predicha.
 
 Ejemplo:
 
@@ -230,14 +472,53 @@ Ejemplo:
 | `off` | 0 | 32 | 3 |
 | `none` | 2 | 1 | 27 |
 
-Lectura:
+Lectura por filas:
+
+| Fila | Significado |
+|---|---|
+| `on` | Casos donde la acción correcta era encender el LED. |
+| `off` | Casos donde la acción correcta era apagar el LED. |
+| `none` | Casos donde no se debía ejecutar acción de control. |
+
+Lectura por columnas:
+
+| Columna | Significado |
+|---|---|
+| `on` | Casos donde el modelo predijo encender el LED. |
+| `off` | Casos donde el modelo predijo apagar el LED. |
+| `none` | Casos donde el modelo predijo no ejecutar acción. |
+
+Lectura de la diagonal principal:
+
+| Celda | Significado |
+|---|---|
+| `on → on = 30` | 30 instrucciones de encendido fueron clasificadas correctamente. |
+| `off → off = 32` | 32 instrucciones de apagado fueron clasificadas correctamente. |
+| `none → none = 27` | 27 prompts sin acción fueron clasificados correctamente. |
+
+Lectura de errores fuera de la diagonal:
+
+| Celda | Significado |
+|---|---|
+| `on → off = 1` | El usuario pidió encender, pero el modelo predijo apagar. |
+| `on → none = 4` | El usuario pidió encender, pero el modelo no ejecutó acción. |
+| `off → none = 3` | El usuario pidió apagar, pero el modelo no ejecutó acción. |
+| `none → on = 2` | El usuario no pidió acción, pero el modelo predijo encender. |
+| `none → off = 1` | El usuario no pidió acción, pero el modelo predijo apagar. |
+
+Interpretación para sistemas físicos:
 
 ```text
 - La diagonal principal representa aciertos.
 - Los valores fuera de la diagonal representan errores.
 - Casos none predichos como on indican activaciones no deseadas.
+- Casos none predichos como off indican acciones físicas innecesarias.
 - Casos on predichos como none indican instrucciones ignoradas.
+- Casos off predichos como none indican instrucciones de apagado ignoradas.
+- Casos on predichos como off u off predichos como on indican inversión de acción.
 ```
+
+La matriz de confusión permite identificar errores específicos que accuracy no muestra. Por ejemplo, dos modelos pueden tener el mismo accuracy, pero uno puede fallar más en `none → on`, lo cual es más riesgoso si se conectan actuadores reales.
 
 **Espacio para imagen sugerida:**
 
