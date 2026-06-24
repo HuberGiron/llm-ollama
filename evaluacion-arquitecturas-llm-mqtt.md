@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Evaluación LLM + MQTT
+title: Evaluación LLM
 nav_order: 6
 ---
 
@@ -10,43 +10,14 @@ Esta sección presenta una metodología para evaluar proyectos basados en modelo
 
 El propósito es evaluar el comportamiento completo de una arquitectura aplicada: entrada del usuario, interpretación del modelo, generación de JSON, validación en backend, publicación MQTT, latencia, tokens, costo estimado y supervisión humana.
 
-La práctica usa:
-
-```text
-Ollama + FastAPI + MQTT + Python + CSV + Excel + gráficas
-```
-
-El experimento se formula como una tarea de clasificación de intención:
-
-```text
-Prompt del usuario                         → acción esperada
-
-"enciende el led"                          → on
-"apaga el led"                             → off
-"explícame qué es MQTT"                    → none
-"no enciendas el led todavía"              → none
-"desactiva la luz del prototipo"           → off
-```
-
-La arquitectura evaluada es:
-
-```text
-Usuario
-→ Cliente de prueba o frontend
-→ Backend FastAPI
-→ Ollama
-→ JSON estructurado
-→ Validación en backend
-→ Publicación MQTT
-```
 
 > 🎯 **Objetivo de aprendizaje:** Al finalizar esta actividad, el estudiante será capaz de diseñar una evaluación experimental para una arquitectura LLM aplicada; calcular métricas de clasificación como accuracy, precision, recall, F1-score y matriz de confusión; medir latencia, tokens y costo estimado; validar salidas JSON generadas por un LLM; verificar publicación MQTT; y construir un instrumento de supervisión humana para revisar resultados.
 
 ---
 
-## 1. Resumen del tema
+## 1. Evaluación de proyectos que utilizan LLM
 
-En aplicaciones con LLM integradas a backend, APIs, MQTT o hardware, la evaluación debe considerar más que la calidad aparente de la respuesta textual. Se debe medir si el sistema completo produce una decisión correcta, estructurada, validable y operable.
+En aplicaciones con LLM integradas a backend, APIs, MQTT o hardware, la evaluación debe medir si el sistema completo produce una decisión correcta, estructurada, validable y operable.
 
 En esta clase se evalúan cuatro dimensiones:
 
@@ -77,13 +48,13 @@ Ejemplos:
 
 | Prompt | Etiqueta esperada |
 |---|---|
-| `enciende el led` | `on` |
-| `prende la luz del prototipo` | `on` |
-| `apaga el led` | `off` |
-| `desactiva la salida` | `off` |
-| `qué es MQTT` | `none` |
-| `no enciendas el led` | `none` |
-| `mañana prende el led` | `none` |
+| enciende el led | `on` |
+| prende la luz del prototipo | `on` |
+| apaga el led | `off` |
+| desactiva la salida | `off` |
+| qué es MQTT | `none` |
+| no enciendas el led | `none` |
+| mañana prende el led | `none` |
 
 La clase `none` evita que el sistema active hardware cuando el usuario hace una pregunta general, una instrucción ambigua o una instrucción no inmediata.
 
@@ -93,53 +64,7 @@ La clase `none` evita que el sistema active hardware cuando el usuario hace una 
 
 La arquitectura se organiza en cinco componentes:
 
-```text
-Cliente de prueba
-→ Backend FastAPI
-→ Ollama
-→ JSON validado
-→ MQTT broker
-```
-
-**Espacio para imagen sugerida:**
-
-```md
-![Arquitectura LLM Backend MQTT](assets/img/evaluacion/arquitectura_llm_backend_mqtt.png)
-```
-
-La arquitectura puede representarse así:
-
-```text
-┌──────────────────────────┐
-│ Usuario / cliente prueba │
-│ Prompt en lenguaje natural
-└─────────────┬────────────┘
-              ↓ HTTP POST /led-agent
-┌──────────────────────────┐
-│ Backend FastAPI          │
-│ Valida entrada           │
-│ Llama a Ollama           │
-│ Parsea JSON              │
-│ Publica MQTT             │
-└─────────────┬────────────┘
-              ↓ HTTP POST /api/generate
-┌──────────────────────────┐
-│ Ollama                   │
-│ Modelo LLM local         │
-│ Respuesta JSON           │
-└─────────────┬────────────┘
-              ↓ JSON
-┌──────────────────────────┐
-│ Backend FastAPI          │
-│ Valida schema            │
-│ Publica comando          │
-└─────────────┬────────────┘
-              ↓ MQTT publish
-┌──────────────────────────┐
-│ Broker MQTT              │
-│ public/llm-led/cmd       │
-└──────────────────────────┘
-```
+![Arquitectura LLM Backend MQTT](assets/img/evaluacion/arquitectura_led.png)
 
 El backend funciona como capa de seguridad y validación. El LLM no publica directamente en MQTT. Primero genera una intención estructurada y el backend decide si el resultado es válido.
 
