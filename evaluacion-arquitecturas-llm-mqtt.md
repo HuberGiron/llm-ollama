@@ -1,0 +1,1608 @@
+---
+layout: default
+title: Evaluación LLM + MQTT
+nav_order: 6
+---
+
+# Evaluación de arquitecturas LLM aplicadas: backend, JSON y MQTT
+
+Esta sección presenta una metodología para evaluar proyectos basados en modelos grandes de lenguaje (*Large Language Models*, LLM) integrados con backend, salida estructurada y mensajería MQTT. El caso de estudio consiste en clasificar instrucciones en lenguaje natural para controlar un LED mediante comandos publicados por MQTT.
+
+El propósito es evaluar el comportamiento completo de una arquitectura aplicada: entrada del usuario, interpretación del modelo, generación de JSON, validación en backend, publicación MQTT, latencia, tokens, costo estimado y supervisión humana.
+
+La práctica usa:
+
+```text
+Ollama + FastAPI + MQTT + Python + CSV + Excel + gráficas
+```
+
+El experimento se formula como una tarea de clasificación de intención:
+
+```text
+Prompt del usuario                         → acción esperada
+
+"enciende el led"                          → on
+"apaga el led"                             → off
+"explícame qué es MQTT"                    → none
+"no enciendas el led todavía"              → none
+"desactiva la luz del prototipo"           → off
+```
+
+La arquitectura evaluada es:
+
+```text
+Usuario
+→ Cliente de prueba o frontend
+→ Backend FastAPI
+→ Ollama
+→ JSON estructurado
+→ Validación en backend
+→ Publicación MQTT
+```
+
+> 🎯 **Objetivo de aprendizaje:** Al finalizar esta actividad, el estudiante será capaz de diseñar una evaluación experimental para una arquitectura LLM aplicada; calcular métricas de clasificación como accuracy, precision, recall, F1-score y matriz de confusión; medir latencia, tokens y costo estimado; validar salidas JSON generadas por un LLM; verificar publicación MQTT; y construir un instrumento de supervisión humana para revisar resultados.
+
+---
+
+## 1. Resumen del tema
+
+En aplicaciones con LLM integradas a backend, APIs, MQTT o hardware, la evaluación debe considerar más que la calidad aparente de la respuesta textual. Se debe medir si el sistema completo produce una decisión correcta, estructurada, validable y operable.
+
+En esta clase se evalúan cuatro dimensiones:
+
+| Dimensión | Pregunta principal | Métricas asociadas |
+|---|---|---|
+| Calidad de decisión | ¿El LLM clasificó correctamente la intención? | Accuracy, precision, recall, F1-score, matriz de confusión |
+| Salida estructurada | ¿El LLM entregó JSON válido y usable por software? | JSON validity rate, schema valid |
+| Arquitectura | ¿El backend validó y publicó correctamente? | MQTT publish rate, architecture success |
+| Operación | ¿Cuánto tarda, cuántos tokens usa y cuánto costaría? | Latencia, tokens, tokens/s, costo estimado |
+
+En esta práctica la medición termina cuando el backend publica correctamente el mensaje MQTT. La recepción o ejecución física del comando en un ESP32 queda fuera del experimento principal. Esta decisión permite repetir pruebas cíclicas sin depender del hardware físico.
+
+---
+
+## 2. Caso de estudio: clasificación de intención para LED
+
+El caso de estudio es un agente simple que recibe una instrucción en lenguaje natural y decide si debe encender, apagar o no modificar un LED.
+
+Las clases son:
+
+| Clase | Significado | Acción física asociada |
+|---|---|---|
+| `on` | Encender, prender o activar LED | Publicar comando de encendido |
+| `off` | Apagar o desactivar LED | Publicar comando de apagado |
+| `none` | No hay instrucción clara de control | No modificar el estado del LED |
+
+Ejemplos:
+
+| Prompt | Etiqueta esperada |
+|---|---|
+| `enciende el led` | `on` |
+| `prende la luz del prototipo` | `on` |
+| `apaga el led` | `off` |
+| `desactiva la salida` | `off` |
+| `qué es MQTT` | `none` |
+| `no enciendas el led` | `none` |
+| `mañana prende el led` | `none` |
+
+La clase `none` evita que el sistema active hardware cuando el usuario hace una pregunta general, una instrucción ambigua o una instrucción no inmediata.
+
+---
+
+## 3. Arquitectura evaluada
+
+La arquitectura se organiza en cinco componentes:
+
+```text
+Cliente de prueba
+→ Backend FastAPI
+→ Ollama
+→ JSON validado
+→ MQTT broker
+```
+
+**Espacio para imagen sugerida:**
+
+```md
+![Arquitectura LLM Backend MQTT](assets/img/evaluacion/arquitectura_llm_backend_mqtt.png)
+```
+
+La arquitectura puede representarse así:
+
+```text
+┌──────────────────────────┐
+│ Usuario / cliente prueba │
+│ Prompt en lenguaje natural
+└─────────────┬────────────┘
+              ↓ HTTP POST /led-agent
+┌──────────────────────────┐
+│ Backend FastAPI          │
+│ Valida entrada           │
+│ Llama a Ollama           │
+│ Parsea JSON              │
+│ Publica MQTT             │
+└─────────────┬────────────┘
+              ↓ HTTP POST /api/generate
+┌──────────────────────────┐
+│ Ollama                   │
+│ Modelo LLM local         │
+│ Respuesta JSON           │
+└─────────────┬────────────┘
+              ↓ JSON
+┌──────────────────────────┐
+│ Backend FastAPI          │
+│ Valida schema            │
+│ Publica comando          │
+└─────────────┬────────────┘
+              ↓ MQTT publish
+┌──────────────────────────┐
+│ Broker MQTT              │
+│ public/llm-led/cmd       │
+└──────────────────────────┘
+```
+
+El backend funciona como capa de seguridad y validación. El LLM no publica directamente en MQTT. Primero genera una intención estructurada y el backend decide si el resultado es válido.
+
+---
+
+## 4. Salida esperada del LLM
+
+La salida esperada del modelo debe ser JSON válido:
+
+<!-- code-open: true -->
+```json
+{
+  "action": "on",
+  "confidence": 0.95,
+  "reason": "El usuario pidió encender el LED"
+}
+```
+
+Campos obligatorios:
+
+| Campo | Tipo | Regla |
+|---|---|---|
+| `action` | string | Debe ser `on`, `off` o `none` |
+| `confidence` | number | Debe estar entre `0` y `1` |
+| `reason` | string | Explicación breve |
+
+El backend debe rechazar cualquier respuesta que no cumpla el esquema esperado.
+
+---
+
+## 5. Fundamento teórico de las métricas
+
+### 5.1 Clasificación de intención
+
+La tarea se modela como clasificación multiclase. Cada muestra corresponde a un prompt; cada prompt tiene una etiqueta esperada; el LLM produce una predicción.
+
+```text
+y_true = etiqueta esperada
+y_pred = acción generada por el LLM
+```
+
+Clases:
+
+```text
+on, off, none
+```
+
+Scikit-learn documenta funciones de evaluación para clasificación, incluyendo accuracy, precision, recall, F1-score y matriz de confusión [1]–[4].
+
+---
+
+### 5.2 Accuracy
+
+Accuracy mide la proporción de predicciones correctas respecto al total:
+
+```text
+accuracy = predicciones_correctas / total_de_pruebas
+```
+
+Ejemplo:
+
+| Prompt | Esperado | Predicho | Correcto |
+|---|---|---|---|
+| `enciende el led` | `on` | `on` | sí |
+| `apaga el led` | `off` | `none` | no |
+| `qué es MQTT` | `none` | `none` | sí |
+
+Si hay 80 aciertos en 100 pruebas:
+
+```text
+accuracy = 80 / 100 = 0.80
+```
+
+---
+
+### 5.3 Precision
+
+Precision mide la confiabilidad de las predicciones de una clase.
+
+```text
+precision = TP / (TP + FP)
+```
+
+Para la clase `on`:
+
+```text
+precision_on =
+veces que el modelo predijo on correctamente
+/
+todas las veces que el modelo predijo on
+```
+
+Interpretación:
+
+```text
+Cuando el modelo dice que debe encender el LED, ¿qué tan frecuente es correcto?
+```
+
+En sistemas físicos, precision es importante porque un falso positivo puede activar hardware sin instrucción válida.
+
+---
+
+### 5.4 Recall
+
+Recall mide qué tanto detecta el modelo una clase cuando realmente aparece.
+
+```text
+recall = TP / (TP + FN)
+```
+
+Para la clase `on`:
+
+```text
+recall_on =
+veces que el modelo predijo on correctamente
+/
+todas las veces que realmente debía ser on
+```
+
+Interpretación:
+
+```text
+De todos los prompts que pedían encender el LED, ¿cuántos detectó correctamente?
+```
+
+Un recall bajo indica que el sistema ignora instrucciones válidas.
+
+---
+
+### 5.5 F1-score
+
+F1-score combina precision y recall mediante media armónica:
+
+```text
+F1 = 2 * (precision * recall) / (precision + recall)
+```
+
+También puede expresarse como:
+
+```text
+F1 = 2TP / (2TP + FP + FN)
+```
+
+En esta práctica se recomienda usar **macro F1**:
+
+```text
+macro_F1 = promedio(F1_on, F1_off, F1_none)
+```
+
+Macro F1 da peso similar a las tres clases. Esto ayuda cuando el dataset no tiene el mismo número de ejemplos por clase.
+
+---
+
+### 5.6 Matriz de confusión
+
+La matriz de confusión muestra aciertos y errores por clase.
+
+Ejemplo:
+
+| Esperado / Predicho | `on` | `off` | `none` |
+|---|---:|---:|---:|
+| `on` | 30 | 1 | 4 |
+| `off` | 0 | 32 | 3 |
+| `none` | 2 | 1 | 27 |
+
+Lectura:
+
+```text
+- La diagonal principal representa aciertos.
+- Los valores fuera de la diagonal representan errores.
+- Casos none predichos como on indican activaciones no deseadas.
+- Casos on predichos como none indican instrucciones ignoradas.
+```
+
+**Espacio para imagen sugerida:**
+
+```md
+![Matriz de confusión explicada](assets/img/evaluacion/matriz_confusion_teoria.png)
+```
+
+---
+
+## 6. Métricas de salida estructurada
+
+En una arquitectura integrada con backend, la respuesta debe ser interpretable por software. Un texto correcto para humanos puede fallar si no respeta el formato requerido.
+
+Métrica principal:
+
+```text
+json_validity_rate = respuestas_JSON_validas / total_de_respuestas
+```
+
+Una respuesta se considera válida si cumple:
+
+```text
+1. Es JSON parseable.
+2. Contiene action, confidence y reason.
+3. action pertenece a on, off o none.
+4. confidence está entre 0 y 1.
+5. No contiene estructura ambigua.
+```
+
+Ollama permite solicitar salidas estructuradas mediante el parámetro `format`, incluyendo esquemas JSON [5]. Esto reduce respuestas libres, aunque el backend debe validar siempre la salida.
+
+---
+
+## 7. Métricas de arquitectura
+
+Las métricas de arquitectura evalúan el flujo técnico, no la calidad semántica de la respuesta.
+
+| Métrica | Tipo | Definición |
+|---|---|---|
+| `schema_valid` | Booleano | La salida del LLM cumple el esquema esperado |
+| `mqtt_published` | Booleano | El backend logró publicar por MQTT |
+| `architecture_success` | Booleano | `schema_valid AND mqtt_published` |
+| `architecture_success_rate` | Tasa | Promedio de casos exitosos |
+| `architecture_failure_rate` | Tasa | `1 - architecture_success_rate` |
+
+Definición central:
+
+```text
+architecture_success = schema_valid AND mqtt_published
+```
+
+Esto significa que el sistema fue exitoso si el modelo generó JSON válido, el backend lo validó y el comando fue publicado por MQTT.
+
+---
+
+## 8. Métricas de latencia
+
+La latencia mide el tiempo que tarda el sistema en completar la operación.
+
+| Métrica | Qué mide |
+|---|---|
+| `api_elapsed_ms` | Tiempo observado por el cliente que llama al backend |
+| `backend_elapsed_ms` | Tiempo medido dentro del backend |
+| `ollama_elapsed_ms` | Tiempo de llamada desde backend a Ollama |
+| `mqtt_publish_ms` | Tiempo de publicación MQTT |
+| `ollama_total_duration_ms` | Tiempo total reportado por Ollama |
+
+También se deben reportar percentiles:
+
+| Dato | Interpretación |
+|---|---|
+| Media | Tiempo promedio |
+| P50 | Mediana |
+| P95 | Tiempo bajo el cual cae el 95 % de pruebas |
+| P99 | Cola de latencia |
+
+**Espacio para imagen sugerida:**
+
+```md
+![Descomposición de latencia](assets/img/evaluacion/descomposicion_latencia.png)
+```
+
+---
+
+## 9. Métricas de tokens
+
+Ollama reporta métricas de uso como `prompt_eval_count`, `eval_count`, `prompt_eval_duration` y `eval_duration` cuando se usa la API de generación con `stream: false` [6], [7].
+
+| Campo | Significado |
+|---|---|
+| `prompt_eval_count` | Tokens de entrada |
+| `eval_count` | Tokens de salida |
+| `total_tokens` | Tokens de entrada + salida |
+| `prompt_eval_duration_ms` | Tiempo de evaluación del prompt |
+| `eval_duration_ms` | Tiempo de generación |
+| `input_tokens_per_s` | Velocidad de procesamiento de entrada |
+| `output_tokens_per_s` | Velocidad de generación |
+
+Fórmulas:
+
+```text
+input_tokens_per_s = prompt_eval_count / (prompt_eval_duration_ms / 1000)
+```
+
+```text
+output_tokens_per_s = eval_count / (eval_duration_ms / 1000)
+```
+
+**Espacio para imagen sugerida:**
+
+```md
+![Tokens latencia costo](assets/img/evaluacion/tokens_latencia_costo.png)
+```
+
+---
+
+## 10. Métrica de costo estimado
+
+En Ollama local:
+
+```text
+costo_API = 0
+```
+
+El experimento conserva la estructura de costo para estimar cuánto costaría ejecutar el mismo flujo con una API externa.
+
+Fórmula:
+
+```text
+costo_request =
+(input_tokens / 1,000,000) * precio_input_por_1M
++
+(output_tokens / 1,000,000) * precio_output_por_1M
+```
+
+Ejemplo:
+
+```text
+input_tokens = 300
+output_tokens = 40
+precio_input = 0.25 USD / 1M tokens
+precio_output = 1.25 USD / 1M tokens
+```
+
+```text
+costo_request = (300 / 1,000,000) * 0.25 + (40 / 1,000,000) * 1.25
+```
+
+Los precios deben actualizarse antes de cada actividad si se usa API comercial [8].
+
+---
+
+## 11. Evaluación humana supervisada
+
+La evaluación automática compara `expected_action` contra `llm_action`. La evaluación humana permite revisar casos ambiguos, respuestas parciales o errores de interpretación.
+
+Ejemplo ambiguo:
+
+```text
+"mañana enciende el led"
+```
+
+En control inmediato se puede etiquetar como `none`. Un supervisor puede marcarlo como ambiguo o parcial.
+
+Columnas sugeridas para el instrumento de supervisión:
+
+| Columna | Uso |
+|---|---|
+| `accion_correcta_supervisor` | Acción correcta según supervisor: `on`, `off`, `none` |
+| `evaluacion_supervisor` | `correcto`, `parcial`, `incorrecto`, `no evaluado` |
+| `calidad_1_5` | Calificación subjetiva |
+| `observaciones_supervisor` | Comentarios |
+
+Niveles de evaluación:
+
+```text
+Evaluación automática:
+llm_action vs expected_action_dataset
+```
+
+```text
+Evaluación supervisada:
+llm_action vs accion_correcta_supervisor
+```
+
+---
+
+## 12. Diseño experimental
+
+### 12.1 Pregunta experimental
+
+¿Qué tan bien una arquitectura LLM local con Ollama, backend FastAPI y MQTT puede interpretar instrucciones de usuario para publicar comandos estructurados de encendido y apagado de un LED?
+
+---
+
+### 12.2 Hipótesis práctica
+
+Un LLM local configurado con prompt estructurado, temperatura baja y salida JSON puede clasificar instrucciones simples de control con alta consistencia, baja tasa de JSON inválido y latencia aceptable para una práctica académica.
+
+---
+
+### 12.3 Variables del experimento
+
+| Tipo | Variable |
+|---|---|
+| Independiente | Modelo LLM usado en Ollama |
+| Independiente | Prompt de sistema |
+| Independiente | Temperatura |
+| Independiente | Número de pruebas |
+| Dependiente | Acción predicha: `on`, `off`, `none` |
+| Dependiente | JSON validity rate |
+| Dependiente | MQTT publish rate |
+| Dependiente | Latencia total |
+| Dependiente | Tokens de entrada y salida |
+| Dependiente | Costo estimado |
+
+---
+
+### 12.4 Tópico MQTT sugerido
+
+Se recomienda usar un tópico público de prueba:
+
+```text
+public/llm-led/cmd
+```
+
+Payload publicado:
+
+<!-- code-open: true -->
+```json
+{
+  "request_id": "abc123",
+  "source": "llm_backend",
+  "device": "esp32_led_01",
+  "action": "on",
+  "value": 1,
+  "confidence": 0.95,
+  "reason": "El usuario pidió encender el LED",
+  "sent_unix_ms": 1710000000000
+}
+```
+
+---
+
+## 13. Instalación y ejecución
+
+### 13.1 Requisitos
+
+```text
+- Python 3.10 o superior
+- Ollama instalado
+- Modelo local descargado
+- Conexión al broker MQTT
+```
+
+Descargar modelo:
+
+```bash
+ollama pull llama3.2:3b
+```
+
+Modelos alternativos:
+
+```bash
+ollama pull qwen2.5:7b
+ollama pull mistral:7b
+```
+
+---
+
+### 13.2 Crear carpeta de trabajo
+
+```bash
+mkdir llm-led-eval
+cd llm-led-eval
+```
+
+---
+
+### 13.3 Crear entorno virtual
+
+Windows PowerShell:
+
+```powershell
+python -m venv .venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+macOS / Linux:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+---
+
+### 13.4 Instalar dependencias
+
+```bash
+pip install fastapi uvicorn requests paho-mqtt pydantic pandas numpy openpyxl matplotlib scikit-learn
+```
+
+Crear `requirements.txt`:
+
+```bash
+pip freeze > requirements.txt
+```
+
+---
+
+### 13.5 Verificar Ollama
+
+```bash
+ollama list
+```
+
+Probar modelo:
+
+```bash
+ollama run llama3.2:3b
+```
+
+---
+
+## 14. Código 1: backend FastAPI + Ollama + MQTT
+
+Guardar como:
+
+```text
+main.py
+```
+
+<!-- code-file: main.py -->
+```python
+import os
+import json
+import time
+import uuid
+from typing import Optional, Literal
+
+import requests
+import paho.mqtt.client as mqtt
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+
+MQTT_BROKER = os.getenv("MQTT_BROKER", "mqtt.mecatronica-ibero.mx")
+MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
+CMD_TOPIC = os.getenv("CMD_TOPIC", "public/llm-led/cmd")
+
+ALLOWED_ACTIONS = {"on", "off", "none"}
+
+SYSTEM_PROMPT = """
+Eres un clasificador de intención para controlar un LED conectado a un ESP32 por MQTT.
+
+Tu tarea es decidir si el usuario quiere:
+- "on": encender, prender o activar el LED.
+- "off": apagar o desactivar el LED.
+- "none": no hay una instrucción clara para cambiar el LED.
+
+Reglas:
+1. Responde únicamente JSON válido.
+2. No escribas texto fuera del JSON.
+3. Si el usuario pregunta algo general, responde action = "none".
+4. Si el usuario dice "no enciendas", "no prendas" o algo equivalente, responde action = "none".
+5. Si el usuario pide explícitamente apagar, responde action = "off".
+6. Si el usuario pide explícitamente encender, responde action = "on".
+7. confidence debe estar entre 0 y 1.
+
+Formato obligatorio:
+{
+  "action": "on" | "off" | "none",
+  "confidence": número entre 0 y 1,
+  "reason": "explicación breve"
+}
+""".strip()
+
+OLLAMA_RESPONSE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "action": {"type": "string", "enum": ["on", "off", "none"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "reason": {"type": "string"}
+    },
+    "required": ["action", "confidence", "reason"],
+    "additionalProperties": False
+}
+
+app = FastAPI(title="LLM LED Agent Evaluation")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class LedAgentRequest(BaseModel):
+    prompt: str
+    expected_action: Optional[Literal["on", "off", "none"]] = None
+
+class LedAgentResponse(BaseModel):
+    request_id: str
+    prompt: str
+    expected_action: Optional[str]
+    llm_action: Optional[str]
+    confidence: Optional[float]
+    reason: Optional[str]
+    schema_valid: bool
+    mqtt_published: bool
+    architecture_success: bool
+    api_elapsed_ms: float
+    backend_elapsed_ms: float
+    ollama_elapsed_ms: float
+    mqtt_publish_ms: float
+    prompt_eval_count: int
+    eval_count: int
+    total_tokens: int
+    input_tokens_per_s: float
+    output_tokens_per_s: float
+    raw_llm_response: str
+    error: Optional[str]
+
+
+def now_ms() -> float:
+    return time.perf_counter() * 1000
+
+
+def wall_unix_ms() -> int:
+    return int(time.time() * 1000)
+
+
+def safe_float(value, default=0.0) -> float:
+    try:
+        return float(value)
+    except Exception:
+        return default
+
+
+def validate_llm_json(raw_text: str):
+    try:
+        data = json.loads(raw_text)
+    except json.JSONDecodeError:
+        return False, None, "La respuesta del LLM no es JSON parseable."
+
+    if not isinstance(data, dict):
+        return False, None, "La respuesta JSON no es un objeto."
+
+    required = {"action", "confidence", "reason"}
+    missing = required - set(data.keys())
+
+    if missing:
+        return False, data, f"Faltan campos requeridos: {missing}"
+
+    if data.get("action") not in ALLOWED_ACTIONS:
+        return False, data, "El campo action no pertenece a on, off o none."
+
+    confidence = data.get("confidence")
+    if not isinstance(confidence, (int, float)) or not 0 <= confidence <= 1:
+        return False, data, "El campo confidence debe ser numérico entre 0 y 1."
+
+    if not isinstance(data.get("reason"), str):
+        return False, data, "El campo reason debe ser texto."
+
+    return True, data, None
+
+
+def call_ollama(prompt: str):
+    full_prompt = f"{SYSTEM_PROMPT}\n\nUsuario:\n{prompt}\n"
+
+    payload = {
+        "model": OLLAMA_MODEL,
+        "prompt": full_prompt,
+        "stream": False,
+        "format": OLLAMA_RESPONSE_SCHEMA,
+        "options": {
+            "temperature": 0.0,
+            "top_p": 0.9,
+            "num_predict": 120,
+            "num_ctx": 2048,
+            "repeat_penalty": 1.1
+        }
+    }
+
+    start = now_ms()
+    response = requests.post(OLLAMA_URL, json=payload, timeout=180)
+    elapsed = now_ms() - start
+    response.raise_for_status()
+
+    data = response.json()
+    raw_text = data.get("response", "").strip()
+
+    metrics = {
+        "ollama_elapsed_ms": elapsed,
+        "prompt_eval_count": int(data.get("prompt_eval_count", 0) or 0),
+        "eval_count": int(data.get("eval_count", 0) or 0),
+        "prompt_eval_duration_ms": safe_float(data.get("prompt_eval_duration", 0)) / 1e6,
+        "eval_duration_ms": safe_float(data.get("eval_duration", 0)) / 1e6,
+    }
+
+    prompt_duration_s = metrics["prompt_eval_duration_ms"] / 1000
+    eval_duration_s = metrics["eval_duration_ms"] / 1000
+
+    metrics["input_tokens_per_s"] = (
+        metrics["prompt_eval_count"] / prompt_duration_s if prompt_duration_s > 0 else 0
+    )
+    metrics["output_tokens_per_s"] = (
+        metrics["eval_count"] / eval_duration_s if eval_duration_s > 0 else 0
+    )
+
+    return raw_text, metrics
+
+
+def publish_mqtt(payload: dict):
+    start = now_ms()
+
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    client.connect(MQTT_BROKER, MQTT_PORT, keepalive=30)
+
+    result = client.publish(CMD_TOPIC, json.dumps(payload), qos=0)
+    result.wait_for_publish(timeout=5)
+
+    client.disconnect()
+
+    elapsed = now_ms() - start
+    success = result.rc == mqtt.MQTT_ERR_SUCCESS
+
+    return success, elapsed
+
+
+@app.get("/")
+def root():
+    return {
+        "service": "LLM LED Agent Evaluation",
+        "endpoint": "/led-agent",
+        "model": OLLAMA_MODEL,
+        "mqtt_topic": CMD_TOPIC
+    }
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+@app.post("/led-agent", response_model=LedAgentResponse)
+def led_agent(req: LedAgentRequest):
+    request_id = str(uuid.uuid4())
+    api_start = now_ms()
+    error = None
+
+    llm_action = None
+    confidence = None
+    reason = None
+    schema_valid = False
+    mqtt_published = False
+    mqtt_publish_ms = 0.0
+
+    prompt_eval_count = 0
+    eval_count = 0
+    input_tokens_per_s = 0.0
+    output_tokens_per_s = 0.0
+    raw_llm_response = ""
+    ollama_metrics = {"ollama_elapsed_ms": 0.0}
+
+    try:
+        raw_llm_response, ollama_metrics = call_ollama(req.prompt)
+
+        prompt_eval_count = ollama_metrics["prompt_eval_count"]
+        eval_count = ollama_metrics["eval_count"]
+        input_tokens_per_s = ollama_metrics["input_tokens_per_s"]
+        output_tokens_per_s = ollama_metrics["output_tokens_per_s"]
+
+        schema_valid, parsed, validation_error = validate_llm_json(raw_llm_response)
+
+        if not schema_valid:
+            error = validation_error
+
+        if schema_valid and parsed:
+            llm_action = parsed["action"]
+            confidence = parsed["confidence"]
+            reason = parsed["reason"]
+
+            if llm_action in {"on", "off"}:
+                mqtt_payload = {
+                    "request_id": request_id,
+                    "source": "llm_backend",
+                    "device": "esp32_led_01",
+                    "action": llm_action,
+                    "value": 1 if llm_action == "on" else 0,
+                    "confidence": confidence,
+                    "reason": reason,
+                    "sent_unix_ms": wall_unix_ms()
+                }
+
+                mqtt_published, mqtt_publish_ms = publish_mqtt(mqtt_payload)
+            else:
+                mqtt_published = True
+                mqtt_publish_ms = 0.0
+
+    except Exception as exc:
+        error = str(exc)
+
+    backend_elapsed_ms = now_ms() - api_start
+    architecture_success = bool(schema_valid and mqtt_published)
+    total_tokens = prompt_eval_count + eval_count
+
+    return LedAgentResponse(
+        request_id=request_id,
+        prompt=req.prompt,
+        expected_action=req.expected_action,
+        llm_action=llm_action,
+        confidence=confidence,
+        reason=reason,
+        schema_valid=schema_valid,
+        mqtt_published=mqtt_published,
+        architecture_success=architecture_success,
+        api_elapsed_ms=backend_elapsed_ms,
+        backend_elapsed_ms=backend_elapsed_ms,
+        ollama_elapsed_ms=ollama_metrics.get("ollama_elapsed_ms", 0.0),
+        mqtt_publish_ms=mqtt_publish_ms,
+        prompt_eval_count=prompt_eval_count,
+        eval_count=eval_count,
+        total_tokens=total_tokens,
+        input_tokens_per_s=input_tokens_per_s,
+        output_tokens_per_s=output_tokens_per_s,
+        raw_llm_response=raw_llm_response,
+        error=error
+    )
+```
+
+---
+
+## 15. Código 2: prueba cíclica de 100 ejecuciones
+
+Guardar como:
+
+```text
+eval_100.py
+```
+
+<!-- code-file: eval_100.py -->
+```python
+import os
+import time
+import uuid
+import random
+from datetime import datetime
+
+import requests
+import pandas as pd
+
+from openpyxl import load_workbook
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from openpyxl.worksheet.datavalidation import DataValidation
+
+from sklearn.metrics import accuracy_score, f1_score, classification_report, confusion_matrix
+
+
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000/led-agent")
+N_RUNS = int(os.getenv("N_RUNS", "100"))
+RANDOM_SEED = int(os.getenv("RANDOM_SEED", "42"))
+
+INPUT_PRICE_PER_1M = float(os.getenv("INPUT_PRICE_PER_1M", "0"))
+OUTPUT_PRICE_PER_1M = float(os.getenv("OUTPUT_PRICE_PER_1M", "0"))
+
+CSV_OUTPUT = "resultados_llm_led_raw.csv"
+XLSX_OUTPUT = "instrumento_supervision_llm_led.xlsx"
+
+random.seed(RANDOM_SEED)
+
+DATASET = [
+    ("enciende el led", "on"),
+    ("prende el led", "on"),
+    ("activa la luz del prototipo", "on"),
+    ("enciende la salida digital", "on"),
+    ("quiero que el led quede prendido", "on"),
+    ("puedes prender la luz", "on"),
+
+    ("apaga el led", "off"),
+    ("desactiva el led", "off"),
+    ("quita la luz", "off"),
+    ("apaga la salida digital", "off"),
+    ("quiero que el led quede apagado", "off"),
+    ("desconecta la señal de luz", "off"),
+
+    ("explícame qué es MQTT", "none"),
+    ("qué es un led", "none"),
+    ("cuál es la diferencia entre mqtt y http", "none"),
+    ("no enciendas el led", "none"),
+    ("no lo prendas todavía", "none"),
+    ("mañana enciende el led", "none"),
+    ("si puedes, dime cómo funciona un esp32", "none"),
+    ("revisa el estado del led", "none"),
+]
+
+
+def estimate_cost(input_tokens: int, output_tokens: int) -> float:
+    return (
+        (input_tokens / 1_000_000) * INPUT_PRICE_PER_1M
+        + (output_tokens / 1_000_000) * OUTPUT_PRICE_PER_1M
+    )
+
+
+def run_single_test(index: int):
+    prompt, expected_action = random.choice(DATASET)
+    trial_id = str(uuid.uuid4())
+
+    payload = {"prompt": prompt, "expected_action": expected_action}
+    start = time.perf_counter()
+
+    try:
+        response = requests.post(BACKEND_URL, json=payload, timeout=240)
+        api_elapsed_ms = (time.perf_counter() - start) * 1000
+        data = response.json()
+
+        llm_action = data.get("llm_action")
+        prompt_eval_count = int(data.get("prompt_eval_count", 0) or 0)
+        eval_count = int(data.get("eval_count", 0) or 0)
+
+        return {
+            "trial_index": index,
+            "trial_id": trial_id,
+            "timestamp": datetime.now().isoformat(timespec="seconds"),
+            "prompt": prompt,
+            "expected_action": expected_action,
+            "llm_action": llm_action,
+            "is_correct": expected_action == llm_action,
+            "schema_valid": bool(data.get("schema_valid", False)),
+            "mqtt_published": bool(data.get("mqtt_published", False)),
+            "architecture_success": bool(data.get("architecture_success", False)),
+            "api_elapsed_ms_client": api_elapsed_ms,
+            "api_elapsed_ms_backend": data.get("api_elapsed_ms"),
+            "backend_elapsed_ms": data.get("backend_elapsed_ms"),
+            "ollama_elapsed_ms": data.get("ollama_elapsed_ms"),
+            "mqtt_publish_ms": data.get("mqtt_publish_ms"),
+            "prompt_eval_count": prompt_eval_count,
+            "eval_count": eval_count,
+            "total_tokens": data.get("total_tokens"),
+            "input_tokens_per_s": data.get("input_tokens_per_s"),
+            "output_tokens_per_s": data.get("output_tokens_per_s"),
+            "estimated_cost_usd": estimate_cost(prompt_eval_count, eval_count),
+            "confidence": data.get("confidence"),
+            "reason": data.get("reason"),
+            "raw_llm_response": data.get("raw_llm_response"),
+            "error": data.get("error")
+        }
+
+    except Exception as exc:
+        return {
+            "trial_index": index,
+            "trial_id": trial_id,
+            "timestamp": datetime.now().isoformat(timespec="seconds"),
+            "prompt": prompt,
+            "expected_action": expected_action,
+            "llm_action": None,
+            "is_correct": False,
+            "schema_valid": False,
+            "mqtt_published": False,
+            "architecture_success": False,
+            "api_elapsed_ms_client": (time.perf_counter() - start) * 1000,
+            "api_elapsed_ms_backend": None,
+            "backend_elapsed_ms": None,
+            "ollama_elapsed_ms": None,
+            "mqtt_publish_ms": None,
+            "prompt_eval_count": 0,
+            "eval_count": 0,
+            "total_tokens": 0,
+            "input_tokens_per_s": 0,
+            "output_tokens_per_s": 0,
+            "estimated_cost_usd": 0,
+            "confidence": None,
+            "reason": None,
+            "raw_llm_response": None,
+            "error": str(exc)
+        }
+
+
+def create_supervision_excel(df: pd.DataFrame):
+    supervision = df.copy()
+    supervision["accion_correcta_supervisor"] = ""
+    supervision["evaluacion_supervisor"] = "no evaluado"
+    supervision["calidad_1_5"] = ""
+    supervision["observaciones_supervisor"] = ""
+
+    supervision.to_excel(XLSX_OUTPUT, index=False)
+
+    wb = load_workbook(XLSX_OUTPUT)
+    ws = wb.active
+    ws.title = "Supervision"
+
+    header_fill = PatternFill("solid", fgColor="E00034")
+    header_font = Font(color="FFFFFF", bold=True)
+    thin = Side(border_style="thin", color="CCCCCC")
+
+    for cell in ws[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        cell.border = Border(top=thin, bottom=thin, left=thin, right=thin)
+
+    for row in ws.iter_rows(min_row=2):
+        for cell in row:
+            cell.alignment = Alignment(vertical="top", wrap_text=True)
+            cell.border = Border(top=thin, bottom=thin, left=thin, right=thin)
+
+    headers = [cell.value for cell in ws[1]]
+
+    def col_letter(name):
+        idx = headers.index(name) + 1
+        return ws.cell(row=1, column=idx).column_letter
+
+    action_col = col_letter("accion_correcta_supervisor")
+    eval_col = col_letter("evaluacion_supervisor")
+    quality_col = col_letter("calidad_1_5")
+
+    action_dv = DataValidation(type="list", formula1='"on,off,none"', allow_blank=True)
+    eval_dv = DataValidation(type="list", formula1='"correcto,parcial,incorrecto,no evaluado"', allow_blank=True)
+    quality_dv = DataValidation(type="whole", operator="between", formula1="1", formula2="5", allow_blank=True)
+
+    ws.add_data_validation(action_dv)
+    ws.add_data_validation(eval_dv)
+    ws.add_data_validation(quality_dv)
+
+    action_dv.add(f"{action_col}2:{action_col}{len(supervision)+1}")
+    eval_dv.add(f"{eval_col}2:{eval_col}{len(supervision)+1}")
+    quality_dv.add(f"{quality_col}2:{quality_col}{len(supervision)+1}")
+
+    for col in ws.columns:
+        max_len = 0
+        col_letter_value = col[0].column_letter
+        for cell in col:
+            value = str(cell.value) if cell.value is not None else ""
+            max_len = max(max_len, len(value))
+        ws.column_dimensions[col_letter_value].width = min(max(max_len + 2, 12), 50)
+
+    ws.freeze_panes = "A2"
+    wb.save(XLSX_OUTPUT)
+
+
+def print_summary(df: pd.DataFrame):
+    valid = df.dropna(subset=["llm_action"]).copy()
+
+    print("\nResumen del experimento")
+    print("=" * 60)
+    print(f"Pruebas totales: {len(df)}")
+    print(f"Accuracy: {accuracy_score(valid['expected_action'], valid['llm_action']):.4f}")
+    print(f"Macro F1: {f1_score(valid['expected_action'], valid['llm_action'], average='macro'):.4f}")
+    print(f"JSON validity rate: {df['schema_valid'].mean():.4f}")
+    print(f"MQTT publish rate: {df['mqtt_published'].mean():.4f}")
+    print(f"Architecture success rate: {df['architecture_success'].mean():.4f}")
+    print(f"Costo estimado total USD: {df['estimated_cost_usd'].sum():.8f}")
+
+    print("\nReporte de clasificación")
+    print(classification_report(valid["expected_action"], valid["llm_action"]))
+
+
+def main():
+    rows = []
+
+    for i in range(1, N_RUNS + 1):
+        print(f"Ejecutando prueba {i}/{N_RUNS}")
+        rows.append(run_single_test(i))
+        time.sleep(0.2)
+
+    df = pd.DataFrame(rows)
+    df.to_csv(CSV_OUTPUT, index=False, encoding="utf-8-sig")
+
+    create_supervision_excel(df)
+    print_summary(df)
+
+    print(f"\nCSV generado: {CSV_OUTPUT}")
+    print(f"Excel generado: {XLSX_OUTPUT}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+## 16. Código 3: análisis de resultados y gráficas
+
+Guardar como:
+
+```text
+analizar_resultados.py
+```
+
+<!-- code-file: analizar_resultados.py -->
+```python
+from pathlib import Path
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.metrics import (
+    accuracy_score,
+    f1_score,
+    precision_score,
+    recall_score,
+    classification_report,
+    confusion_matrix,
+    ConfusionMatrixDisplay,
+)
+
+CSV_INPUT = "resultados_llm_led_raw.csv"
+OUT_DIR = Path("graficas_resultados")
+OUT_DIR.mkdir(exist_ok=True)
+
+LABELS = ["on", "off", "none"]
+
+
+def load_data():
+    return pd.read_csv(CSV_INPUT)
+
+
+def save_metrics_summary(df):
+    valid = df.dropna(subset=["llm_action"]).copy()
+
+    summary = {
+        "n_total": len(df),
+        "n_valid_predictions": len(valid),
+        "accuracy": accuracy_score(valid["expected_action"], valid["llm_action"]),
+        "precision_macro": precision_score(valid["expected_action"], valid["llm_action"], average="macro", zero_division=0),
+        "recall_macro": recall_score(valid["expected_action"], valid["llm_action"], average="macro", zero_division=0),
+        "f1_macro": f1_score(valid["expected_action"], valid["llm_action"], average="macro", zero_division=0),
+        "json_validity_rate": df["schema_valid"].mean(),
+        "mqtt_publish_rate": df["mqtt_published"].mean(),
+        "architecture_success_rate": df["architecture_success"].mean(),
+        "latency_mean_ms": df["api_elapsed_ms_client"].mean(),
+        "latency_p50_ms": df["api_elapsed_ms_client"].quantile(0.50),
+        "latency_p95_ms": df["api_elapsed_ms_client"].quantile(0.95),
+        "latency_p99_ms": df["api_elapsed_ms_client"].quantile(0.99),
+        "input_tokens_mean": df["prompt_eval_count"].mean(),
+        "output_tokens_mean": df["eval_count"].mean(),
+        "total_tokens_mean": df["total_tokens"].mean(),
+        "estimated_cost_usd_total": df["estimated_cost_usd"].sum(),
+    }
+
+    summary_df = pd.DataFrame([summary])
+    summary_df.to_csv("resumen_metricas.csv", index=False, encoding="utf-8-sig")
+
+    report = classification_report(
+        valid["expected_action"],
+        valid["llm_action"],
+        labels=LABELS,
+        output_dict=True,
+        zero_division=0,
+    )
+
+    report_df = pd.DataFrame(report).transpose()
+    report_df.to_csv("classification_report.csv", encoding="utf-8-sig")
+
+    return summary_df
+
+
+def plot_confusion_matrix(df):
+    valid = df.dropna(subset=["llm_action"]).copy()
+    cm = confusion_matrix(valid["expected_action"], valid["llm_action"], labels=LABELS)
+
+    fig, ax = plt.subplots(figsize=(7, 6))
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=LABELS)
+    disp.plot(ax=ax, values_format="d", colorbar=False)
+    ax.set_title("Matriz de confusión: intención LED")
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "confusion_matrix.png", dpi=180)
+    plt.close(fig)
+
+
+def plot_latency_by_trial(df):
+    fig, ax = plt.subplots(figsize=(11, 6))
+    ax.plot(df["trial_index"], df["api_elapsed_ms_client"], marker="o", linewidth=1.3, markersize=4, label="Latencia total cliente")
+    ax.plot(df["trial_index"], df["ollama_elapsed_ms"], marker="o", linewidth=1.3, markersize=4, label="Latencia Ollama")
+    ax.set_title("Latencia por iteración")
+    ax.set_xlabel("Iteración")
+    ax.set_ylabel("Tiempo (ms)")
+    ax.grid(True)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "latency_by_trial.png", dpi=180)
+    plt.close(fig)
+
+
+def plot_latency_boxplot(df):
+    data = [
+        df["api_elapsed_ms_client"].dropna(),
+        df["ollama_elapsed_ms"].dropna(),
+        df["mqtt_publish_ms"].dropna(),
+    ]
+
+    fig, ax = plt.subplots(figsize=(9, 6))
+    ax.boxplot(data, labels=["Total cliente", "Ollama", "MQTT"], showmeans=True)
+    ax.set_title("Distribución de latencia")
+    ax.set_ylabel("Tiempo (ms)")
+    ax.grid(True, axis="y")
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "latency_boxplot.png", dpi=180)
+    plt.close(fig)
+
+
+def plot_tokens_vs_latency(df):
+    fig, ax = plt.subplots(figsize=(9, 6))
+    ax.scatter(df["total_tokens"], df["api_elapsed_ms_client"], alpha=0.75)
+    ax.set_title("Tokens totales vs latencia")
+    ax.set_xlabel("Tokens totales")
+    ax.set_ylabel("Latencia total cliente (ms)")
+    ax.grid(True)
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "tokens_vs_latency.png", dpi=180)
+    plt.close(fig)
+
+
+def plot_success_rates(df):
+    metrics = {
+        "JSON válido": df["schema_valid"].mean(),
+        "MQTT publicado": df["mqtt_published"].mean(),
+        "Éxito arquitectura": df["architecture_success"].mean(),
+        "Clasificación correcta": df["is_correct"].mean(),
+    }
+
+    fig, ax = plt.subplots(figsize=(9, 6))
+    ax.bar(metrics.keys(), metrics.values())
+    ax.set_title("Tasas de éxito del experimento")
+    ax.set_ylabel("Tasa")
+    ax.set_ylim(0, 1.05)
+    ax.grid(True, axis="y")
+
+    for i, value in enumerate(metrics.values()):
+        ax.text(i, value + 0.02, f"{value:.2f}", ha="center")
+
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "success_rates.png", dpi=180)
+    plt.close(fig)
+
+
+def main():
+    df = load_data()
+    summary = save_metrics_summary(df)
+    plot_confusion_matrix(df)
+    plot_latency_by_trial(df)
+    plot_latency_boxplot(df)
+    plot_tokens_vs_latency(df)
+    plot_success_rates(df)
+
+    print("Resumen de métricas:")
+    print(summary.to_string(index=False))
+    print(f"\nGráficas guardadas en: {OUT_DIR.resolve()}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+## 17. Ejecución de la práctica
+
+### 17.1 Ejecutar backend
+
+```bash
+uvicorn main:app --reload --port 8000
+```
+
+Verificar:
+
+```text
+http://localhost:8000/health
+```
+
+---
+
+### 17.2 Probar endpoint manualmente
+
+```bash
+curl -X POST http://localhost:8000/led-agent \
+  -H "Content-Type: application/json" \
+  -d "{\"prompt\":\"enciende el led\",\"expected_action\":\"on\"}"
+```
+
+---
+
+### 17.3 Ejecutar prueba cíclica
+
+```bash
+python eval_100.py
+```
+
+Archivos generados:
+
+```text
+resultados_llm_led_raw.csv
+instrumento_supervision_llm_led.xlsx
+```
+
+---
+
+### 17.4 Analizar resultados
+
+```bash
+python analizar_resultados.py
+```
+
+Archivos generados:
+
+```text
+resumen_metricas.csv
+classification_report.csv
+graficas_resultados/confusion_matrix.png
+graficas_resultados/latency_by_trial.png
+graficas_resultados/latency_boxplot.png
+graficas_resultados/tokens_vs_latency.png
+graficas_resultados/success_rates.png
+```
+
+---
+
+## 18. Actividad: evaluación de arquitectura LLM + MQTT
+
+### 18.1 Objetivo
+
+Evaluar una arquitectura LLM aplicada a clasificación de intención, salida JSON estructurada, backend FastAPI y publicación MQTT.
+
+---
+
+### 18.2 Requerimientos
+
+El estudiante debe:
+
+```text
+1. Ejecutar Ollama con un modelo local.
+2. Implementar el backend FastAPI.
+3. Configurar el tópico MQTT.
+4. Probar manualmente el endpoint /led-agent.
+5. Ejecutar mínimo 100 pruebas cíclicas.
+6. Exportar resultados en CSV.
+7. Generar instrumento de supervisión en Excel.
+8. Calcular métricas de clasificación.
+9. Generar matriz de confusión.
+10. Graficar latencias, tokens y tasas de éxito.
+11. Analizar errores y proponer mejoras.
+```
+
+---
+
+### 18.3 Variantes sugeridas
+
+| Variante | Qué cambia | Qué comparar |
+|---|---|---|
+| Modelo | `llama3.2:3b`, `qwen2.5:7b`, `mistral:7b` | Calidad, latencia, tokens |
+| Temperatura | `0.0`, `0.3`, `0.7` | Consistencia y JSON válido |
+| Prompt de sistema | Estricto vs flexible | JSON validity rate |
+| Dataset | Balanceado vs desbalanceado | Accuracy vs macro F1 |
+| MQTT | Broker local vs remoto | Latencia de publicación |
+
+---
+
+## 19. Evidencias esperadas
+
+El estudiante debe entregar:
+
+```text
+1. Captura de Ollama con modelo instalado.
+2. Captura del backend ejecutándose.
+3. Captura de prueba manual del endpoint.
+4. CSV de resultados crudos.
+5. Excel de supervisión.
+6. Resumen de métricas.
+7. Matriz de confusión.
+8. Gráfica de latencia por iteración.
+9. Gráfica de tokens vs latencia.
+10. Reflexión técnica.
+```
+
+---
+
+## 20. Plantilla de reporte
+
+| Elemento | Respuesta |
+|---|---|
+| Modelo usado | |
+| Número de pruebas | |
+| Accuracy | |
+| Macro F1 | |
+| JSON validity rate | |
+| MQTT publish rate | |
+| Architecture success rate | |
+| Latencia media | |
+| Latencia P95 | |
+| Tokens de entrada promedio | |
+| Tokens de salida promedio | |
+| Costo estimado total | |
+| Principal error observado | |
+| Mejora propuesta | |
+
+---
+
+## 21. Preguntas de análisis
+
+```text
+1. ¿Qué clase tuvo mayor número de errores?
+2. ¿El modelo confundió instrucciones ambiguas con comandos reales?
+3. ¿Qué fue más crítico: calidad de clasificación o validez del JSON?
+4. ¿La latencia fue estable durante las 100 pruebas?
+5. ¿Qué ocurrió con P95 y P99?
+6. ¿El backend publicó mensajes MQTT solo cuando correspondía?
+7. ¿Qué cambios harías al prompt de sistema?
+8. ¿Qué modelo tuvo mejor relación entre calidad y latencia?
+9. ¿Qué riesgos existirían si se conectara un actuador real?
+10. ¿Qué validaciones agregarías antes de controlar hardware físico?
+```
+
+---
+
+## 22. Rúbrica de evaluación
+
+| Criterio | Puntaje |
+|---|---:|
+| Backend funcional con Ollama y MQTT | 20 |
+| Validación correcta de JSON y acciones permitidas | 15 |
+| Ejecución de mínimo 100 pruebas | 15 |
+| Cálculo de métricas de clasificación | 15 |
+| Análisis de latencia, tokens y arquitectura | 15 |
+| Gráficas y archivos exportados | 10 |
+| Reflexión técnica y propuesta de mejora | 10 |
+| **Total** | **100** |
+
+---
+
+## 23. Consideraciones para sistemas físicos
+
+En sistemas ciberfísicos, un LLM debe operar como componente de interpretación, asistencia o planificación. La ejecución física debe mantenerse bajo validaciones deterministas.
+
+Recomendaciones:
+
+```text
+- No permitir que el LLM publique directamente en MQTT.
+- Validar siempre action, confidence y campos requeridos.
+- Definir allowlist de acciones permitidas.
+- Bloquear acciones ambiguas.
+- Registrar request_id y timestamp.
+- Usar tópicos de prueba antes de hardware real.
+- Mantener lógica de seguridad fuera del LLM.
+- Agregar supervisión humana en pruebas críticas.
+```
+
+---
+
+## 24. Conclusión
+
+En esta clase se evaluó una arquitectura LLM aplicada a una tarea de control discreto. La evaluación integra métricas de clasificación, salida estructurada, arquitectura, latencia, tokens, costo estimado y supervisión humana.
+
+Conclusión:
+
+```text
+En una arquitectura LLM aplicada a sistemas ciberfísicos, se debe medir si el modelo tomó la decisión correcta, si generó una salida estructurada válida, si el backend pudo procesarla, si se publicó correctamente por MQTT y cuánto costó en tiempo, tokens y dinero.
+```
+
+---
+
+## 25. Referencias
+
+[1] Scikit-learn. (s. f.). *Model evaluation: quantifying the quality of predictions*. Disponible en: <https://scikit-learn.org/stable/modules/model_evaluation.html>
+
+[2] Scikit-learn. (s. f.). *classification_report*. Disponible en: <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html>
+
+[3] Scikit-learn. (s. f.). *confusion_matrix*. Disponible en: <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html>
+
+[4] Scikit-learn. (s. f.). *f1_score*. Disponible en: <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>
+
+[5] Ollama. (s. f.). *Structured outputs*. Documentación oficial para solicitar salidas JSON estructuradas. Disponible en: <https://docs.ollama.com/capabilities/structured-outputs>
+
+[6] Ollama. (s. f.). *Generate API*. Documentación oficial del endpoint `/api/generate`, incluyendo uso de `stream`, `format`, `options` y métricas de respuesta. Disponible en: <https://docs.ollama.com/api/generate>
+
+[7] Ollama. (s. f.). *Usage*. Documentación oficial sobre métricas como `total_duration`, `load_duration`, `prompt_eval_count`, `eval_count` y `eval_duration`. Disponible en: <https://docs.ollama.com/api/usage>
+
+[8] OpenAI. (s. f.). *API pricing*. Disponible en: <https://developers.openai.com/api/docs/pricing>
+
+[9] FastAPI. (s. f.). *CORS (Cross-Origin Resource Sharing)*. Documentación oficial sobre comunicación entre frontend y backend en orígenes diferentes mediante `CORSMiddleware`. Disponible en: <https://fastapi.tiangolo.com/tutorial/cors/>
+
+[10] Eclipse Foundation. (s. f.). *Eclipse Paho MQTT Python Client*. Disponible en: <https://eclipse.dev/paho/files/paho.mqtt.python/html/>
+
+[11] Mecatrónica Ibero. (s. f.). *Broker MQTT*. Disponible en: <https://mecatronica.ibero.mx/mqtt/>
+
+[12] Liang, P., Bommasani, R., Lee, T., Tsipras, D., Soylu, D., Yasunaga, M., Zhang, Y., Narayanan, D., Wu, Y., Kumar, A., Newman, B., Yuan, B., Yan, B., Zhang, C., Cosgrove, C., Manning, C. D., Ré, C., Acosta-Navas, D., Hudson, D. A., ... Wu, P. (2022). *Holistic Evaluation of Language Models*. arXiv. Disponible en: <https://arxiv.org/abs/2211.09110>
+
+[13] RAGAS. (s. f.). *Metrics*. Disponible en: <https://docs.ragas.io/>
