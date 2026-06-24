@@ -518,11 +518,7 @@ Interpretación para sistemas físicos:
 
 La matriz de confusión permite identificar errores específicos que accuracy no muestra. Por ejemplo, dos modelos pueden tener el mismo accuracy, pero uno puede fallar más en `none → on`, lo cual es más riesgoso si se conectan actuadores reales.
 
-**Espacio para imagen sugerida:**
-
-```md
-![Matriz de confusión explicada](assets/img/evaluacion/matriz_confusion_teoria.png)
-```
+![Matriz de confusión explicada](assets/img/evaluacion/confusion_matrix.png)
 
 ---
 
@@ -587,12 +583,6 @@ También se deben reportar percentiles:
 | P95 | Tiempo bajo el cual cae el 95 % de pruebas |
 | P99 | Cola de latencia |
 
-**Espacio para imagen sugerida:**
-
-```md
-![Descomposición de latencia](assets/img/evaluacion/descomposicion_latencia.png)
-```
-
 ---
 
 ## 9. Métricas de tokens
@@ -619,11 +609,7 @@ input_tokens_per_s = prompt_eval_count / (prompt_eval_duration_ms / 1000)
 output_tokens_per_s = eval_count / (eval_duration_ms / 1000)
 ```
 
-**Espacio para imagen sugerida:**
-
-```md
-![Tokens latencia costo](assets/img/evaluacion/tokens_latencia_costo.png)
-```
+![Tokens latencia costo](assets/img/evaluacion/tokens_vs_latency.png)
 
 ---
 
@@ -1423,6 +1409,7 @@ from sklearn.metrics import (
     ConfusionMatrixDisplay,
 )
 
+
 CSV_INPUT = "resultados_llm_led_raw.csv"
 OUT_DIR = Path("graficas_resultados")
 OUT_DIR.mkdir(exist_ok=True)
@@ -1431,19 +1418,80 @@ LABELS = ["on", "off", "none"]
 
 
 def load_data():
-    return pd.read_csv(CSV_INPUT)
+    """
+    Carga el archivo CSV generado por eval_100.py.
+    """
+    df = pd.read_csv(CSV_INPUT)
+    return df
+
+
+def clean_boolean_columns(df):
+    """
+    Asegura que las columnas booleanas se puedan promediar correctamente.
+    Esto ayuda cuando el CSV guarda True/False como texto.
+    """
+    bool_columns = [
+        "is_correct",
+        "schema_valid",
+        "mqtt_published",
+        "architecture_success",
+    ]
+
+    for col in bool_columns:
+        if col in df.columns:
+            if df[col].dtype == "object":
+                df[col] = df[col].astype(str).str.lower().map(
+                    {
+                        "true": True,
+                        "false": False,
+                        "1": True,
+                        "0": False,
+                        "sí": True,
+                        "si": True,
+                        "no": False,
+                    }
+                )
+            df[col] = df[col].fillna(False).astype(bool)
+
+    return df
 
 
 def save_metrics_summary(df):
+    """
+    Calcula métricas globales y guarda:
+    - resumen_metricas.csv
+    - classification_report.csv
+    """
     valid = df.dropna(subset=["llm_action"]).copy()
+
+    if len(valid) == 0:
+        raise ValueError(
+            "No hay predicciones válidas en la columna 'llm_action'. "
+            "Revisa si el backend respondió correctamente."
+        )
 
     summary = {
         "n_total": len(df),
         "n_valid_predictions": len(valid),
         "accuracy": accuracy_score(valid["expected_action"], valid["llm_action"]),
-        "precision_macro": precision_score(valid["expected_action"], valid["llm_action"], average="macro", zero_division=0),
-        "recall_macro": recall_score(valid["expected_action"], valid["llm_action"], average="macro", zero_division=0),
-        "f1_macro": f1_score(valid["expected_action"], valid["llm_action"], average="macro", zero_division=0),
+        "precision_macro": precision_score(
+            valid["expected_action"],
+            valid["llm_action"],
+            average="macro",
+            zero_division=0,
+        ),
+        "recall_macro": recall_score(
+            valid["expected_action"],
+            valid["llm_action"],
+            average="macro",
+            zero_division=0,
+        ),
+        "f1_macro": f1_score(
+            valid["expected_action"],
+            valid["llm_action"],
+            average="macro",
+            zero_division=0,
+        ),
         "json_validity_rate": df["schema_valid"].mean(),
         "mqtt_publish_rate": df["mqtt_published"].mean(),
         "architecture_success_rate": df["architecture_success"].mean(),
@@ -1475,12 +1523,21 @@ def save_metrics_summary(df):
 
 
 def plot_confusion_matrix(df):
+    """
+    Genera matriz de confusión.
+    """
     valid = df.dropna(subset=["llm_action"]).copy()
-    cm = confusion_matrix(valid["expected_action"], valid["llm_action"], labels=LABELS)
+
+    cm = confusion_matrix(
+        valid["expected_action"],
+        valid["llm_action"],
+        labels=LABELS,
+    )
 
     fig, ax = plt.subplots(figsize=(7, 6))
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=LABELS)
     disp.plot(ax=ax, values_format="d", colorbar=False)
+
     ax.set_title("Matriz de confusión: intención LED")
     fig.tight_layout()
     fig.savefig(OUT_DIR / "confusion_matrix.png", dpi=180)
@@ -1488,49 +1545,99 @@ def plot_confusion_matrix(df):
 
 
 def plot_latency_by_trial(df):
+    """
+    Grafica latencia total y latencia de Ollama por iteración.
+    """
     fig, ax = plt.subplots(figsize=(11, 6))
-    ax.plot(df["trial_index"], df["api_elapsed_ms_client"], marker="o", linewidth=1.3, markersize=4, label="Latencia total cliente")
-    ax.plot(df["trial_index"], df["ollama_elapsed_ms"], marker="o", linewidth=1.3, markersize=4, label="Latencia Ollama")
+
+    ax.plot(
+        df["trial_index"],
+        df["api_elapsed_ms_client"],
+        marker="o",
+        linewidth=1.3,
+        markersize=4,
+        label="Latencia total cliente",
+    )
+
+    ax.plot(
+        df["trial_index"],
+        df["ollama_elapsed_ms"],
+        marker="o",
+        linewidth=1.3,
+        markersize=4,
+        label="Latencia Ollama",
+    )
+
     ax.set_title("Latencia por iteración")
     ax.set_xlabel("Iteración")
     ax.set_ylabel("Tiempo (ms)")
     ax.grid(True)
     ax.legend()
+
     fig.tight_layout()
     fig.savefig(OUT_DIR / "latency_by_trial.png", dpi=180)
     plt.close(fig)
 
 
 def plot_latency_boxplot(df):
+    """
+    Genera boxplot de latencias.
+
+    Nota:
+    En versiones recientes de matplotlib, el argumento correcto es
+    tick_labels. En versiones anteriores se usaba labels.
+    """
     data = [
         df["api_elapsed_ms_client"].dropna(),
         df["ollama_elapsed_ms"].dropna(),
         df["mqtt_publish_ms"].dropna(),
     ]
 
+    tick_labels = ["Total cliente", "Ollama", "MQTT"]
+
     fig, ax = plt.subplots(figsize=(9, 6))
-    ax.boxplot(data, labels=["Total cliente", "Ollama", "MQTT"], showmeans=True)
+
+    ax.boxplot(
+        data,
+        tick_labels=tick_labels,
+        showmeans=True,
+    )
+
     ax.set_title("Distribución de latencia")
     ax.set_ylabel("Tiempo (ms)")
     ax.grid(True, axis="y")
+
     fig.tight_layout()
     fig.savefig(OUT_DIR / "latency_boxplot.png", dpi=180)
     plt.close(fig)
 
 
 def plot_tokens_vs_latency(df):
+    """
+    Grafica relación entre tokens totales y latencia.
+    """
     fig, ax = plt.subplots(figsize=(9, 6))
-    ax.scatter(df["total_tokens"], df["api_elapsed_ms_client"], alpha=0.75)
+
+    ax.scatter(
+        df["total_tokens"],
+        df["api_elapsed_ms_client"],
+        alpha=0.75,
+    )
+
     ax.set_title("Tokens totales vs latencia")
     ax.set_xlabel("Tokens totales")
     ax.set_ylabel("Latencia total cliente (ms)")
     ax.grid(True)
+
     fig.tight_layout()
     fig.savefig(OUT_DIR / "tokens_vs_latency.png", dpi=180)
     plt.close(fig)
 
 
 def plot_success_rates(df):
+    """
+    Grafica tasas de éxito del experimento.
+    """
     metrics = {
         "JSON válido": df["schema_valid"].mean(),
         "MQTT publicado": df["mqtt_published"].mean(),
@@ -1540,6 +1647,7 @@ def plot_success_rates(df):
 
     fig, ax = plt.subplots(figsize=(9, 6))
     ax.bar(metrics.keys(), metrics.values())
+
     ax.set_title("Tasas de éxito del experimento")
     ax.set_ylabel("Tasa")
     ax.set_ylim(0, 1.05)
@@ -1555,7 +1663,10 @@ def plot_success_rates(df):
 
 def main():
     df = load_data()
+    df = clean_boolean_columns(df)
+
     summary = save_metrics_summary(df)
+
     plot_confusion_matrix(df)
     plot_latency_by_trial(df)
     plot_latency_boxplot(df)
@@ -1564,11 +1675,20 @@ def main():
 
     print("Resumen de métricas:")
     print(summary.to_string(index=False))
-    print(f"\nGráficas guardadas en: {OUT_DIR.resolve()}")
+
+    print("\nArchivos generados:")
+    print("- resumen_metricas.csv")
+    print("- classification_report.csv")
+    print(f"- {OUT_DIR / 'confusion_matrix.png'}")
+    print(f"- {OUT_DIR / 'latency_by_trial.png'}")
+    print(f"- {OUT_DIR / 'latency_boxplot.png'}")
+    print(f"- {OUT_DIR / 'tokens_vs_latency.png'}")
+    print(f"- {OUT_DIR / 'success_rates.png'}")
 
 
 if __name__ == "__main__":
     main()
+
 ```
 
 ---
@@ -1634,7 +1754,7 @@ graficas_resultados/success_rates.png
 
 ---
 
-## 18. Actividad: evaluación de arquitectura LLM + MQTT
+## 18. Práctica 6: evaluación de arquitectura LLM + MQTT
 
 ### 18.1 Objetivo
 
@@ -1645,8 +1765,6 @@ Evaluar una arquitectura LLM aplicada a clasificación de intención, salida JSO
 ### 18.2 Requerimientos
 
 El estudiante debe:
-
-```text
 1. Ejecutar Ollama con un modelo local.
 2. Implementar el backend FastAPI.
 3. Configurar el tópico MQTT.
@@ -1658,7 +1776,6 @@ El estudiante debe:
 9. Generar matriz de confusión.
 10. Graficar latencias, tokens y tasas de éxito.
 11. Analizar errores y proponer mejoras.
-```
 
 ---
 
@@ -1674,26 +1791,7 @@ El estudiante debe:
 
 ---
 
-## 19. Evidencias esperadas
-
-El estudiante debe entregar:
-
-```text
-1. Captura de Ollama con modelo instalado.
-2. Captura del backend ejecutándose.
-3. Captura de prueba manual del endpoint.
-4. CSV de resultados crudos.
-5. Excel de supervisión.
-6. Resumen de métricas.
-7. Matriz de confusión.
-8. Gráfica de latencia por iteración.
-9. Gráfica de tokens vs latencia.
-10. Reflexión técnica.
-```
-
----
-
-## 20. Plantilla de reporte
+### 18.4 Plantilla de reporte
 
 | Elemento | Respuesta |
 |---|---|
@@ -1714,9 +1812,8 @@ El estudiante debe entregar:
 
 ---
 
-## 21. Preguntas de análisis
+### 18.5 Preguntas de análisis
 
-```text
 1. ¿Qué clase tuvo mayor número de errores?
 2. ¿El modelo confundió instrucciones ambiguas con comandos reales?
 3. ¿Qué fue más crítico: calidad de clasificación o validez del JSON?
@@ -1727,32 +1824,14 @@ El estudiante debe entregar:
 8. ¿Qué modelo tuvo mejor relación entre calidad y latencia?
 9. ¿Qué riesgos existirían si se conectara un actuador real?
 10. ¿Qué validaciones agregarías antes de controlar hardware físico?
-```
 
 ---
 
-## 22. Rúbrica de evaluación
-
-| Criterio | Puntaje |
-|---|---:|
-| Backend funcional con Ollama y MQTT | 20 |
-| Validación correcta de JSON y acciones permitidas | 15 |
-| Ejecución de mínimo 100 pruebas | 15 |
-| Cálculo de métricas de clasificación | 15 |
-| Análisis de latencia, tokens y arquitectura | 15 |
-| Gráficas y archivos exportados | 10 |
-| Reflexión técnica y propuesta de mejora | 10 |
-| **Total** | **100** |
-
----
-
-## 23. Consideraciones para sistemas físicos
+## 19. Consideraciones para sistemas físicos
 
 En sistemas ciberfísicos, un LLM debe operar como componente de interpretación, asistencia o planificación. La ejecución física debe mantenerse bajo validaciones deterministas.
 
 Recomendaciones:
-
-```text
 - No permitir que el LLM publique directamente en MQTT.
 - Validar siempre action, confidence y campos requeridos.
 - Definir allowlist de acciones permitidas.
@@ -1761,19 +1840,14 @@ Recomendaciones:
 - Usar tópicos de prueba antes de hardware real.
 - Mantener lógica de seguridad fuera del LLM.
 - Agregar supervisión humana en pruebas críticas.
-```
 
 ---
 
-## 24. Conclusión
+## 20. Conclusión
 
 En esta clase se evaluó una arquitectura LLM aplicada a una tarea de control discreto. La evaluación integra métricas de clasificación, salida estructurada, arquitectura, latencia, tokens, costo estimado y supervisión humana.
 
-Conclusión:
-
-```text
 En una arquitectura LLM aplicada a sistemas ciberfísicos, se debe medir si el modelo tomó la decisión correcta, si generó una salida estructurada válida, si el backend pudo procesarla, si se publicó correctamente por MQTT y cuánto costó en tiempo, tokens y dinero.
-```
 
 ---
 
