@@ -29,7 +29,7 @@ En el Tema 3 se construyó un chatbot local con esta arquitectura:
 
 Ahora se agrega una nueva capa de decisión: el **proveedor de inferencia**.
 
-![arquitectura](assets/img/apis/arquitectura-proveedor.png)
+![arquitectura2](assets/img/apis/arquitectura-proveedor.png)
 
 La arquitectura sigue usando el backend como intermediario. Esto es especialmente importante porque las API keys no deben exponerse en el navegador.
 

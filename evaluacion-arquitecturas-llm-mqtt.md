@@ -28,7 +28,7 @@ En esta clase se evalúan cuatro dimensiones:
 | Arquitectura | ¿El backend validó y publicó correctamente? | MQTT publish rate, architecture success |
 | Operación | ¿Cuánto tarda, cuántos tokens usa y cuánto costaría? | Latencia, tokens, tokens/s, costo estimado |
 
-En esta práctica la medición termina cuando el backend publica correctamente el mensaje MQTT. La recepción o ejecución física del comando en un ESP32 queda fuera del experimento principal. Esta decisión permite repetir pruebas cíclicas sin depender del hardware físico.
+En esta práctica experimental la medición termina cuando el backend publica correctamente el mensaje MQTT. La recepción o ejecución física del comando en un ESP32 queda fuera del experimento principal. Esta decisión permite repetir pruebas cíclicas sin depender del hardware físico.
 
 ---
 
@@ -64,7 +64,7 @@ La clase `none` evita que el sistema active hardware cuando el usuario hace una 
 
 La arquitectura se organiza en cinco componentes:
 
-![Arquitectura LLM Backend MQTT](assets/img/evaluacion/arquitectura_led.png)
+![Arquitectura LLM Backend MQTT](assets/img/evaluacion/arquitectura-led.png)
 
 El backend funciona como capa de seguridad y validación. El LLM no publica directamente en MQTT. Primero genera una intención estructurada y el backend decide si el resultado es válido.
 
@@ -95,7 +95,7 @@ El backend debe rechazar cualquier respuesta que no cumpla el esquema esperado.
 
 ---
 
-## 5. Fundamento teórico de las métricas
+## 5. Metricas de arquitecturas con LLM
 
 ### 5.1 Clasificación de intención
 
