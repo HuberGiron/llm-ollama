@@ -560,6 +560,8 @@ Las métricas de arquitectura evalúan el flujo técnico, no la calidad semánti
 
 Esto significa que el sistema fue exitoso si el modelo generó JSON válido, el backend lo validó y el comando fue publicado por MQTT.
 
+![Tokens latencia sscosto](assets/img/evaluacion/success_rates.png)
+
 ---
 
 ## 8. Métricas de latencia
@@ -610,6 +612,8 @@ output_tokens_per_s = eval_count / (eval_duration_ms / 1000)
 ```
 
 ![Tokens latencia costo](assets/img/evaluacion/tokens_vs_latency.png)
+
+![Tokens latenciaa costo](assets/img/evaluacion/latency_by_trial.png)
 
 ---
 
@@ -681,6 +685,7 @@ llm_action vs expected_action_dataset
 Evaluación supervisada:
 llm_action vs accion_correcta_supervisor
 ```
+![Ejemplo resumen](assets/img/evaluacion/resumen.png)
 
 ---
 
