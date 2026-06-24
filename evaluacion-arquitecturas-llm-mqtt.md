@@ -182,9 +182,9 @@ Ejemplo:
 
 | Prompt | Esperado | Predicho | Correcto |
 |---|---|---|---|
-| `enciende el led` | `on` | `on` | sí |
-| `apaga el led` | `off` | `none` | no |
-| `qué es MQTT` | `none` | `none` | sí |
+| enciende el led | `on` | `on` | sí |
+| apaga el led | `off` | `none` | no |
+| qué es MQTT | `none` | `none` | sí |
 
 En este ejemplo:
 
@@ -254,10 +254,10 @@ Ejemplo:
 
 | Prompt | Esperado | Predicho | Resultado para clase `on` |
 |---|---|---|---|
-| `enciende el led` | `on` | `on` | `TP_on` |
-| `prende la luz` | `on` | `on` | `TP_on` |
-| `qué es MQTT` | `none` | `on` | `FP_on` |
-| `no enciendas el led` | `none` | `on` | `FP_on` |
+| enciende el led | `on` | `on` | `TP_on` |
+| prende la luz | `on` | `on` | `TP_on` |
+| qué es MQTT | `none` | `on` | `FP_on` |
+| no enciendas el led | `none` | `on` | `FP_on` |
 
 En este ejemplo:
 
@@ -508,7 +508,6 @@ Lectura de errores fuera de la diagonal:
 
 Interpretación para sistemas físicos:
 
-```text
 - La diagonal principal representa aciertos.
 - Los valores fuera de la diagonal representan errores.
 - Casos none predichos como on indican activaciones no deseadas.
@@ -516,7 +515,6 @@ Interpretación para sistemas físicos:
 - Casos on predichos como none indican instrucciones ignoradas.
 - Casos off predichos como none indican instrucciones de apagado ignoradas.
 - Casos on predichos como off u off predichos como on indican inversión de acción.
-```
 
 La matriz de confusión permite identificar errores específicos que accuracy no muestra. Por ejemplo, dos modelos pueden tener el mismo accuracy, pero uno puede fallar más en `none → on`, lo cual es más riesgoso si se conectan actuadores reales.
 
@@ -563,12 +561,6 @@ Las métricas de arquitectura evalúan el flujo técnico, no la calidad semánti
 | `architecture_success` | Booleano | `schema_valid AND mqtt_published` |
 | `architecture_success_rate` | Tasa | Promedio de casos exitosos |
 | `architecture_failure_rate` | Tasa | `1 - architecture_success_rate` |
-
-Definición central:
-
-```text
-architecture_success = schema_valid AND mqtt_published
-```
 
 Esto significa que el sistema fue exitoso si el modelo generó JSON válido, el backend lo validó y el comando fue publicado por MQTT.
 
